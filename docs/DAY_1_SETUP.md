@@ -36,8 +36,18 @@ The startup smoke command verifies real launcher HTTP health for both backends:
 .\.venv\Scripts\python.exe scripts\smoke_startup.py
 ```
 
-GitHub Actions run links and actual launcher results are recorded in the Jira
-handoff after execution. A committed workflow alone does not prove a passing run.
+## Verified GitHub CI
+
+Implementation commit: `297c82d50212202cc72bb55624cb3cd431e15e41`.
+Both automatic runs completed successfully on 02 October 2026:
+
+- [Push build/test run](https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/37009770220).
+- [Pull-request build/test run](https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/37009771267).
+
+Each run passed both backend jobs. The PR run uploaded `node-test-reports`,
+`python-test-reports`, `node-development-build` and `python-development-build`;
+all four artifacts were verified present. CI/CD owner: Jamula Soham Rao.
+Production deployment awaits a selected destination and environment.
 
 ## What these tests establish
 
