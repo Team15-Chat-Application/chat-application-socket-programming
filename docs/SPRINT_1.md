@@ -16,7 +16,7 @@ Existing sprint: CHAT Sprint 1, ID 102. Five support tasks were created and assi
 | --- | --- | --- |
 | [CHAT-39](https://jsohamrao.atlassian.net/browse/CHAT-39) | Unit tests with normal, boundary and error coverage | K Hrisheek |
 | [CHAT-40](https://jsohamrao.atlassian.net/browse/CHAT-40) | Integration tests and interaction/error coverage | Kalluri Yaswanth |
-| [CHAT-41](https://jsohamrao.atlassian.net/browse/CHAT-41) | Automatic build/test CI/CD | Team to select implementation owner |
+| [CHAT-41](https://jsohamrao.atlassian.net/browse/CHAT-41) | Automatic build/test CI/CD | Jamula Soham Rao, selected by the user on 02 October 2026 |
 | [CHAT-42](https://jsohamrao.atlassian.net/browse/CHAT-42) | GitHub tracking and genuine member contributions | Jamula Soham Rao coordinates; each member contributes |
 | [CHAT-43](https://jsohamrao.atlassian.net/browse/CHAT-43) | Progress demonstration and review evidence | Kalluri Yaswanth coordinates; all members demonstrate |
 
@@ -51,7 +51,7 @@ Message history/status (CHAT-22–25), presence/typing/notifications (CHAT-26–
 
 [Team15-Chat-Application/chat-application-socket-programming](https://github.com/Team15-Chat-Application/chat-application-socket-programming)
 
-Repository access was verified on 02 October 2026. The repository initially contained README.md, .gitignore and JIRA_INTEGRATION_TEST.md, with no application code, test suites or CI workflow. Sprint 1 tracking issues and a milestone are now published; implementation and pipeline evidence remain pending.
+Repository access was verified on 02 October 2026. The repository initially contained README.md, .gitignore and JIRA_INTEGRATION_TEST.md. The later setup increment adds development servers, infrastructure tests and CI; see [day-one evidence](DAY_1_SETUP.md). Sprint 1 tracking issues and a milestone are published; business-feature implementation remains pending.
 
 ## Concurrent working practice
 
@@ -62,7 +62,7 @@ Repository access was verified on 02 October 2026. The repository initially cont
 5. Update Jira/GitHub work items, setup/run/test instructions, requirement traceability and defects regularly.
 6. Retain runnable feature demonstrations, test reports, commit/PR/review links and a real passing GitHub Actions run tied to a commit SHA. Distinguish Planned, Implemented, Tested and Verified evidence.
 
-No feature implementation, passing tests or working pipeline is claimed by this tracking update. Deployment requires a defined destination/environment; none has been supplied.
+The 02 October setup increment adds development servers, infrastructure unit/integration tests and a push/PR build/test workflow. See [setup evidence](DAY_1_SETUP.md) and [development commands](DEVELOPMENT.md). Business features and their SRS acceptance tests remain planned. Deployment requires a defined destination/environment; none has been supplied.
 
 ## Source handling and responsibilities
 
@@ -73,7 +73,7 @@ The STP assigns unit test level ownership to K Hrisheek, integration testing and
 ## Outstanding inputs
 
 - Reconcile the proposed feature scope with the approved project plan.
-- CI/CD implementation owner.
+- Team review of the proposed shared interface contract.
 - Confirm Hrisheek's GitHub account/access; his work retains the named owner label.
 - Yaswanth currently has read access; contributions can use fork-based pull requests unless the team changes access separately.
 

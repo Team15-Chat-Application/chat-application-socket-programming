@@ -1,0 +1,25 @@
+{
+  "version": "0.1-proposed",
+  "status": "Team review required; only system:ping is implemented",
+  "socketAuthentication": { "token": "JWT string" },
+  "verifiedIdentity": { "userId": "JWT sub", "sessionId": "JWT jti" },
+  "acknowledgement": {
+    "success": { "ok": true, "data": "event-specific result" },
+    "failure": { "ok": false, "error": { "code": "stable error code", "message": "safe user-facing message" } }
+  },
+  "clientEvents": {
+    "system:ping": { "nonce": "1-64 characters; development diagnostic" },
+    "room:create": { "name": "room display name" },
+    "room:join": { "roomId": "server-issued room ID" },
+    "room:leave": { "roomId": "server-issued room ID" },
+    "room:list": {},
+    "message:send": { "roomId": "server-issued room ID", "content": "text, maximum 2000 characters" }
+  },
+  "serverEvents": {
+    "system:error": "failure acknowledgement shape",
+    "room:membership": { "roomId": "string", "userId": "string", "action": "join or leave", "memberCount": "integer" },
+    "room:list-updated": { "rooms": "array of {roomId,name,memberCount}" },
+    "message:received": { "messageId": "server-issued ID", "roomId": "string", "senderId": "verified user ID", "content": "sanitised text", "createdAt": "UTC ISO 8601" }
+  },
+  "errorCodes": ["AUTH_NOT_IMPLEMENTED", "UNAUTHORIZED", "FORBIDDEN", "VALIDATION_ERROR", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+}
