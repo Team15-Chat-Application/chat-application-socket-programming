@@ -1,9 +1,10 @@
-# Shared interface contract - proposed v0.1
+# Shared interface contract - proposed v0.2
 
 Prepared for team review on 02 October 2026. This is a concrete proposal, not a
 claim that teammates have approved it. `contracts/events.json` is the matching
-event reference. Only HTTP health and the guarded diagnostic `system:ping` are
-implemented today; the auth/room/message routes and events below are planned.
+event reference. Updated 04 October 2026: HTTP health, guarded `system:ping`,
+`room:create` and basic `room:list` are implemented in both backends. Authentication
+routes, room join/leave, live updates and messaging remain planned.
 
 ## Ownership and review
 
@@ -48,8 +49,17 @@ expiry and revocation on every event, not just the handshake. The primary dispat
 guard exists; the secondary diagnostic handler follows that rule. Every future
 secondary handler must retain it. Invalid sessions are rejected and disconnected.
 
-Password hashing is Soham's shared helper integrated with Hrisheek's auth module:
-bcrypt cost >=10. Login rate limiting is five attempts/minute/IP with HTTP 429
+Password hashing helpers are implemented for Hrisheek's auth module to integrate:
+`hashPassword(password, {cost})` / `verifyPassword(password, storedHash)` in Node,
+`hash_password(password, cost=...)` / `verify_password(password, stored_hash)` in
+Python. They return a hash string and boolean respectively, use random salts and
+default to cost 12 (supported operational range 10-14). Store only the returned
+hash. Invalid password inputs raise a safe VALIDATION_ERROR; malformed or
+unsupported stored hashes return false. Passwords use strict UTF-8 with a 72-byte
+maximum to avoid bcrypt truncation; they are not trimmed or normalised. The
+helper accepts nonempty strings; Hrisheek applies the SRS password-strength rules
+at the registration boundary. Neither helper logs credentials. Login rate limiting
+is five attempts/minute/IP with HTTP 429
 for excess attempts. Account lockout after five consecutive failures for 15
 minutes is a separate auth requirement and must not be confused with rate limiting.
 
@@ -73,7 +83,15 @@ Proposed count policy: distinct authenticated users per room, not socket count.
 Multiple tabs keep one user present until their last socket leaves. Team review
 must confirm this policy and room-name uniqueness/length/empty-room lifetime.
 Those policies are not specified in the supplied requirements and are not
-implemented by this setup.
+approved by the team yet. The current create-only increment uses an in-memory
+catalogue isolated per backend process. Names trim ASCII edge whitespace, then
+must contain 1-64 Unicode code points without controls or unpaired surrogates.
+Names are plain text; the UI must render them as text. Duplicate display names
+are allowed and always get distinct server UUIDs. These are implementation
+defaults for review, not additional SRS requirements. Creation does not join the
+creator: `memberCount` is zero until joining is implemented. The catalogue retains
+empty rooms until process restart. `room:list` queries this catalogue, not the
+Socket.IO internal socket channels. Live list broadcasts remain CHAT-21 work.
 
 ## Messaging handoff
 

@@ -1,6 +1,6 @@
 # Sprint 1 - Software Engineering Mini Project
 
-Recorded: 02 October 2026 (Asia/Calcutta)
+Recorded: 02 October 2026; development progress updated 04 October 2026 (Asia/Calcutta)
 
 ## Sprint direction
 
@@ -23,7 +23,7 @@ Existing sprint: CHAT Sprint 1, ID 102. Five support tasks were created and assi
 
 ## Proposed feature selection
 
-The user was unsure of feature scope. This allocation is a proposed practical core-chat increment and does not establish approval of a sprint plan. Feature tickets retain their original requirements and recorded owner labels; real Jira assignees were set to the matching team accounts. All selected tickets remain To Do, with a 20 October due date.
+The user was unsure of feature scope. This allocation is a proposed practical core-chat increment and does not establish approval of a sprint plan. Feature tickets retain their original requirements and recorded owner labels; real Jira assignees were set to the matching team accounts. Selected tickets have a 20 October due date. CHAT-18 and CHAT-34 now have implementation and test evidence for review; see [04 October handoff](OCT_04_PROGRESS.md). Their final acceptance awaits real authentication integration and review.
 
 | Jira item | Requirement/feature | Recorded owner |
 | --- | --- | --- |
@@ -51,7 +51,7 @@ Message history/status (CHAT-22–25), presence/typing/notifications (CHAT-26–
 
 [Team15-Chat-Application/chat-application-socket-programming](https://github.com/Team15-Chat-Application/chat-application-socket-programming)
 
-Repository access was verified on 02 October 2026. The repository initially contained README.md, .gitignore and JIRA_INTEGRATION_TEST.md. The later setup increment adds development servers, infrastructure tests and CI; see [day-one evidence](DAY_1_SETUP.md). Sprint 1 tracking issues and a milestone are published; business-feature implementation remains pending.
+Repository access was verified on 02 October 2026. The repository initially contained README.md, .gitignore and JIRA_INTEGRATION_TEST.md. The setup increment adds development servers, infrastructure tests and CI; see [day-one evidence](DAY_1_SETUP.md). Sprint 1 tracking issues and a milestone are published. The 04 October increment adds room creation, catalogue queries and bcrypt helpers; remaining features and real auth integration are pending.
 
 ## Concurrent working practice
 
@@ -62,7 +62,7 @@ Repository access was verified on 02 October 2026. The repository initially cont
 5. Update Jira/GitHub work items, setup/run/test instructions, requirement traceability and defects regularly.
 6. Retain runnable feature demonstrations, test reports, commit/PR/review links and a real passing GitHub Actions run tied to a commit SHA. Distinguish Planned, Implemented, Tested and Verified evidence.
 
-The 02 October setup increment adds development servers, infrastructure unit/integration tests and a push/PR build/test workflow. See [setup evidence](DAY_1_SETUP.md) and [development commands](DEVELOPMENT.md). Business features and their SRS acceptance tests remain planned. Deployment requires a defined destination/environment; none has been supplied.
+The 02 October setup increment adds development servers, infrastructure unit/integration tests and a push/PR build/test workflow. See [setup evidence](DAY_1_SETUP.md), [04 October implementation](OCT_04_PROGRESS.md) and [development commands](DEVELOPMENT.md). Room creation and bcrypt helpers are implemented and tested with explicit auth fixtures; whole-application SRS acceptance and remaining features are pending. Deployment requires a defined destination/environment; none has been supplied.
 
 ## Source handling and responsibilities
 

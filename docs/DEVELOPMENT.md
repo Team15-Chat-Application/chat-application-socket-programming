@@ -1,8 +1,9 @@
 # Development setup
 
-This increment supplies the development environment, startup/transport tests and CI.
-Authentication, registration, rooms, messaging, persistence and the browser chat UI
-remain feature work. Both launchers reject socket authentication by default.
+The project supplies development servers, room creation/catalogue queries, bcrypt
+helpers, unit/integration tests and CI. Login/registration integration, room
+joining/leaving, live updates, messaging, persistence and the browser UI remain
+feature work. Both launchers reject socket authentication by default.
 
 ## Runtime decision
 
@@ -85,17 +86,25 @@ PYTHONPATH=python_backend .venv/bin/python -m chat_backend
 | --- | --- |
 | `src/app.js` | Primary HTTP/Socket.IO factory and safe dispatch boundary |
 | `src/config.js` | Validated local host/port configuration |
+| `src/rooms.js` | Named-room store and guarded Socket.IO create/list handlers |
+| `src/passwords.js` | Asynchronous bcrypt hash/verify helpers |
 | `python_backend/chat_backend` | Secondary Flask-SocketIO factory and launcher |
 | `contracts/events.json` | Proposed shared event names and envelopes |
 | `docs/INTERFACE_CONTRACT.md` | Authentication, room and messaging handoffs |
 | `tests/unit`, `tests/integration` | Jest unit and real-transport integration tests |
-| `python_backend/tests` | Pytest unit and Flask-SocketIO in-process integration tests |
+| `python_backend/tests` | Pytest unit, Flask-SocketIO in-process and Node/Python bcrypt interoperability tests |
 
 Hrisheek supplies the authentication adapter; Soham supplies room handlers and
 coordinates shared security helpers; Yaswanth supplies messaging handlers.
 These follow the existing Jira allocation, which remains proposed until team
 review. The factory's injected test auth adapter is an isolated fixture and does
 not implement JWT validation or satisfy CHAT-SR-003.
+
+The Python integration suite now requires Node and installed npm dependencies
+because it verifies hashes across both runtimes. The Python CI job explicitly
+installs Node 24 and runs `npm ci`. Pytest importlib mode allows unit/integration
+files to share basenames without collection collisions. For targeted room/hash
+checks and auth-owner integration signatures, see [04 October handoff](OCT_04_PROGRESS.md).
 
 ## CI ownership and delivery
 
