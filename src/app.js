@@ -1,13 +1,14 @@
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 const { AppError, failure } = require('./errors');
+const { RoomStore, registerRoomHandlers } = require('./rooms');
 
 const unavailableAuth = {
   async authenticate() { throw new AppError('AUTH_NOT_IMPLEMENTED', 'Authentication module is not connected yet'); },
   async validate() { return false; }
 };
 
-function createApplication({ auth = unavailableAuth, registerHandlers = () => {} } = {}) {
+function createApplication({ auth = unavailableAuth, registerHandlers = () => {}, rooms = new RoomStore() } = {}) {
   const httpServer = createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-store');
@@ -58,6 +59,7 @@ function createApplication({ auth = unavailableAuth, registerHandlers = () => {}
       }
       acknowledge({ ok: true, data: { nonce: payload.nonce } });
     });
+    registerRoomHandlers(socket, rooms);
     registerHandlers(io, socket);
   });
   return {
