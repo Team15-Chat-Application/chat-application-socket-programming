@@ -1,16 +1,16 @@
 # Sprint 1 - Software Engineering Mini Project
 
-Recorded: 02 October 2026; development progress updated 04 October 2026 (Asia/Calcutta)
+Recorded: 02 October 2026; implementation evidence updated 04 October; Part 2 calendar/tracking updated 11 October 2026 (Asia/Calcutta).
 
 ## Sprint direction
 
-Sprint 1 has started according to the course instruction supplied by the user. Development, testing, version control and CI/CD must progress together. Follow the approved requirements and project plan, implement the features allocated to Sprint 1, develop unit and integration tests alongside each feature, and demonstrate real evidence at the scheduled review.
+The Part 2 document adopted by the user on 11 October supersedes the earlier October 20 planning target. Official Sprint 1 is 19-23 October, with optional practice October 12-16 and official Sprint 2 October 26-30. Earlier work is preparatory history. Development, testing, version control and CI/CD must progress together; demonstrate an integrated working product and upload a one-minute Sprint 1 outcome video. See [the full Part 2 plan](PART_2_PLAN.md).
 
 ## Current verified Jira state
 
 Jira project: [Chat Application (CHAT)](https://jsohamrao.atlassian.net/jira/software/projects/CHAT/boards/35)
 
-Existing sprint: CHAT Sprint 1, ID 102. Five support tasks were created and assigned to this sprint. Its goal now records the proposed core-chat scope plus development, testing, CI/CD and review requirements. Jira's lifecycle is active from 02 October 2026. The user supplied 20 October 2026 as the end/review target; the Jira end time is 18:00 Asia/Calcutta (an administrative default). Sixteen existing feature/security tickets were moved into this sprint, assigned to their recorded owners and labelled proposed-sprint-1. Their requirements were preserved.
+Official Sprint 1 is now CHAT Sprint 1 - Part 2, ID 135, future, October 19-23. Its 21 items retain the proposed 16-feature/security increment plus five support tasks, with owners and proposed story-point estimates. Sprint 2 ID 136 is future, October 26-30, and holds the remaining requirements and final deliverables. The earlier active sprint ID 102 was renamed CHAT Preparation / Dry Run; its actual October 2 start was preserved and its end is October 16. The original October 20 target is historical. Jira uses 09:00/18:00 IST administrative delivery-sprint hours; the PDF specifies dates only.
 
 | Jira item | Activity | Owner |
 | --- | --- | --- |
@@ -23,7 +23,7 @@ Existing sprint: CHAT Sprint 1, ID 102. Five support tasks were created and assi
 
 ## Proposed feature selection
 
-The user was unsure of feature scope. This allocation is a proposed practical core-chat increment and does not establish approval of a sprint plan. Feature tickets retain their original requirements and recorded owner labels; real Jira assignees were set to the matching team accounts. Selected tickets have a 20 October due date. CHAT-18 and CHAT-34 now have implementation and test evidence for review; see [04 October handoff](OCT_04_PROGRESS.md). Their final acceptance awaits real authentication integration and review.
+The user was unsure of feature scope. This allocation remains a proposed practical core-chat increment, not an approved capacity commitment. Feature tickets retain their requirements, real assignees and source role labels, with October 23 due dates and proposed point estimates. CHAT-18 and CHAT-34 retain implementation/test evidence and In Review status; see [04 October handoff](OCT_04_PROGRESS.md). Final acceptance awaits real authentication integration and review.
 
 | Jira item | Requirement/feature | Recorded owner |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ The user was unsure of feature scope. This allocation is a proposed practical co
 | [CHAT-36](https://jsohamrao.atlassian.net/browse/CHAT-36) | CHAT-SR-004 - Login Rate Limiting | Jamula Soham Rao |
 | [CHAT-37](https://jsohamrao.atlassian.net/browse/CHAT-37) | CHAT-SR-005 - Server-Side Input Sanitisation | Jamula Soham Rao |
 
-Message history/status (CHAT-22–25), presence/typing/notifications (CHAT-26–28), full NFR tasks and production TLS tasks remain in the backlog. Their exclusion from this proposed sprint does not remove project requirements. Scope must be reconciled with the approved plan before implementation commitments are treated as approved.
+Message history/status (CHAT-22–25), presence/typing/notifications (CHAT-26–28), full NFR tasks and production TLS tasks are now allocated to proposed Sprint 2 (October 26-30). They remain project requirements. Reconcile scope and estimates with the team before treating them as approved commitments.
 
 
 ## GitHub publication target
@@ -74,7 +74,7 @@ The STP assigns unit test level ownership to K Hrisheek, integration testing and
 
 - Reconcile the proposed feature scope with the approved project plan.
 - Team review of the proposed shared interface contract.
-- Confirm Hrisheek's GitHub account/access; his work retains the named owner label.
+- Hrisheek's GitHub account is now confirmed as hrisheekkaraturi with read access; his issues are assigned to that account. Fork-based PRs preserve his own authorship.
 - Yaswanth currently has read access; contributions can use fork-based pull requests unless the team changes access separately.
 
 ## Source documents

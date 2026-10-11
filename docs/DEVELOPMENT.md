@@ -122,6 +122,7 @@ destination has been chosen. Production deployment is a later explicit decision.
 Create a branch containing the actual Jira key, commit code and its relevant
 tests, open a PR, and link it in Jira. Use your own identity. Review the contract
 before implementing event handlers and document any change to payloads.
-Yaswanth currently has repository read access and can use a fork PR; Hrisheek's
-GitHub account/access still needs confirmation. Access changes are not part of
-this setup increment.
+Yaswanth (kalluri088) and Hrisheek (hrisheekkaraturi) currently have repository
+read access and can use fork PRs under their own identities. Part 2 requires
+the assigned member to raise the PR and repository owners to review and merge.
+See [the current Part 2 calendar and backlog](PART_2_PLAN.md).
