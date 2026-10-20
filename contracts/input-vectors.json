@@ -1,0 +1,14 @@
+[
+  {"input":"hello","output":"hello"},
+  {"input":"<b>Hello</b> <script>alert(1)</script>","output":"Hello "},
+  {"input":"<img src=x onerror=alert(1)>ok","output":"ok"},
+  {"input":"<svg onload=alert(1)>BAD</svg>safe","output":"safe"},
+  {"input":"<math><mtext>BAD</mtext></math>safe","output":"safe"},
+  {"input":"Tom & Jerry","output":"Tom &amp; Jerry"},
+  {"input":"&lt;script&gt;hello&lt;/script&gt;","output":"&lt;script&gt;hello&lt;/script&gt;"},
+  {"input":"<style>x</style>ok","output":"ok"},
+  {"input":"<iframe>bad</iframe>ok","output":"ok"},
+  {"input":"a<!-- invisible -->b","output":"ab"},
+  {"input":"<a href='javascript:alert(1)'>link</a>","output":"link"},
+  {"input":"line 1\nline 2\tend","output":"line 1\nline 2\tend"}
+]

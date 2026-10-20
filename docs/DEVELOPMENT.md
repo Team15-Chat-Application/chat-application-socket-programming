@@ -1,9 +1,11 @@
 # Development setup
 
-The project supplies development servers, room creation/catalogue queries, bcrypt
-helpers, unit/integration tests and CI. Login/registration integration, room
-joining/leaving, live updates, messaging, persistence and the browser UI remain
-feature work. Both launchers reject socket authentication by default.
+The project supplies development servers, room creation/join/leave, live
+membership/catalogue updates, bcrypt helpers, unit/integration tests and CI.
+JWT verification, login limiting and sanitisation helpers are prepared for
+security verification and owner integration. Login/registration, session storage,
+messaging, persistence and the browser UI remain feature work. Both launchers
+reject socket authentication by default.
 
 ## Runtime decision
 
@@ -87,6 +89,9 @@ PYTHONPATH=python_backend .venv/bin/python -m chat_backend
 | `src/app.js` | Primary HTTP/Socket.IO factory and safe dispatch boundary |
 | `src/config.js` | Validated local host/port configuration |
 | `src/rooms.js` | Named-room store and guarded Socket.IO create/list handlers |
+| `src/jwt-auth.js` | Prepared HS256 verification adapter with fresh session lookup |
+| `src/login-limit.js` | Sliding five-per-minute peer-IP login limit |
+| `src/input.js` | Shared username/message/room text validation and sanitisation |
 | `src/passwords.js` | Asynchronous bcrypt hash/verify helpers |
 | `python_backend/chat_backend` | Secondary Flask-SocketIO factory and launcher |
 | `contracts/events.json` | Proposed shared event names and envelopes |
@@ -97,8 +102,14 @@ PYTHONPATH=python_backend .venv/bin/python -m chat_backend
 Hrisheek supplies the authentication adapter; Soham supplies room handlers and
 coordinates shared security helpers; Yaswanth supplies messaging handlers.
 These follow the existing Jira allocation, which remains proposed until team
-review. The factory's injected test auth adapter is an isolated fixture and does
-not implement JWT validation or satisfy CHAT-SR-003.
+review. Legacy injected auth fixtures remain isolated transport fixtures. New
+membership tests use the actual JWT verifier with signed test tokens and an
+in-memory test session lookup; they do not implement registration/login or a
+production session store. See SOHAM_INTEGRATION_HANDOFF.md for factory signatures.
+
+Jest scripts enable Node's VM module support because the locked sanitizer uses
+an ESM parser. This affects the test runner only; the Node 24 application uses
+native module loading. Keep the locked dependency versions when reproducing CI.
 
 The Python integration suite now requires Node and installed npm dependencies
 because it verifies hashes across both runtimes. The Python CI job explicitly

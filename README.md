@@ -7,6 +7,7 @@ The adopted Part 2 calendar sets backlog/estimates due **12 October**, optional 
 
 - [Sprint 1 plan, responsibilities and review evidence](docs/SPRINT_1.md)
 - [Part 2 plan, full backlog, points and deliverables](docs/PART_2_PLAN.md)
+- [20-23 October daily execution and verified progress](docs/SPRINT_1_DAILY_EXECUTION.md)
 - [Linked GitHub Project](https://github.com/orgs/Team15-Chat-Application/projects/1)
 - [Sprint 2 milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/3)
 - [Working-product video checklist](docs/SPRINT_VIDEO_CHECKLIST.md)
@@ -18,10 +19,11 @@ Development, unit/integration testing, Git/GitHub tracking and automatic build/t
 
 ## Run locally
 
-The project includes Node/Socket.IO and Flask-SocketIO backends, named-room creation and catalogue queries, shared bcrypt helpers, unit/integration tests and push/PR CI. Login/JWT integration, room joining/leaving, live room updates, messaging, persistence and the chat UI remain planned. Socket authentication is denied until the real authentication module is supplied.
+The project includes Node/Socket.IO and Flask-SocketIO backends, room creation/join/leave, distinct-user membership counts, room notices, authenticated live catalogue updates, shared bcrypt helpers, unit/integration tests and push/PR CI. A JWT-verification adapter, login-rate middleware and input-sanitisation helpers are prepared for security verification and owner integration. Registration/login, session persistence, business messaging, history and the chat UI remain pending. The default launchers deny socket authentication until a real authentication adapter is supplied.
 
 - [Complete setup and PowerShell commands](docs/DEVELOPMENT.md)
 - [Shared interface proposal for team review](docs/INTERFACE_CONTRACT.md)
+- [Authentication and messaging integration handoff](docs/SOHAM_INTEGRATION_HANDOFF.md)
 - [02 October setup evidence](docs/DAY_1_SETUP.md)
 - [04 October room creation and bcrypt handoff](docs/OCT_04_PROGRESS.md)
 
