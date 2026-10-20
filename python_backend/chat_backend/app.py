@@ -3,6 +3,8 @@ from flask_socketio import SocketIO, disconnect, emit, join_room, leave_room
 from functools import wraps
 from threading import RLock
 from .rooms import RoomError, RoomStore, CATALOGUE_CHANNEL, room_channel
+from .input import InputError
+from .messages import MessageError, MessageService
 from .login_limit import LoginLimiter
 
 
@@ -18,10 +20,12 @@ class UnavailableAuth:
         return False
 
 
-def create_application(auth=None, rooms=None, login_limiter=None, login_handler=None):
+def create_application(auth=None, rooms=None, login_limiter=None, login_handler=None, messages=None):
     auth = auth if auth is not None else UnavailableAuth()
     rooms = rooms if rooms is not None else RoomStore()
     login_limiter = login_limiter if login_limiter is not None else LoginLimiter()
+    # Messaging gates on the same membership record the room handlers write.
+    messages = messages if messages is not None else MessageService(rooms)
     app = Flask(__name__)
     socketio = SocketIO(app, async_mode='threading')
     identities = {}
@@ -179,6 +183,21 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
             return failure('VALIDATION_ERROR', 'payload must be an object')
         try:
             return {'ok': True, 'data': {'rooms': rooms.list()}}
+        except Exception:
+            return failure('INTERNAL_ERROR', 'An internal error occurred')
+
+    @socketio.on('message:send')
+    @require_session
+    def send_message(payload=None):
+        try:
+            with room_events:
+                message = messages.send(identities[request.sid]['identity'], request.sid, payload)
+                socketio.emit('message:received', message, to=room_channel(message['roomId']))
+            # The sender's acknowledgement is returned only after the broadcast is
+            # dispatched (CHAT-F-006). Per-recipient delivery confirmation is CHAT-24/25.
+            return {'ok': True, 'data': message}
+        except (RoomError, InputError, MessageError) as error:
+            return failure(error.code, str(error))
         except Exception:
             return failure('INTERNAL_ERROR', 'An internal error occurred')
 
