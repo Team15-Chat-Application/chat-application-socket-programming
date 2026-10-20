@@ -15,6 +15,20 @@ This log records actual decisions and open gaps, not an approved waiver or sign-
 | SAD 4.3 proposes distinct-user room membership | Implement first/final-socket membership changes, idempotent joins/leaves and server-only chat:room: transport channels | Prevent inflated counts from tabs and prevent raw socket IDs from becoming public chat rooms | membership unit/integration tests; room store and handlers | Component-tested; team/QA review pending |
 | SRS CHAT-SR-004 requires five attempts/minute/IP | Sliding window before supplied login handler; bounded process-local store; ignore forwarded headers | Enforce the stated limit without trusting spoofed headers; multi-process deployment needs a shared limiter and explicit proxy policy | login-limit modules; actual HTTP middleware tests | Production topology and real login integration pending |
 | SRS CHAT-SR-005; SAD 4.3 leaves sanitisation/Unicode policy open | Prepared no-HTML message sanitizer; 2000 raw Unicode code points; reject unsafe controls/surrogates; usernames use a proposed 1-32 ASCII identifier policy | Shared safe input boundary; no silent credential renaming; escaped output display must be reviewed | input modules; contracts/input-vectors.json; security foundation tests | Team policy review and auth/message call-site integration pending |
+| SRS CHAT-F-005/006 (CHAT-14/CHAT-15) real-time delivery and acknowledgement | `message:send` resolves the room, then this socket's membership, then the shared content helper; broadcasts `message:received` to `chat:room:<roomId>` and returns the sender's acknowledgement only after the broadcast has been dispatched. The acknowledgement is not per-recipient delivered/read confirmation (CHAT-24/25) and this increment adds no history or persistence | One shared membership store gates sending, identity stays server-issued, and the acknowledgement claim is limited to what the tests actually show | `src/messages.js`, `python_backend/chat_backend/messages.py`; messaging unit and integration tests (Node 124 unit + 37 integration, Python 122 unit + 39 integration, run 20 October 2026) | Component and fixture-token transport tested; production login/issuance, UI and team/QA review pending |
+
+## Local toolchain deviations on the development machine (20 October 2026)
+
+These are environment facts rather than product decisions: they change how the documented
+commands are run, not what is tested.
+
+- mise resolves Node 26.7.0 globally, while this repository requires `>=24 <25`. Every Node
+  command needs the `mise exec node@24 --` prefix (verified: v24.22.0). CI still pins Node 24.
+- `python_backend/.venv` is created by `uv` and contains no `pip`, so the documented
+  `.venv/bin/python -m pip install ...` cannot run. Use
+  `uv pip install --python .venv/bin/python -r python_backend/requirements-dev.lock.txt`
+  and invoke the venv interpreter explicitly (verified: Python 3.12.14; the system `python3`
+  is 3.14.7 and must not be used).
 
 ## Acceptance gaps, not accepted deviations
 
