@@ -88,5 +88,18 @@ monthly availability and final development freeze cannot be pre-certified now.
 ## Publication checkpoint
 
 Branch: `CHAT-19-rooms-security`, based on the planning branch
-`CHAT-44-part-2-planning`. New PR and exact-commit CI evidence will be added
-after publication. Nothing in this checkpoint closes a pending acceptance item.
+`CHAT-44-part-2-planning`. Published [draft PR #44](https://github.com/Team15-Chat-Application/chat-application-socket-programming/pull/44)
+under Soham's authorized GitHub identity. The implementation commit is
+`b3275a5395ad5f59666ebe31db2800a2068e8c75`.
+
+Both [PR CI](https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/39399571122)
+and [push CI](https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/39399563724)
+passed for that exact implementation commit. PR CI logs report Node 95 unit +
+19 integration tests and Python 95 unit + 22 integration tests: **231 passed**.
+Build/check jobs passed. Later checkpoint-only commits still require their own
+checks before being described as passing.
+
+Jira and GitHub Project API read-back now show CHAT-9 and CHAT-19/20/21 In Review,
+CHAT-35/36/37 In Progress, and CHAT-44 still In Review. No items were marked Done;
+no PR was merged and no human approval was inferred. The preparation sprint was
+left intact. On the next run, check PR #44's newest commit and reuse this branch.
