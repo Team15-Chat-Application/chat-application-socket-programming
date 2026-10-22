@@ -1,8 +1,14 @@
 from time import time
+from unicodedata import category
 import jwt
 
 ISSUER = 'team15-chat'
 AUDIENCE = 'chat-application'
+MAX_SAFE_INTEGER = 9007199254740991
+
+
+def valid_number(value):
+    return type(value) is int and abs(value) <= MAX_SAFE_INTEGER
 
 
 class AuthError(Exception):
@@ -23,14 +29,15 @@ class JwtAuth:
                 raise ValueError()
             claims = jwt.decode(token, self._secret, algorithms=['HS256'], issuer=ISSUER, audience=AUDIENCE,
                                 options={'require': ['sub', 'jti', 'iat', 'exp', 'iss', 'aud']})
-            if not all(isinstance(claims[k], str) and 1 <= len(claims[k]) <= 128 for k in ('sub', 'jti')) or not all(
-                type(claims[k]) is int and abs(claims[k]) <= 9007199254740991 for k in ('iat', 'exp')
-            ) or claims['exp'] <= claims['iat'] or ('nbf' in claims and type(claims['nbf']) is not int):
+            if not all(isinstance(claims[k], str) and 1 <= len(claims[k]) <= 128 and
+                       not any(category(c) == 'Cs' for c in claims[k]) for k in ('sub', 'jti')) or not all(
+                valid_number(claims[k]) for k in ('iat', 'exp')
+            ) or claims['exp'] <= claims['iat'] or ('nbf' in claims and not valid_number(claims['nbf'])):
                 raise ValueError()
             session = self._find_session(claims['jti'])
             if not isinstance(session, dict) or session.get('sessionId') != claims['jti'] or session.get('userId') != claims['sub'] or (
                 'revokedAt' not in session or session['revokedAt'] is not None or
-                type(session.get('expiresAt')) is not int or session['expiresAt'] <= int(time())
+                not valid_number(session.get('expiresAt')) or session['expiresAt'] <= int(time())
             ):
                 raise ValueError()
             if claims['exp'] <= int(time()):

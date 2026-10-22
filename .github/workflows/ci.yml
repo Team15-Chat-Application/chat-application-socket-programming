@@ -64,12 +64,18 @@ jobs:
       - name: Integration tests
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: python -m pytest python_backend/tests/integration --junitxml=reports/python-integration.xml
+      - name: Build Node launcher for cross-backend smoke checks
+        run: npm run build
+      - name: Real launcher health and fail-closed smoke checks
+        run: python scripts/smoke_startup.py --report reports/launcher-smoke.json
       - name: Upload available test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: python-test-reports
-          path: reports/*.xml
+          path: |
+            reports/*.xml
+            reports/launcher-smoke.json
           if-no-files-found: warn
       - name: Upload secondary backend
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

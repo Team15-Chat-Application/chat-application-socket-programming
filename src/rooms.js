@@ -106,6 +106,16 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   socket.emit('room:list-updated', { rooms: rooms.list() });
   // Serialise membership operations for one socket, including rapid duplicate requests.
   let pending = Promise.resolve();
+  async function ensureLiveSession() {
+    let valid = false;
+    try { valid = await validateSession() === true; } catch { /* fail closed */ }
+    if (!socket.connected) return false;
+    if (!valid) {
+      socket.emit('system:error', failure(new AppError('UNAUTHORIZED', 'Session is no longer valid')));
+      socket.disconnect(true);
+    }
+    return valid;
+  }
   function handle(event, operation) {
     socket.on(event, (payload, acknowledge) => {
       const respond = typeof acknowledge === 'function' ? acknowledge : () => {};
@@ -113,15 +123,9 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
         if (!socket.connected) return;
         try {
           // Queued work must not reuse a validation performed before it waited.
-          let valid = false;
-          try { valid = await validateSession() === true; } catch { /* fail closed */ }
-          if (!valid) {
-            socket.emit('system:error', failure(new AppError('UNAUTHORIZED', 'Session is no longer valid')));
-            socket.disconnect(true);
-            return;
-          }
-          if (!socket.connected) return;
-          respond({ ok: true, data: await operation(payload) });
+          if (!await ensureLiveSession()) return;
+          const data = await operation(payload);
+          if (socket.connected) respond({ ok: true, data });
         }
         catch (error) { respond(failure(error)); }
       });
@@ -141,7 +145,7 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   handle('room:join', async payload => {
     const room = rooms.get(payload);
     await socket.join(roomChannel(room.roomId));
-    if (!socket.connected) return;
+    if (!await ensureLiveSession()) return;
     const result = rooms.join(socket.data.identity, socket.id, payload);
     if (result.changed) {
       membership({ roomId: room.roomId, userId: socket.data.identity.userId, action: 'join', memberCount: result.room.memberCount });
@@ -152,6 +156,7 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   handle('room:leave', async payload => {
     const room = rooms.get(payload);
     await socket.leave(roomChannel(room.roomId));
+    if (!await ensureLiveSession()) return;
     const result = rooms.leave(socket.data.identity, socket.id, payload);
     if (result.changed) {
       membership({ roomId: room.roomId, userId: socket.data.identity.userId, action: 'leave', memberCount: result.room.memberCount });

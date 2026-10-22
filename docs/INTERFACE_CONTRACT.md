@@ -5,7 +5,8 @@ claim that teammates have approved it. `contracts/events.json` is the matching
 event reference. Updated 20 October 2026: HTTP health, guarded `system:ping`,
 room creation/join/leave/list, membership notifications and live catalogue updates
 are implemented in both backends. A JWT verification adapter, login limiter and
-sanitisation helpers are prepared. Registration/login, session storage, messaging
+sanitisation helpers are component-verified as of 22 October (356 regression tests
+across both backends). Registration/login, session storage, messaging
 and UI integration remain pending. See SOHAM_INTEGRATION_HANDOFF.md.
 
 ## Ownership and review
@@ -39,7 +40,12 @@ The prepared verifier proposes HS256 only, issuer `team15-chat`, audience
 `chat-application`, a configured secret of at least 32 UTF-8 bytes, and required
 `sub`, `jti`, `iat`, `exp`, `iss`, `aud` claims. Hrisheek must review this proposal
 and supply real token issuance and session storage. The verifier has no default
-secret and does not implement login or issue production tokens.
+secret and does not implement login or issue production tokens. Identity claims
+contain 1-128 Unicode code points without unpaired surrogates. Time claims and
+session expiresAt use integer Unix seconds within +/-9007199254740991. After a
+potentially asynchronous lookup, token and session expiry are checked again.
+Room join/leave revalidate after awaited transport operations before membership
+mutation. These boundary clarifications retain the proposed v0.3 event format.
 
 Primary server adapter:
 
