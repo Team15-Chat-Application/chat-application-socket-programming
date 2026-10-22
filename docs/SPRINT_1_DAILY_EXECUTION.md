@@ -158,3 +158,27 @@ next integration run must inspect new owner modules before proceeding; current
 missing dependencies are unchanged. This publication checkpoint follows the
 implementation commit; inspect its own head checks before claiming current-head
 CI success.
+
+## Board correction on 22 October
+
+The empty board was caused by the saved `assignee = empty` (Unassigned) filter;
+all sprint issues have assignees. Cleared the filter and verified the populated
+board after refresh. Preparation sprint 102 had also been left active while
+official Sprint 1 was future. Closed preparation administratively at
+`2026-10-22T06:52:59.217Z` (12:22:59 IST), keeping its original 2 October start,
+16 October planned end and historical evidence. Its three unfinished issues
+were moved to the backlog: CHAT-9 and CHAT-44 remain In Review; optional CHAT-45
+remains To Do with Yaswanth. No issue was marked Done or deleted.
+
+Activated existing Sprint 1 (135) at its actual administrative start,
+`2026-10-22T06:53:39.345Z` (12:23:39 IST), retaining the planned end of
+23 October at 18:00 IST and all 21 allocated issues. The adopted course window
+remains 19-23 October; Jira's activation was late and was not backdated. Read-back
+confirms preparation closed, Sprint 1 active and Sprint 2 (136) still future on
+26-30 October. Sprint 1 statuses remain 11 To Do, 2 In Progress, 8 In Review,
+0 Done. Preparation issues are not assigned to an open sprint.
+
+PR #44 was separately made ready for review and assigned to Yaswanth
+(`kalluri088`) with his review requested on the user's instruction. This is not
+human approval or completion of the missing product integrations. Use the current
+states above instead of earlier historical future/draft/active-preparation notes.
