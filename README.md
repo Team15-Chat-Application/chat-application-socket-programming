@@ -19,7 +19,7 @@ Development, unit/integration testing, Git/GitHub tracking and automatic build/t
 
 ## Run locally
 
-The project includes Node/Socket.IO and Flask-SocketIO backends, room creation/join/leave, distinct-user membership counts, room notices, authenticated live catalogue updates, shared bcrypt helpers, unit/integration tests and push/PR CI. A JWT-verification adapter, login-rate middleware and input-sanitisation helpers are prepared for security verification and owner integration. Registration/login, session persistence, business messaging, history and the chat UI remain pending. The default launchers deny socket authentication until a real authentication adapter is supplied.
+The project includes Node/Socket.IO and Flask-SocketIO backends, room creation/join/leave, distinct-user membership counts, room notices, authenticated live catalogue updates, shared bcrypt helpers, unit/integration tests and push/PR CI. A JWT-verification adapter, login-rate middleware and input-sanitisation helpers passed component security checks on 22 October: 174 Node and 182 Python tests passed. Owner integration remains pending for registration/login, session persistence, business messaging, history and the chat UI. The default launchers deny socket authentication until a real authentication adapter is supplied.
 
 - [Complete setup and PowerShell commands](docs/DEVELOPMENT.md)
 - [Shared interface proposal for team review](docs/INTERFACE_CONTRACT.md)

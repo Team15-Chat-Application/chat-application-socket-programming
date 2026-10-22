@@ -11,8 +11,8 @@ class LoginLimiter:
         self._lock = RLock()
 
     def consume(self, ip):
-        now = self.clock()
         with self._lock:
+            now = self.clock()
             if not isinstance(ip, str) or not 1 <= len(ip) <= 128:
                 return {'allowed': False, 'retryAfter': 60}
             if ip not in self._attempts and len(self._attempts) >= self.max_keys:

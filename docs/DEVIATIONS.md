@@ -1,7 +1,7 @@
 # Deviation and implementation-decision log
 
 Part 2 requires following the submitted SRS, SAD and Test Plan, documenting
-departures and explaining them during the final demo. Updated 20 October 2026.
+departures and explaining them during the final demo. Updated 22 October 2026.
 This log records actual decisions and open gaps, not an approved waiver or sign-off.
 
 ## Recorded decisions for review
@@ -28,6 +28,17 @@ This log records actual decisions and open gaps, not an approved waiver or sign-
 - Node integration uses actual HTTP/Socket.IO transport; Python integration uses
   the in-process client plus real Node subprocesses for bcrypt interoperability.
   Retain that distinction when reporting test coverage.
+
+## 22 October security verification
+
+The 21 October checklist was carried forward and executed on 22 October, without
+backdating. PR #44 hardens the existing JWT/session boundary and delayed room
+transport operations. Both runtimes now share safe-integer time bounds and
+1-128-code-point identity bounds without unpaired surrogates. These are concrete
+validation policies for owner review, not newly agreed SRS requirements.
+356 local tests passed, including JWT and sanitizer interoperability. Production
+auth/message call sites and human QA review remain open; see the daily execution
+record and owner handoff for exact coverage and acceptance boundaries.
 
 ## Recording future changes
 

@@ -46,7 +46,7 @@ branch/PR rather than duplicating it. Preserve all unrelated user changes.
   vectors. This is preparation for 21 October verification, not a claim that
   real login, logout, registration or message sending is integrated.
 
-## Next security checks on 21 October
+## Planned security checks for 21 October
 
 1. Re-read any new authentication/messaging PRs and integrate only genuine
    owner-submitted work through the existing interfaces.
@@ -103,3 +103,51 @@ Jira and GitHub Project API read-back now show CHAT-9 and CHAT-19/20/21 In Revie
 CHAT-35/36/37 In Progress, and CHAT-44 still In Review. No items were marked Done;
 no PR was merged and no human approval was inferred. The preparation sprint was
 left intact. On the next run, check PR #44's newest commit and reuse this branch.
+
+## 21 October security work completed on 22 October (catch-up)
+
+The user requested yesterday's tasks on 22 October. No execution or approval is
+backdated to 21 October. Re-read both AGENTS.md files, inspected the clean branch,
+fetched origin and inspected open PRs and live Jira assignments before changing
+code. CHAT-35/36/37 remain Soham's responsibility. No new owner-submitted auth or
+messaging PR was available; continue the existing draft PR #44.
+
+- **CHAT-35 / TC-Sec-03:** actual signed JWTs expire after a successful connection
+  and room join. All six exercised events (ping, create, list, join, leave and an
+  unknown event) reject expired sessions and clean up membership. Required and
+  malformed claims, revoked/mismatched sessions, safe errors, queued work and
+  lookup failures are covered. Real Node-to-Python and Python-to-Node signing /
+  verification tests pass using a test-only session lookup.
+- Reproduced and fixed stale Node session-expiry checks after asynchronous lookup
+  and a delayed transport join that could mutate membership after expiry. Node
+  now checks token/session expiry after lookup and revalidates after awaited
+  transport join/leave before changing membership. Identity claims use 1-128
+  Unicode code points without unpaired surrogates in both runtimes. Python now
+  rejects timestamp values outside the shared safe-integer range.
+- **CHAT-36 / TC-Sec-04:** concurrent HTTP attempts allow exactly five per peer IP
+  per sliding minute; excess attempts receive HTTP 429, Retry-After and no-store.
+  Tests cover independent peers, spoofed forwarded headers and exact expiry
+  boundaries. Python reads its clock inside the limiter lock. Real login-handler
+  integration remains dependent on Hrisheek; account lockout is separate.
+- **CHAT-37 / TC-Sec-05:** shared sanitisation passes adversarial markup/entity,
+  control/surrogate, username and 2000/2001 Unicode-character boundaries in both
+  runtimes. Cross-runtime corpus outputs agree. Existing sanitizer code needed
+  no change. Registration and message call sites remain owner handoffs.
+- Local regression: **174 Node + 182 Python = 356 passed**, with zero failures.
+  `npm run build`, Python compileall and `git diff --check` passed. Ignored local
+  reports: `reports/oct22-security-node.json` and
+  `reports/oct22-security-python.xml`. Node uses real HTTP/Socket.IO; Flask uses
+  in-process clients and actual Node subprocesses for interoperability.
+
+The new tests are `tests/unit/security-edge.test.js`,
+`tests/integration/security.test.js`, `python_backend/tests/unit/test_security_edge.py`,
+`python_backend/tests/integration/test_security.py` and
+`python_backend/tests/integration/test_security_interop.py`, with the test-only
+`tests/fixtures/security_bridge.js`. These extend the submitted security cases;
+Yaswanth's test-case review remains pending. Component verification does not
+complete real auth/messaging integration, product acceptance or the outcome video.
+
+Publish on the existing branch/PR, verify CI against the exact new commit and
+move security components to In Review only after publication. No Done status,
+human sign-off or merge is implied. The next integration run must inspect new
+owner modules before proceeding; current missing dependencies are unchanged.

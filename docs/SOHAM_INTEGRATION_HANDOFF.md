@@ -1,6 +1,6 @@
 # Soham room and security integration handoff
 
-Prepared 20 October 2026 for the existing assigned owners. This is a concrete
+Prepared 20 October, updated 22 October 2026 for the existing assigned owners. This is a concrete
 integration proposal, not evidence of their agreement or contribution.
 
 ## Authentication handoff for Hrisheek
@@ -10,7 +10,9 @@ Python exports `JwtAuth(secret=..., find_session=...)` from
 `chat_backend.jwt_auth`. The verifier permits HS256 only, issuer `team15-chat`
 and audience `chat-application`, and requires `sub`, `jti`, `iat`, `exp`, `iss`
 and `aud`. Identity claims must be nonempty strings; issuance/expiry must be
-integer Unix seconds. Configuration requires an external secret of at least
+integer Unix seconds within +/-9007199254740991 (also applies to optional nbf
+and session expiresAt). Identity claims contain 1-128 Unicode code points and
+reject unpaired surrogates. Configuration requires an external secret of at least
 32 UTF-8 bytes. No production secret or signing fallback is supplied.
 
 Session lookup receives `jti` and returns a record with `sessionId`, `userId`,
@@ -18,7 +20,9 @@ Session lookup receives `jti` and returns a record with `sessionId`, `userId`,
 session. Unknown, expired, revoked or mismatched records fail closed. The Node
 lookup may return a promise; the Python lookup is synchronous. Logout must
 persist revocation so the next event's lookup sees it. The helpers verify
-signature, time, identity and revocation on every validation.
+signature, time, identity and revocation on every validation. Node rechecks
+token/session expiry after asynchronous lookup; room handlers revalidate after
+awaited transport join/leave before mutating membership.
 
 ```javascript
 const { createJwtAuth } = require('./jwt-auth');
@@ -81,9 +85,14 @@ events but does not wrap newly registered known handlers automatically.
 
 Yaswanth remains QA Lead for test-case review. The room-routing probe in tests
 is deliberately test-only: it is not a replacement for message:send, history,
-delivery acknowledgements or the working-product video. The 21 October session
-must extend security edge-case coverage and inspect real owner modules if they
-are available. Refer to SPRINT_1_DAILY_EXECUTION.md for the dated plan and results.
+delivery acknowledgements or the working-product video. The 21 October security
+checklist was executed as catch-up on 22 October: 356 tests passed across both
+backends, including real JWT interoperability and adversarial input comparisons.
+Hrisheek must wire issuance, live session storage/revocation, registration
+sanitisation and the login handler. Yaswanth must wire sanitisation into the actual
+message handler and retain its event/session guard. Owner modules were absent at
+read-back, so these integration acceptance checks remain open. Refer to
+SPRINT_1_DAILY_EXECUTION.md for dates, traceability and publication evidence.
 
 Primary implementation references consulted: [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken),
 [PyJWT](https://pyjwt.readthedocs.io/en/stable/api.html),
