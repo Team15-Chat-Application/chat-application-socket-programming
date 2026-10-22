@@ -80,11 +80,7 @@ test('CHAT-14: a missing or empty content is a validation error', () => {
   }
 });
 
-// CHAT-16/CHAT-17 semantics below are asserted against the shared helper's behaviour,
-// which this messaging increment deliberately does not re-implement or renegotiate.
-// They stay marked as pending team confirmation and must not be treated as a signed-off
-// contract; re-check them against docs/INTERFACE_CONTRACT.md once the team agrees.
-test('CHAT-16 pending team confirmation: length policy is delegated to the shared helper', () => {
+test('CHAT-16: accepts 2000 Unicode code points and rejects 2001', () => {
   const { service, room } = setup();
   const send = content => service.send(ALICE, 'sock-alice', { roomId: room.roomId, content });
   expect(send('a'.repeat(2000)).content).toBe('a'.repeat(2000));
@@ -95,7 +91,7 @@ test('CHAT-16 pending team confirmation: length policy is delegated to the share
   expect(codeOf(() => send('😀'.repeat(2001)))).toBe('VALIDATION_ERROR');
 });
 
-test('CHAT-17 pending team confirmation: markup policy is delegated to the shared helper', () => {
+test('CHAT-17: strips script content, removes markup, and escapes text safely', () => {
   const { service, room } = setup();
   expect(service.send(ALICE, 'sock-alice', { roomId: room.roomId, content: '<b>hello</b>' }).content).toBe('hello');
   expect(service.send(ALICE, 'sock-alice', { roomId: room.roomId, content: '<script>alert(1)</script>hi' }).content).toBe('hi');

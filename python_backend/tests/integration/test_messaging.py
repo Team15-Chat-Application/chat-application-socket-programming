@@ -128,6 +128,63 @@ def test_chat_14_invalid_payloads_return_a_failure_envelope_without_broadcast(se
     assert events(alice, 'message:received') == []
 
 
+def test_chat_16_accepts_2000_code_points_and_rejects_2001_without_broadcast(setup):
+    _, _, _, client, join = setup
+    alice, bob = client('alice'), client('bob')
+    room = join(alice, bob)
+    exact = '😀' * 2000
+
+    accepted = alice.emit('message:send', {'roomId': room['roomId'], 'content': exact}, callback=True)
+    assert accepted['ok'] is True
+    assert accepted['data']['content'] == exact
+    delivered = events(bob, 'message:received')
+    assert delivered == [accepted['data']]
+
+    rejected = alice.emit('message:send', {'roomId': room['roomId'], 'content': '😀' * 2001}, callback=True)
+    assert rejected['ok'] is False
+    assert rejected['error']['code'] == 'VALIDATION_ERROR'
+    assert isinstance(rejected['error']['message'], str) and rejected['error']['message']
+    assert events(bob, 'message:received') == []
+
+
+@pytest.mark.parametrize('content', ['', '   ', '<script>alert(1)</script>'])
+def test_chat_16_empty_or_invalid_content_fails_without_broadcast(setup, content):
+    _, _, _, client, join = setup
+    alice, bob = client('alice'), client('bob')
+    room = join(alice, bob)
+    result = alice.emit('message:send', {'roomId': room['roomId'], 'content': content}, callback=True)
+    assert result['ok'] is False
+    assert result['error']['code'] == 'VALIDATION_ERROR'
+    assert result['error']['message']
+    assert events(bob, 'message:received') == []
+
+
+def test_chat_17_recipients_and_acknowledgement_receive_sanitized_content_only(setup):
+    _, _, _, client, join = setup
+    alice, bob = client('alice'), client('bob')
+    room = join(alice, bob)
+    result = alice.emit('message:send', {
+        'roomId': room['roomId'], 'content': '<b>Hello</b><script>alert(1)</script> & <i>world</i>'
+    }, callback=True)
+    expected = 'Hello &amp; world'
+    assert result['ok'] is True
+    assert result['data']['content'] == expected
+    assert events(bob, 'message:received') == [result['data']]
+
+
+def test_chat_17_content_empty_after_sanitization_fails_without_broadcast(setup):
+    _, _, _, client, join = setup
+    alice, bob = client('alice'), client('bob')
+    room = join(alice, bob)
+    result = alice.emit('message:send', {
+        'roomId': room['roomId'], 'content': '<script>alert(1)</script>'
+    }, callback=True)
+    assert result['ok'] is False
+    assert result['error']['code'] == 'VALIDATION_ERROR'
+    assert result['error']['message']
+    assert events(bob, 'message:received') == []
+
+
 def test_chat_14_second_tab_of_a_member_sends_and_both_receive(setup):
     _, _, _, client, join = setup
     alice, tab = client('alice'), client('alice', 'second')

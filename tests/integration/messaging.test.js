@@ -125,6 +125,69 @@ test.each([null, undefined, [], 'room', {}, { roomId: 42 }, { roomId: 'x'.repeat
     expect(messages).toEqual([]);
   });
 
+test('CHAT-16: accepts 2000 code points and rejects 2001 without broadcasting', async () => {
+  const alice = await client('alice'), bob = await client('bob');
+  const room = await joinRoom(alice, bob);
+  const received = collect(bob, 'message:received');
+
+  const exact = '😀'.repeat(2000);
+  const accepted = await ack(alice, 'message:send', { roomId: room.roomId, content: exact });
+  expect(accepted).toMatchObject({ ok: true, data: { content: exact } });
+  await ack(bob, 'system:ping', { nonce: 'chat-16-accepted' });
+  expect(received).toHaveLength(1);
+
+  const rejected = await ack(alice, 'message:send', {
+    roomId: room.roomId, content: '😀'.repeat(2001)
+  });
+  expect(rejected).toEqual({
+    ok: false,
+    error: { code: 'VALIDATION_ERROR', message: expect.any(String) }
+  });
+  await ack(alice, 'system:ping', { nonce: 'chat-16-boundary' });
+  expect(received).toHaveLength(1);
+});
+
+test.each(['', '   ', '<script>alert(1)</script>'])
+  ('CHAT-16: empty or invalid content returns validation failure without broadcasting: %j', async content => {
+    const alice = await client('alice'), bob = await client('bob');
+    const room = await joinRoom(alice, bob);
+    const received = collect(bob, 'message:received');
+    const result = await ack(alice, 'message:send', { roomId: room.roomId, content });
+    expect(result).toEqual({
+      ok: false,
+      error: { code: 'VALIDATION_ERROR', message: expect.any(String) }
+    });
+    await ack(alice, 'system:ping', { nonce: 'chat-16-invalid' });
+    expect(received).toEqual([]);
+  });
+
+test('CHAT-17: recipients and acknowledgement receive sanitized content only', async () => {
+  const alice = await client('alice'), bob = await client('bob');
+  const room = await joinRoom(alice, bob);
+  const received = once(bob, 'message:received');
+  const result = await ack(alice, 'message:send', {
+    roomId: room.roomId, content: '<b>Hello</b><script>alert(1)</script> & <i>world</i>'
+  });
+  const expected = 'Hello &amp; world';
+  expect(result).toMatchObject({ ok: true, data: { content: expected } });
+  await expect(received).resolves.toMatchObject({ content: expected });
+});
+
+test('CHAT-17: content empty after sanitization fails and is not broadcast', async () => {
+  const alice = await client('alice'), bob = await client('bob');
+  const room = await joinRoom(alice, bob);
+  const received = collect(bob, 'message:received');
+  const result = await ack(alice, 'message:send', {
+    roomId: room.roomId, content: '<script>alert(1)</script>'
+  });
+  expect(result).toEqual({
+    ok: false,
+    error: { code: 'VALIDATION_ERROR', message: expect.any(String) }
+  });
+  await ack(alice, 'system:ping', { nonce: 'chat-17-empty' });
+  expect(received).toEqual([]);
+});
+
 test('CHAT-14: an unacknowledged emit still broadcasts', async () => {
   const alice = await client('alice'), bob = await client('bob');
   const room = await joinRoom(alice, bob);

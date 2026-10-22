@@ -97,10 +97,7 @@ def test_chat_14_missing_or_empty_content_is_a_validation_error():
         assert code_of(lambda: env.service.send(ALICE, 'sock-alice', payload)) == 'VALIDATION_ERROR'
 
 
-# CHAT-16/CHAT-17 semantics below are asserted against the shared helper's behaviour, which
-# this messaging increment deliberately does not re-implement or renegotiate. They remain
-# pending team confirmation and must not be read as a signed-off contract.
-def test_chat_16_pending_team_confirmation_length_policy_is_delegated():
+def test_chat_16_accepts_2000_unicode_code_points_and_rejects_2001():
     env = Env()
     send = lambda content: env.service.send(ALICE, 'sock-alice', {'roomId': env.room['roomId'], 'content': content})
     assert send('a' * 2000)['content'] == 'a' * 2000
@@ -110,7 +107,7 @@ def test_chat_16_pending_team_confirmation_length_policy_is_delegated():
     assert code_of(lambda: send('😀' * 2001)) == 'VALIDATION_ERROR'
 
 
-def test_chat_17_pending_team_confirmation_markup_policy_is_delegated():
+def test_chat_17_strips_script_content_removes_markup_and_escapes_text_safely():
     env = Env()
     send = lambda content: env.service.send(ALICE, 'sock-alice',
                                             {'roomId': env.room['roomId'], 'content': content})['content']
