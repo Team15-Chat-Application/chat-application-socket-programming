@@ -48,12 +48,12 @@
     "scripts/verify_sprint1.ps1"
   ],
   "remoteRefresh": {
-    "gitFetch": "FAILED: GitHub connectivity",
-    "pullRequestsAndReviews": "UNAVAILABLE: GitHub connectivity",
+    "gitFetch": "Succeeded on retry",
+    "pullRequestsAndReviews": "PR #44 read-back succeeded: no submitted reviews, Yaswanth assigned/requested; whole PR list refresh failed",
     "jira": "UNAVAILABLE: connector transport"
   },
-  "publication": "Pending push; remote connectivity unavailable at execution",
-  "exactNewCommitCI": "Not yet run; push required",
+  "publication": "Push succeeded to existing PR #44; PR head read-back confirms implementation commit",
+  "exactNewCommitCI": "Status retrieval unavailable/intermittent; do not infer success",
   "productAcceptance": "BLOCKED: actual auth/session, messaging and usable demo client are missing in the local branch",
   "humanQAReview": "pending",
   "ownerApproval": "pending",
@@ -65,5 +65,6 @@
     "Retain current issue states until evidence/review supports a change",
     "Update GitHub Project and planning-document historical future-sprint wording with the already verified administrative correction",
     "Run blocked real acceptance cases and record/upload a genuine video only when readiness gates pass"
-  ]
+  ],
+  "implementationCommit": "4220d17073df49b3ca8bcaf88a0c6cde8a4fe603"
 }
