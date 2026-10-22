@@ -1,6 +1,6 @@
 {
   "version": "0.3-proposed",
-  "status": "Team review required; room create/join/leave/list, membership and live catalogue updates implemented behind auth; security foundation prepared on 20 October; registration/login, messaging and UI integration remain pending",
+  "status": "Team review required; rooms and security components verified on 22 October; real authentication/session, business messaging and UI integration remain pending",
   "socketAuthentication": { "token": "JWT string" },
   "verifiedIdentity": { "userId": "JWT sub", "sessionId": "JWT jti" },
   "jwtVerificationProposal": {
@@ -8,6 +8,8 @@
     "issuer": "team15-chat",
     "audience": "chat-application",
     "requiredClaims": ["sub", "jti", "iat", "exp", "iss", "aud"],
+    "identityBounds": "sub/jti: 1-128 Unicode code points; reject unpaired surrogates",
+    "timeBounds": "iat/exp/optional nbf and session expiresAt: integer Unix seconds within +/-9007199254740991; recheck expiry after async lookup",
     "sessionRecord": "{sessionId,userId,expiresAt:integer Unix seconds,revokedAt:null|integer}; fresh lookup on every validation"
   },
   "roomPolicy": {

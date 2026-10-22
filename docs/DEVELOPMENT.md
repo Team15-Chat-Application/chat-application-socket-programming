@@ -2,8 +2,8 @@
 
 The project supplies development servers, room creation/join/leave, live
 membership/catalogue updates, bcrypt helpers, unit/integration tests and CI.
-JWT verification, login limiting and sanitisation helpers are prepared for
-security verification and owner integration. Login/registration, session storage,
+JWT verification, login limiting and sanitisation helpers have passed component
+security checks; real owner integration remains pending. Login/registration, session storage,
 messaging, persistence and the browser UI remain feature work. Both launchers
 reject socket authentication by default.
 
@@ -137,3 +137,19 @@ Yaswanth (kalluri088) and Hrisheek (hrisheekkaraturi) currently have repository
 read access and can use fork PRs under their own identities. Part 2 requires
 the assigned member to raise the PR and repository owners to review and merge.
 See [the current Part 2 calendar and backlog](PART_2_PLAN.md).
+
+## Sprint 1 review reproduction
+
+Run `scripts/verify_sprint1.ps1` from PowerShell to build, run all current Node/
+Python tests, execute actual launcher smoke checks and save fresh reports under
+`reports/sprint1`. `run.json` records commit, dirty-checkout state, timestamps,
+counts and overall result. A passing component run never certifies the product.
+For Linux/CI, the existing workflow runs builds and suites separately, then
+`python scripts/smoke_startup.py --report reports/launcher-smoke.json` after
+building the Node launcher. It uploads the real launcher result with Python reports.
+
+The smoke check deliberately expects default authentication to remain unavailable.
+It uses real loopback HTTP and Socket.IO polling without injecting users/tokens.
+Once real owner modules are integrated, replace that baseline with genuine login/
+logout/message acceptance checks. See SPRINT_1_TRACEABILITY.md and
+SPRINT_1_REVIEW_DEMO.md for blocked cases, review gates and recording prerequisites.

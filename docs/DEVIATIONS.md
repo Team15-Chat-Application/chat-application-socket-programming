@@ -40,6 +40,15 @@ validation policies for owner review, not newly agreed SRS requirements.
 auth/message call sites and human QA review remain open; see the daily execution
 record and owner handoff for exact coverage and acceptance boundaries.
 
+## 22 October integration preparation
+
+Actual launcher smoke checks use real processes and Socket.IO polling; they do
+not establish a WebSocket-only transport result, business messaging, the 200 ms
+message-delivery criterion or a working-product video. Prepared an explicit
+requirement/test matrix and blocked-case checklist. Retained TC-Msg-01's own
+200 ms target despite dedicated performance work being allocated to Sprint 2.
+No SRS acceptance criterion has been waived.
+
 ## Recording future changes
 
 For each departure, record the exact SRS/SAD/STP clause, old and new behaviour,

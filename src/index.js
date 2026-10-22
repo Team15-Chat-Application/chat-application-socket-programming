@@ -6,7 +6,7 @@ async function main() {
   const app = createApplication();
   const address = await app.start(config.port, config.host);
   console.log(`Node development server: http://${config.host}:${address.port}/api/health`);
-  console.log('Authentication, rooms and messaging are not implemented yet. Socket access is denied by default.');
+  console.log('Room/security components are available; authentication/session and messaging integration is pending. Socket access is denied by default.');
   let stopping = false;
   const stop = async () => {
     if (stopping) return;

@@ -10,6 +10,8 @@ The adopted Part 2 calendar sets backlog/estimates due **12 October**, optional 
 - [20-23 October daily execution and verified progress](docs/SPRINT_1_DAILY_EXECUTION.md)
 - [Linked GitHub Project](https://github.com/orgs/Team15-Chat-Application/projects/1)
 - [Sprint 2 milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/3)
+- [Sprint 1 requirement/test traceability](docs/SPRINT_1_TRACEABILITY.md)
+- [Final regression, review and demo checklist](docs/SPRINT_1_REVIEW_DEMO.md)
 - [Working-product video checklist](docs/SPRINT_VIDEO_CHECKLIST.md)
 - [Deviation log](docs/DEVIATIONS.md)
 - [Sprint 1 issues and milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/1)

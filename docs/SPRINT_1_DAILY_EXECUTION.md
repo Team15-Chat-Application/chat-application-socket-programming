@@ -182,3 +182,47 @@ PR #44 was separately made ready for review and assigned to Yaswanth
 (`kalluri088`) with his review requested on the user's instruction. This is not
 human approval or completion of the missing product integrations. Use the current
 states above instead of earlier historical future/draft/active-preparation notes.
+
+## 22 October integration work - executed on the user's request
+
+Completed the independent part of today's plan in the existing branch. GitHub
+fetch/PR/review refresh failed due connectivity, and Jira refresh failed with a
+connector transport error. A bounded retry also failed DNS resolution. Therefore
+no new owner PR, review or Jira status is asserted in this checkpoint. The last
+successful remote checks earlier today had only Soham's four PRs, no human
+reviews and no auth/messaging owner PR. Recheck remote state before integration.
+
+Prepared SPRINT_1_TRACEABILITY.md covering all 16 proposed Sprint 1 requirements,
+the five support items, exact submitted test-case IDs, actual component evidence
+and blocked integrated acceptance checks. Retained the 200 ms normal-load p90
+criterion within TC-Msg-01; dedicated performance work in Sprint 2 does not waive
+that criterion. Message persistence/history stay in proposed Sprint 2 scope;
+real auth session lookup/revocation is a distinct Sprint 1 dependency.
+
+Prepared SPRINT_1_REVIEW_DEMO.md with normal/boundary/negative real-user cases,
+readiness and human-review gates, a one-minute recording sequence and verified
+upload/playback requirements. The usable demo-client owner still needs agreement.
+Existing owner handoffs remain applicable; no teammate module was fabricated or
+taken over. Local source still lacks real auth/session, business messaging and UI.
+
+Added scripts/verify_sprint1.ps1 and extended actual launcher smoke checks.
+The Node built launcher and actual Flask process now verify HTTP health, first
+five unavailable-login responses, sixth-attempt HTTP 429/Retry-After/no-store and
+explicit default-auth socket denial over real Socket.IO polling, without injected
+users or successful fixture auth. Added those probes/report artifacts to CI.
+Corrected stale launcher text which incorrectly said rooms were unimplemented.
+Aligned shared-contract boundary metadata and linked the new review documents.
+
+Full reproducible local run at 14:38:08-14:38:43 UTC (20:08 IST): **174 Node +
+182 Python = 356 tests passed**, both builds/checks, actual launcher smoke checks
+and whitespace checks passed. Reports: reports/sprint1/node.json, python.xml,
+launchers.json and run.json. The run records base 9a2be776fc673cbb3be3122fbd554daf0f784ad6
+with a dirty checkout: this is actual local working-tree evidence, not exact-new-
+commit CI evidence. SPRINT_1_OCT22_INTEGRATION_EVIDENCE.json preserves the snapshot.
+
+Publication and new exact-commit CI remain pending connectivity. Preserve the
+current In Review / In Progress statuses; do not claim new Jira updates, human
+approval, approved merges, a working product or a video. On the next connected run,
+fetch/re-read owners' PRs and reviews, push this existing branch, verify its CI and
+then execute the blocked real acceptance cases when their modules are available.
+The 23 October 18:00 IST follow-up carries forward those remaining actions.
