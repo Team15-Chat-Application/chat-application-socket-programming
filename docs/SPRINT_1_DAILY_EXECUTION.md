@@ -335,3 +335,39 @@ CHAT-41 and CHAT-42. No Done transition or merge was performed. Real QA/owner
 approval and integrated acceptance remain pending. The earlier snapshot is
 historical; following this transition the board has 5 To Do, 16 In Review,
 0 In Progress and 0 Done, subject to later owner updates.
+
+### 23 October pre-merge review fixes requested by the user
+
+The user explicitly requested all PRs merged, then supplied H1/M1/M2/L1 findings
+and asked for these fixes first. No Git fetch or integration checkout was made:
+automatic approval review could not execute that command because its account
+usage limit was reached; this was a review-service failure, not an unsafe-action
+determination. Independent local implementation/testing continued.
+
+New tests reproduced H1 (slow Python validation blocked another socket) and M1
+(Node throwing acknowledgement poisoned the pending chain; the disconnected
+error path also acknowledged a dead socket). After the local fixes, both Node
+tests pass; Python slow-lookup isolation, ACK-failure recovery and the original
+signed-JWT room-wait expiry regression pass. Validation now holds only the
+per-context lock. Mutations use live_room_events, retrying validation outside
+the global room lock after contention, so the old expiry bug is not reopened.
+
+Recorded M2/L1 as proposed Sprint 2 entries S2-ROOM-CAPACITY and S2-PROXY-IP in
+DEVIATIONS.md, with limitations and concrete acceptance checks. No quota, proxy
+trust, agreed scope or remote ticket creation is falsely claimed.
+
+Pending: publish these local changes, retain live_room_events in PR #45's Python
+message dispatch, resolve its Node broadcast-error finding, verify exact-commit
+CI and merge in dependency order. The requested sequence into main is #22,
+#23, documentation #43 retargeted as appropriate, #44 and #45. Preserve real
+authorship and existing branches; the user's merge instruction does not fabricate
+QA/test-case approval or working-product/video acceptance.
+
+Initial available checks passed 149 Node unit tests and all 185 Python tests.
+The first full Node attempt hit loopback EACCES in the restricted session.
+A fresh approved retry resolved the service/access failure without bypassing
+permissions: **176 Node + 185 Python = 361 tests passed**, Node build/Python
+compile and both actual launcher probes passed. Reports and the initial failure
+are captured in SPRINT_1_PREMERGE_EVIDENCE.json. These remain dirty-checkout
+results until the published commit's CI is verified. No merge was performed
+during the initially blocked preparation; publication and merges follow separately.

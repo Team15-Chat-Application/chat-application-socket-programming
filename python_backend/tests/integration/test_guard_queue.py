@@ -24,13 +24,19 @@ def test_signed_jwt_expiring_while_waiting_for_shared_room_lock_cannot_mutate(mo
             self.inner = RLock()
 
         def __enter__(self):
-            if current_thread().name == 'guard-waiter':
-                waiting.set()
-            self.inner.acquire()
+            self.acquire()
             return self
 
-        def __exit__(self, *_args):
+        def acquire(self, blocking=True):
+            if current_thread().name == 'guard-waiter':
+                waiting.set()
+            return self.inner.acquire(blocking=blocking)
+
+        def release(self):
             self.inner.release()
+
+        def __exit__(self, *_args):
+            self.release()
 
     class PausingRooms(RoomStore):
         def create(self, identity, payload):

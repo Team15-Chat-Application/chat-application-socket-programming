@@ -73,10 +73,47 @@ For each departure, record the exact SRS/SAD/STP clause, old and new behaviour,
 reason, impact, linked issue/PR, test evidence and review/approval state. Obtain
 genuine team/owner decisions and explain accepted changes in the final demo.
 Do not fill approval/signature fields or mark acceptance without actual evidence.
-# 23 October tracking convention observation
+## 23 October tracking convention observation
 
 CHAT-42 asks for actual Jira keys in feature branch names, commits and PR titles.
 Yaswanth's existing branch `sprint-1/yaswanth` lacks a CHAT key; PR #45 and its
 feature commits identify CHAT-14/15/16/17. The actual branch and author are
 preserved. No automatic Jira Development indexing is claimed from those strings.
 The review package links the real commits/PR directly; no owner branch is renamed.
+
+## 23 October requested review fixes (local, not yet published)
+
+H1: the earlier guard-level global lock described above is superseded by a
+per-socket validation lock plus a live_room_events mutation boundary. A slow
+session lookup holds no shared room lock. Simply deleting the global guard lock
+would reopen the signed-JWT expiry-during-room-wait race; after any contended
+room wait, the mutation boundary revalidates outside that lock and retries a
+nonblocking acquisition. Existing handler mutation blocks retain serialization.
+Ping/unknown dispatch does not acquire the room lock. The old expiry regression
+and new two-user slow-lookup isolation test must both pass.
+
+M1: Node room dispatch terminates its pending promise chain with a rejection
+handler so a throwing acknowledgement cannot poison later queued events. The
+error response also checks socket.connected. New tests cover queue recovery
+and an operation that fails after disconnection. The Python regression injects
+an ACK packet-send failure, then verifies the next list/create operations work;
+the framework sends its ACK after handler locks are released, rather than using
+a Node-style promise queue. This does not claim a failed ACK can be delivered.
+
+### Proposed Sprint 2 follow-ups (M2 / L1)
+
+These named entries track the review findings without inventing team agreement,
+new feature estimates, assignments or completed mitigation. Scope/policy needs
+team review before Sprint 2 implementation.
+
+| Tracking ID | Current limitation and impact | Proposed work / acceptance evidence | State |
+| --- | --- | --- | --- |
+| S2-ROOM-CAPACITY (M2) | Authenticated room creation has no count/rate quota and empty rooms persist until process restart. Memory/catalogue work can grow without bound. | Agree total/per-user capacity and creation-rate policy, empty-room lifetime/cleanup and safe refusal envelope. Test quota boundaries, independent users, cleanup under concurrent membership and bounded catalogue resources. Preserve required room behavior; do not silently evict active rooms. | Proposed Sprint 2 follow-up; not mitigated |
+| S2-PROXY-IP (L1) | Login limiting uses the direct peer IP and ignores forwarded headers. Behind a reverse proxy, users can share one limit; the store is process-local. | Review deployment topology and explicit trusted-proxy allowlist/hop policy, reject spoofed forwarding, and choose a shared limiter for multiple workers. Test direct/proxied peer isolation, forged headers, five/six boundaries and cross-worker enforcement. | Proposed Sprint 2 follow-up; not mitigated |
+
+The user requested these fixes before merging all PRs. No merge is inferred from
+this log. Git integration preparation was not executed because automatic approval
+review initially returned a usage error. A fresh approved retry subsequently
+succeeded; the service restriction is resolved. The approved full run passed
+176 Node + 185 Python tests and both launcher probes. Publication, owner messaging
+integration, exact-commit CI and dependency-order merges follow as separate steps.

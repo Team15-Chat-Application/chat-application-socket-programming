@@ -23,9 +23,12 @@ persist revocation so the next event's lookup sees it. The helpers verify
 signature, time, identity and revocation on every validation. Node rechecks
 token/session expiry after asynchronous lookup; room handlers revalidate after
 awaited transport join/leave before mutating membership.
-Python acquires the context/shared room dispatch locks before validation so a
-token expiring during a lock wait cannot dispatch. Retain this guard when
-integrating new known handlers; test_guard_queue.py reproduces the old race.
+Python validates under the per-socket context lock, without holding the global
+room lock during a session lookup. Room mutations/dispatch use live_room_events:
+after any contended room-lock wait, revalidate outside the global lock and retry
+nonblocking acquisition before mutation. Retain both the guard and this mutation
+boundary when integrating known handlers. test_guard_queue.py covers expiry
+during the wait; test_dispatch_recovery.py covers slow-lookup isolation.
 
 ```javascript
 const { createJwtAuth } = require('./jwt-auth');
@@ -82,7 +85,11 @@ HTML sanitisation alone does not protect SQL/NoSQL query construction.
 The existing Node factory invokes `registerHandlers(io,socket)` after its
 authentication middleware. Flask business handlers must retain the
 validate-before-dispatch rule used in `app.py`; the catch-all protects unknown
-events but does not wrap newly registered known handlers automatically.
+events but does not wrap newly registered known handlers automatically. In
+PR #45's send_message handler, replace `with room_events:` with
+`with live_room_events():` during integration, retaining require_session.
+That owner-handler integration is pending publication/merge; it is not claimed
+as tested by the current base-branch suite.
 
 ## Review and evidence
 

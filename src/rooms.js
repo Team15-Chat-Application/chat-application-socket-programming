@@ -127,8 +127,8 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
           const data = await operation(payload);
           if (socket.connected) respond({ ok: true, data });
         }
-        catch (error) { respond(failure(error)); }
-      });
+        catch (error) { if (socket.connected) respond(failure(error)); }
+      }).catch(() => {}); // An acknowledgement/transport failure must not poison the next queued event.
     });
   }
   handle('room:create', payload => {
