@@ -371,3 +371,29 @@ compile and both actual launcher probes passed. Reports and the initial failure
 are captured in SPRINT_1_PREMERGE_EVIDENCE.json. These remain dirty-checkout
 results until the published commit's CI is verified. No merge was performed
 during the initially blocked preparation; publication and merges follow separately.
+
+### 23 October messaging integration and actual merge gate
+
+The approved base-branch full run passed 361 tests and launcher probes. Published
+Soham commit cdd572a for H1/M1, retaining expiry-after-room-wait protection while
+removing session lookup from the shared lock. M2/L1 remain proposed follow-ups.
+
+In an isolated PR #45 checkout, merged that shared base using a genuine Soham
+merge commit, preserving Yaswanth's original commits. Added two negative cases:
+Node adapter broadcast throws, and Python message session expires while waiting
+for a shared room dispatch lock. Both failed before the integration changes.
+Soham's integration fix catches Node broadcast errors before success response
+and uses live_room_events for Python message dispatch. Full candidate checks:
+**230 Node + 236 Python = 466 passed**, Node build, Python compile and both actual
+default-launcher probes passed. Current-head CI must still verify publication.
+
+No PR was merged. Automatic approval review rejected the command to merge #22
+into main because no genuine human review was evidenced and AGENTS.md requires
+it. The rejection occurred before execution, so the bundled retarget/next-PR
+steps also did not run. Do not bypass this through direct main pushes, alternate
+APIs, auto-merge or fabricated reviews. Publish the concrete tested fixes, then
+obtain actual required human review before retrying dependency-order merges.
+
+These changes are attributed to Soham, with maintainer edits enabled on the
+existing owner PR. They do not impersonate Yaswanth or establish QA/test-case,
+working-product or video approval. Authentication/client acceptance remains open.

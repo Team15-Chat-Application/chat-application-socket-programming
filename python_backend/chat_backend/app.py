@@ -215,7 +215,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     @require_session
     def send_message(payload=None):
         try:
-            with room_events:
+            with live_room_events():
                 message = messages.send(identities[request.sid]['identity'], request.sid, payload)
                 socketio.emit('message:received', message, to=room_channel(message['roomId']))
             # The sender's acknowledgement is returned only after the broadcast is

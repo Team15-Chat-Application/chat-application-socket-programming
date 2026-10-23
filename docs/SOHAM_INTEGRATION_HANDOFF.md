@@ -86,10 +86,10 @@ The existing Node factory invokes `registerHandlers(io,socket)` after its
 authentication middleware. Flask business handlers must retain the
 validate-before-dispatch rule used in `app.py`; the catch-all protects unknown
 events but does not wrap newly registered known handlers automatically. In
-PR #45's send_message handler, replace `with room_events:` with
-`with live_room_events():` during integration, retaining require_session.
-That owner-handler integration is pending publication/merge; it is not claimed
-as tested by the current base-branch suite.
+PR #45's send_message handler now uses `with live_room_events():` in the
+user-requested integration candidate, retaining require_session. Its new signed
+JWT/contended-message regression fails before and passes after that change.
+Candidate publication/current-head CI and merge are recorded separately.
 
 ## Review and evidence
 

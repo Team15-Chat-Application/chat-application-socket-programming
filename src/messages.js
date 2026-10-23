@@ -43,15 +43,13 @@ class MessageService {
 function registerMessageHandlers(socket, service, io) {
   socket.on('message:send', (payload, acknowledge) => {
     const respond = typeof acknowledge === 'function' ? acknowledge : () => {};
-    let message;
     try {
-      message = service.send(socket.data.identity, socket.id, payload);
+      const message = service.send(socket.data.identity, socket.id, payload);
+      io.to(roomChannel(message.roomId)).emit('message:received', message);
+      respond({ ok: true, data: message });
     } catch (error) {
       respond(failure(error));
-      return;
     }
-    io.to(roomChannel(message.roomId)).emit('message:received', message);
-    respond({ ok: true, data: message });
   });
 }
 

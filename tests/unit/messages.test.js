@@ -1,5 +1,5 @@
 const { RoomStore } = require('../../src/rooms');
-const { MessageService } = require('../../src/messages');
+const { MessageService, registerMessageHandlers } = require('../../src/messages');
 
 const ALICE = { userId: 'alice', sessionId: 'alice-1' };
 const BOB = { userId: 'bob', sessionId: 'bob-1' };
@@ -107,4 +107,21 @@ test('CHAT-14: a failed ID allocation is a defect, never a partial message', () 
   // asserted over the transport in tests/integration/messaging.test.js.
   expect(() => service.send(ALICE, 'sock-alice', { roomId: room.roomId, content: 'hi' }))
     .toThrow('Message ID allocation failed');
+});
+
+test('CHAT-15: a broadcast failure returns a safe error without escaping or acknowledging success', () => {
+  const { service, payload } = setup();
+  const handlers = {};
+  const socket = {
+    id: 'sock-alice', data: { identity: ALICE },
+    on: (event, handler) => { handlers[event] = handler; }
+  };
+  const io = { to: () => ({ emit: () => { throw new Error('private adapter detail'); } }) };
+  const respond = jest.fn();
+  registerMessageHandlers(socket, service, io);
+  expect(() => handlers['message:send'](payload, respond)).not.toThrow();
+  expect(respond).toHaveBeenCalledTimes(1);
+  expect(respond).toHaveBeenCalledWith({
+    ok: false, error: { code: 'INTERNAL_ERROR', message: 'An internal error occurred' }
+  });
 });

@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 from threading import Event, RLock, Thread, current_thread
 import jwt
+import pytest
 from chat_backend import app as app_module
 from chat_backend.jwt_auth import JwtAuth, ISSUER, AUDIENCE
 from chat_backend.rooms import RoomStore
@@ -10,7 +11,8 @@ BASE = 1800000000
 SECRET = 'test-only-queued-guard-signing-key-at-least-thirty-two-bytes'
 
 
-def test_signed_jwt_expiring_while_waiting_for_shared_room_lock_cannot_mutate(monkeypatch):
+@pytest.mark.parametrize('event', ['room:create', 'message:send'])
+def test_signed_jwt_expiring_while_waiting_for_shared_room_lock_cannot_mutate(monkeypatch, event):
     clock = [BASE]
     held, waiting, release = Event(), Event(), Event()
 
@@ -71,15 +73,26 @@ def test_signed_jwt_expiring_while_waiting_for_shared_room_lock_cannot_mutate(mo
 
     holder, waiter = client('holder', BASE + 600), client('waiter', BASE + 1)
     results, errors = {}, []
+    waiter_payload = {'name': 'Expired'}
+    expected_rooms = ['Holding']
+    if event == 'message:send':
+        target = rooms.create({'userId': 'holder', 'sessionId': 'holder'}, {'name': 'Chat'})
+        for connection in (holder, waiter):
+            assert connection.emit('room:join', {'roomId': target['roomId']}, callback=True)['ok']
+            connection.get_received()
+        waiter_payload = {'roomId': target['roomId'], 'content': 'Must not broadcast'}
+        expected_rooms = ['Chat', 'Holding']
 
-    def create(key, connection, name):
+    def dispatch(key, connection, name):
         try:
-            results[key] = connection.emit('room:create', {'name': name}, callback=True)
+            operation = event if key == 'waiter' else 'room:create'
+            payload = waiter_payload if key == 'waiter' else {'name': name}
+            results[key] = connection.emit(operation, payload, callback=True)
         except Exception as error:
             errors.append(error)
 
-    threads = [Thread(target=create, name='guard-holder', args=('holder', holder, 'Holding'), daemon=True),
-               Thread(target=create, name='guard-waiter', args=('waiter', waiter, 'Expired'), daemon=True)]
+    threads = [Thread(target=dispatch, name='guard-holder', args=('holder', holder, 'Holding'), daemon=True),
+               Thread(target=dispatch, name='guard-waiter', args=('waiter', waiter, 'Expired'), daemon=True)]
     try:
         threads[0].start()
         assert held.wait(3), 'Holder must own the shared room lock'
@@ -93,7 +106,8 @@ def test_signed_jwt_expiring_while_waiting_for_shared_room_lock_cannot_mutate(mo
         assert not errors
         assert results['holder']['ok'] is True
         assert not waiter.is_connected(), 'Expired waiting session must be rejected before dispatch'
-        assert [room['name'] for room in rooms.list()] == ['Holding']
+        assert [room['name'] for room in rooms.list()] == expected_rooms
+        assert not [message for message in holder.get_received() if message['name'] == 'message:received']
     finally:
         release.set()
         for thread in threads:

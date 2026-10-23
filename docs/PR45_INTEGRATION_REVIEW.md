@@ -1,5 +1,12 @@
 # Messaging integration review - 23 October 2026
 
+> Subsequent user-requested integration update: Soham prepared a separately
+> attributed fix for the Node broadcast error and retained the new Python
+> live_room_events mutation guard in messaging. New negative tests first failed
+> for both broadcast failure and message expiry during a shared-lock wait, then
+> passed after the changes. The original exact-head review below is historical;
+> publication, current-head CI and merge evidence are recorded separately.
+
 Reviewed owner-submitted PR #45 by Yaswanth (`kalluri088`), exact head
 `9af2ad20f07b2e33d1b578d62d0d7818d45b035a`, targeting Soham's PR #44 branch.
 The original owner commits and dates are preserved. No owner PR was changed,
