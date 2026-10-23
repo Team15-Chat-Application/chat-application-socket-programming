@@ -237,3 +237,45 @@ status and Jira still failed intermittently. Therefore the implementation is
 published, but new exact-commit CI, current owner PR availability and fresh Jira
 read-back must still be verified; the earlier pending-publication paragraph is
 historical. Keep the tested local results distinct from remote CI success.
+
+## 23 October final available work
+
+Resumed on the user's instruction after the planned 18:00 IST endpoint; no date,
+approval or acceptance was backdated. The 22 October implementation/checkpoint
+was published through 5aedbd200d5a78f745e84a59e6ea1ebdb1828105. Previously
+unavailable exact-head push CI 39800040861 and PR CI 39800055009 are now verified
+successful: 174 Node + 182 Python tests and both real-launcher probes passed.
+
+Owner-submitted messaging PR #45 by Yaswanth is now available, head
+9af2ad20f07b2e33d1b578d62d0d7818d45b035a, based on this branch. An isolated
+review checkout passed 227 Node + 232 Python tests (459 total), builds and real
+launcher probes; its exact-head CI 39824321298 passed. No human review is recorded
+on #44 or #45; no pending PR was merged. Hrisheek's authentication/session PR is
+still absent at the live read-back. Messaging exists in the unmerged owner PR;
+real authentication and the usable UI remain absent.
+
+Reproduced and fixed a Soham-owned Python guard race: a request validated its
+signed JWT before waiting for the global room lock and could mutate after expiry.
+Now the existing lock order is acquired before validation. The new two-thread,
+controlled-clock TC-Sec-03 regression failed before and passed after the fix.
+Full local branch verification: 174 Node + 183 Python = **357 passed**, builds,
+launcher probes and whitespace checks passed. In an explicitly unpublished
+PR #45 overlay with this guard change, all 233 Python tests also pass; Node
+source is unchanged from its 227-test exact-head run. This is compatibility
+validation, not a human-approved integration or exact candidate CI claim.
+
+A separate Node broadcaster-throws probe reproduced an escaping error with no
+safe acknowledgement in the owner messaging handler. Prepared the reproduction,
+proposed error-boundary structure and owner test expectation in
+PR45_INTEGRATION_REVIEW.md; the owner PR was not silently changed or messaged.
+
+Live Jira now has CHAT-14/15/16/17 and CHAT-40/43 In Review. Yaswanth's 23 October
+CHAT-43 comment explicitly says no video has been recorded/uploaded, blocked by
+auth and an agreed demo-client owner. The working-product/video deadline therefore
+remains unmet; passing 357/459 component tests does not waive it. Sprint 1 remains
+administratively active, preparation closed, Sprint 2 future. Preserve these
+accurate limitations and outstanding human QA/owner review boundaries.
+
+SPRINT_1_OCT23_EVIDENCE.json contains the actual execution and CI snapshot.
+The final feature commit still requires its own exact-commit CI before being
+called passing. No work is marked Done or merged by this checkpoint.

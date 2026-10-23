@@ -100,7 +100,9 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                 emit('system:error', result)
                 disconnect()
                 return result
-            with context['lock']:
+            # Validate only after every dispatch lock is held: another socket may
+            # keep room_events busy until this signed token has expired.
+            with context['lock'], room_events:
                 try:
                     valid = auth.validate({'token': context['token'], 'identity': dict(context['identity'])}) is True
                 except Exception:

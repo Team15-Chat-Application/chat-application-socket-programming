@@ -1,7 +1,7 @@
 # Deviation and implementation-decision log
 
 Part 2 requires following the submitted SRS, SAD and Test Plan, documenting
-departures and explaining them during the final demo. Updated 22 October 2026.
+departures and explaining them during the final demo. Updated 23 October 2026.
 This log records actual decisions and open gaps, not an approved waiver or sign-off.
 
 ## Recorded decisions for review
@@ -48,6 +48,23 @@ message-delivery criterion or a working-product video. Prepared an explicit
 requirement/test matrix and blocked-case checklist. Retained TC-Msg-01's own
 200 ms target despite dedicated performance work being allocated to Sprint 2.
 No SRS acceptance criterion has been waived.
+
+## 23 October shared dispatch fix and owner-module review
+
+A controlled two-thread/signed-JWT test reproduced expiry while waiting for the
+Python shared room lock. The guard now acquires context then room locks before
+validation, preserving the existing order and reentrant handler locking. This
+also serializes guarded ping/unknown dispatch with room operations; real product
+latency/load assessment remains pending. The original regression fails and the
+fixed branch passes it. Base branch regression is 357 tests; an isolated exact
+owner messaging head passes 459, and its Python suite with the guard overlay
+passes 233. None is an approved working-product acceptance result.
+
+PR #45 supplies real owner-authored messaging components but remains unmerged
+and has a reproduced Node broadcast-error handoff. Authentication, usable client,
+required human reviews and the genuine outcome video remain missing. The 23
+October 18:00 IST administrative deadline passed without product/video acceptance;
+this is an actual delivery deviation to explain, not a backdated completion.
 
 ## Recording future changes
 

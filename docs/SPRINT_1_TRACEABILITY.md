@@ -78,3 +78,19 @@ Yaswanth reviews test cases as QA Lead. Hrisheek retains unit-test leadership;
 Soham maintains security/RTM evidence and coordinates product acceptance. Owner
 review and actual sign-off are pending. No one has approved this matrix by virtue
 of CI passing or a review request being sent.
+
+## 23 October assessment (supersedes earlier availability notes)
+
+Yaswanth's unmerged PR #45 (9af2ad2) now supplies the actual room/message handlers
+and shared sanitization call sites for CHAT-F-005-008. Its exact head passes
+227 Node + 232 Python tests and CI 39824321298. Full product acceptance remains
+B for real auth/UI and the unmeasured TC-Msg-01 p90 target. A reproduced Node
+broadcast-exception finding needs the owner fix and negative test; see
+PR45_INTEGRATION_REVIEW.md. No message requirement is signed off here.
+
+Soham's new TC-Sec-03 shared-lock expiry regression passes after the Python guard
+fix; the base branch now has 174 Node + 183 Python passing tests. The regression
+also passes in a PR #45 overlay (233 Python tests), which is not a merged/approved
+product. New exact-commit CI is recorded through the final publication checkpoint.
+CHAT-43's owner confirms no recording/upload exists; its In Review status is not
+acceptance. All genuine QA/owner approvals and final product checks remain open.
