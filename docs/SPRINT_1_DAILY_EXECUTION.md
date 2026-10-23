@@ -309,3 +309,29 @@ stop its automation and do not continue changes after 23 October. Any later
 completion must retain its actual dates, genuine reviews and explanation of
 unmet scope. Separate Sprint 2 scheduling is unchanged. Later documentation-only
 checkpoint commits still need their own head checks before claiming head CI green.
+
+### 23 October user-requested personal-task completion
+
+On the new instruction "finish off my tasks", reconciled CHAT-42 against its
+actual acceptance criteria. Tracking unfinished team work accurately does not
+require representing it as delivered. The package now includes
+SPRINT_1_CONTRIBUTIONS.md and SPRINT_1_TRACKING_AUDIT.json, with live evidence
+for all 21 selected items: unique Jira/GitHub links, acceptance criteria, matching
+owners/statuses, positive proposed estimates/due dates and 16 requirement/test
+mappings. Project 1's repository link was verified by GraphQL; its 40-item
+backlog remains intact. No duplicate task or PR was created.
+
+Updated README, handoff and traceability availability notes to acknowledge the
+actual unmerged messaging PR and 357-test room/security baseline. Recorded the
+owner branch-name convention deviation without renaming his branch. Linked real
+member commits, absent auth/reviews and outstanding defect/video dependencies.
+Local Markdown-link, JSON/mapping and whitespace checks passed; no runtime code
+changed in this checkpoint. The new publication still needs its own CI result.
+
+CHAT-42's Jira description now links the delivered package and retains previous
+history. Its transition to In Review succeeded; GitHub Project mirrors it.
+All ten Soham Sprint 1 items are now In Review: CHAT-18-21, CHAT-34-37,
+CHAT-41 and CHAT-42. No Done transition or merge was performed. Real QA/owner
+approval and integrated acceptance remain pending. The earlier snapshot is
+historical; following this transition the board has 5 To Do, 16 In Review,
+0 In Progress and 0 Done, subject to later owner updates.

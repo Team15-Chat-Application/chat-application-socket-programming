@@ -73,3 +73,10 @@ For each departure, record the exact SRS/SAD/STP clause, old and new behaviour,
 reason, impact, linked issue/PR, test evidence and review/approval state. Obtain
 genuine team/owner decisions and explain accepted changes in the final demo.
 Do not fill approval/signature fields or mark acceptance without actual evidence.
+# 23 October tracking convention observation
+
+CHAT-42 asks for actual Jira keys in feature branch names, commits and PR titles.
+Yaswanth's existing branch `sprint-1/yaswanth` lacks a CHAT key; PR #45 and its
+feature commits identify CHAT-14/15/16/17. The actual branch and author are
+preserved. No automatic Jira Development indexing is claimed from those strings.
+The review package links the real commits/PR directly; no owner branch is renamed.
