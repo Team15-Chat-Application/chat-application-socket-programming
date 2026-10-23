@@ -271,11 +271,41 @@ PR45_INTEGRATION_REVIEW.md; the owner PR was not silently changed or messaged.
 
 Live Jira now has CHAT-14/15/16/17 and CHAT-40/43 In Review. Yaswanth's 23 October
 CHAT-43 comment explicitly says no video has been recorded/uploaded, blocked by
-auth and an agreed demo-client owner. The working-product/video deadline therefore
-remains unmet; passing 357/459 component tests does not waive it. Sprint 1 remains
+auth and an agreed demo-client owner. The working-product/video deliverables remain incomplete at this administrative
+checkpoint; Part 2 specifies the date rather than a mandatory end hour. Passing
+357/459 component tests does not waive the real-product/video requirement. Sprint 1 remains
 administratively active, preparation closed, Sprint 2 future. Preserve these
 accurate limitations and outstanding human QA/owner review boundaries.
 
 SPRINT_1_OCT23_EVIDENCE.json contains the actual execution and CI snapshot.
 The final feature commit still requires its own exact-commit CI before being
 called passing. No work is marked Done or merged by this checkpoint.
+
+### 23 October publication and tracking checkpoint
+
+Implementation commit `407155ed3279f4ae597ee4a393b44828cb604414` is published
+on PR #44. Exact-head [push CI](https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/39956171367)
+and [PR CI](https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/39956178311)
+both passed. Logs confirm Node 147 unit + 27 integration and Python 148 unit +
+35 integration tests (**357 passed**), plus both actual launcher smoke probes.
+
+CHAT-41 is now In Review in Jira and GitHub Project; CHAT-42 remains In Progress
+because final contributions/review/acceptance evidence is incomplete. Mirrored
+CHAT-14/15/16/17 and CHAT-40/43 to the live Jira In Review state. Final live Sprint 1
+snapshot: 21 items, **5 To Do, 1 In Progress, 15 In Review, 0 Done**. Corrected the
+GitHub Project's stale future-sprint wording without erasing preparation history.
+No issue was marked Done and no PR was merged. No human approval was inferred.
+
+Preserved the actual exact-head PR #45 reports and unpublished guard-overlay
+patch under ignored reports/pr45-review, then removed the temporary detached
+checkout and dependency junction after verifying its absolute cleanup path.
+The main dependency installation and owner's remote branch were untouched.
+
+The one-minute real-product recording remains blocked, as confirmed by the
+owner's CHAT-43 update. Remaining actions and proposed recording flow are in
+SPRINT_1_REVIEW_DEMO.md; the reproduced owner fix is in PR45_INTEGRATION_REVIEW.md.
+This final scheduled Sprint 1 session ends after recording the available work;
+stop its automation and do not continue changes after 23 October. Any later
+completion must retain its actual dates, genuine reviews and explanation of
+unmet scope. Separate Sprint 2 scheduling is unchanged. Later documentation-only
+checkpoint commits still need their own head checks before claiming head CI green.

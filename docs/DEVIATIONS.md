@@ -63,8 +63,9 @@ passes 233. None is an approved working-product acceptance result.
 PR #45 supplies real owner-authored messaging components but remains unmerged
 and has a reproduced Node broadcast-error handoff. Authentication, usable client,
 required human reviews and the genuine outcome video remain missing. The 23
-October 18:00 IST administrative deadline passed without product/video acceptance;
-this is an actual delivery deviation to explain, not a backdated completion.
+October 18:00 IST Jira administrative checkpoint passed with product/video
+acceptance incomplete. Part 2 specifies dates, not a required end hour; record
+actual later completion and explain unresolved scope without backdating.
 
 ## Recording future changes
 

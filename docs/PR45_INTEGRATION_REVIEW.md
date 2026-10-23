@@ -77,3 +77,7 @@ Do not merge the owner PR before required human review or silently rewrite it.
   approvals remain open. No human reviews were submitted on #44 or #45 at read-back.
 - Yaswanth's CHAT-43 comment on 23 October explicitly confirms no video was recorded
   or uploaded. The recording is blocked by auth integration and a demo-client owner.
+
+Actual local validation reports and the guard-only overlay patch are retained under
+ignored reports/pr45-review. The temporary detached checkout was removed after
+validation; the owner commits remain accessible through the fetched PR ref.
