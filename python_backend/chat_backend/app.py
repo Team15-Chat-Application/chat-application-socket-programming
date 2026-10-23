@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, disconnect, emit, join_room, leave_room
 from functools import wraps
+from contextlib import contextmanager
 from threading import RLock
 from .rooms import RoomError, RoomStore, CATALOGUE_CHANNEL, room_channel
 from .input import InputError
@@ -94,7 +95,38 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                 if notices:
                     catalogue()
 
-    # Every future business handler must retain this guard.
+    def session_is_live(context):
+        try:
+            valid = auth.validate({'token': context['token'], 'identity': dict(context['identity'])}) is True
+        except Exception:
+            valid = False
+        return valid and identities.get(request.sid) is context
+
+    def reject_session():
+        result = failure('UNAUTHORIZED', 'Session is no longer valid')
+        emit('system:error', result)
+        disconnect()
+        return result
+
+    @contextmanager
+    def live_room_events():
+        # The caller holds its own context lock. A potentially slow session
+        # lookup must never hold the shared room lock. If acquisition waits,
+        # revalidate outside it, then retry without waiting on stale validation.
+        context = identities[request.sid]
+        while not room_events.acquire(blocking=False):
+            with room_events:
+                pass
+            if not session_is_live(context):
+                reject_session()
+                raise RoomError('UNAUTHORIZED', 'Session is no longer valid')
+        try:
+            yield
+        finally:
+            room_events.release()
+
+    # Every future business handler must retain this guard and use
+    # live_room_events for shared room mutations/dispatch.
     def require_session(handler):
         @wraps(handler)
         def guarded(*args, **kwargs):
@@ -105,15 +137,8 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                 disconnect()
                 return result
             with context['lock']:
-                try:
-                    valid = auth.validate({'token': context['token'], 'identity': dict(context['identity'])}) is True
-                except Exception:
-                    valid = False
-                if not valid or identities.get(request.sid) is not context:
-                    result = failure('UNAUTHORIZED', 'Session is no longer valid')
-                    emit('system:error', result)
-                    disconnect()
-                    return result
+                if not session_is_live(context):
+                    return reject_session()
                 return handler(*args, **kwargs)
         return guarded
 
@@ -129,7 +154,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     @require_session
     def create_room(payload=None):
         try:
-            with room_events:
+            with live_room_events():
                 room = rooms.create(identities[request.sid]['identity'], payload)
                 catalogue()
             return {'ok': True, 'data': room}
@@ -142,7 +167,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     @require_session
     def join_chat_room(payload=None):
         try:
-            with room_events:
+            with live_room_events():
                 room = rooms.get(payload)
                 join_room(room_channel(room['roomId']))
                 identity = identities[request.sid]['identity']
@@ -161,7 +186,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     @require_session
     def leave_chat_room(payload=None):
         try:
-            with room_events:
+            with live_room_events():
                 room = rooms.get(payload)
                 leave_room(room_channel(room['roomId']))
                 identity = identities[request.sid]['identity']

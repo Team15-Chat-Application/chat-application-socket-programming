@@ -94,3 +94,13 @@ feature is incomplete, state that fact rather than showing a fabricated result.
 
 No teammate is messaged or assigned new work by this checklist. No review,
 acceptance, merge or video upload is claimed without verified evidence.
+
+## 23 October readiness disposition
+
+Owner messaging PR #45 is available and component-tested (459 tests on its exact
+head); it is unmerged and has an error-path finding documented in
+PR45_INTEGRATION_REVIEW.md. Authentication/session issuance, a usable demo client
+and genuine QA/owner approvals remain missing. Yaswanth's CHAT-43 update confirms
+no video recorded or uploaded. Keep the real-product and video gates unchecked.
+This checklist is a reproducible handoff, not a substitute recording. Record any
+later completion with its actual date and explain deadline/scope deviations.

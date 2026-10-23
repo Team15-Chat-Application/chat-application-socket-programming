@@ -1,0 +1,46 @@
+{
+  "observedAt": "2026-10-23 17:56:14 UTC",
+  "baseCommit": "dfa85f2ca4fd61e848f2f01f221edf8c360718c4",
+  "dirtyCheckout": true,
+  "published": false,
+  "mergedPRs": [],
+  "requestedFixes": {
+    "H1": "Session validation under per-context lock only; live_room_events revalidates outside global lock after a contended wait and retries nonblocking acquisition.",
+    "M1": "Node queue tail rejection handler and connected guard on failure acknowledgement; recovery tests in both backends.",
+    "M2": "S2-ROOM-CAPACITY proposed Sprint 2 follow-up in DEVIATIONS.md, not mitigated.",
+    "L1": "S2-PROXY-IP proposed Sprint 2 follow-up in DEVIATIONS.md, not mitigated."
+  },
+  "baselineReproduction": {
+    "nodeQueueRecovery": "FAIL before fix",
+    "nodeDisconnectedAck": "FAIL before fix",
+    "pythonSlowLookupIsolation": "FAIL before fix",
+    "pythonAckRecovery": "PASS before and after fix"
+  },
+  "verification": {
+    "nodeBuild": "PASS",
+    "pythonCompile": "PASS",
+    "nodeUnitPassed": 149,
+    "pythonPassed": 185,
+    "totalPassedAvailableChecks": 361,
+    "nodeQueueAndDisconnectRegressions": "PASS",
+    "pythonLookupIsolationAckRecoveryAndPriorExpiryRegression": "PASS",
+    "nodeFullTransportRun": "PASS on approved retry: 176 tests; prior restricted run hit loopback EACCES",
+    "launcherSmoke": "PASS: actual Node and Flask health/login-limit/socket-denial probes",
+    "exactCommitCI": "Pending publication",
+    "reports": [
+      "reports/premerge-review/node-full.json",
+      "reports/premerge-review/python.xml",
+      "reports/premerge-review/launchers.json"
+    ],
+    "nodeFullPassed": 176
+  },
+  "publicationBlocker": "Initial automatic approval-service usage error resolved on a fresh approved retry. No permission boundary bypassed.",
+  "integrationStillRequired": [
+    "Apply and test PR #45 Python message dispatch with live_room_events",
+    "Fix and test PR #45 Node broadcast error as a separately attributed Soham integration fix",
+    "Verify exact-commit CI",
+    "Merge #22 then #23 into main; retarget #43 as appropriate, then #44 and #45, retaining genuine authorship and explicit review/acceptance boundaries"
+  ],
+  "qaOrProductApprovalClaimed": false,
+  "snapshotBoundary": "Local dirty-checkout evidence before publishing the review-fix commit; later CI/merge evidence remains separate."
+}

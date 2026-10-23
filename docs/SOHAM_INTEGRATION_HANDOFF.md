@@ -1,6 +1,6 @@
 # Soham room and security integration handoff
 
-Prepared 20 October, updated 22 October 2026 for the existing assigned owners. This is a concrete
+Prepared 20 October, updated 23 October 2026 for the existing assigned owners. This is a concrete
 integration proposal, not evidence of their agreement or contribution.
 
 ## Authentication handoff for Hrisheek
@@ -23,6 +23,12 @@ persist revocation so the next event's lookup sees it. The helpers verify
 signature, time, identity and revocation on every validation. Node rechecks
 token/session expiry after asynchronous lookup; room handlers revalidate after
 awaited transport join/leave before mutating membership.
+Python validates under the per-socket context lock, without holding the global
+room lock during a session lookup. Room mutations/dispatch use live_room_events:
+after any contended room-lock wait, revalidate outside the global lock and retry
+nonblocking acquisition before mutation. Retain both the guard and this mutation
+boundary when integrating known handlers. test_guard_queue.py covers expiry
+during the wait; test_dispatch_recovery.py covers slow-lookup isolation.
 
 ```javascript
 const { createJwtAuth } = require('./jwt-auth');
@@ -79,7 +85,11 @@ HTML sanitisation alone does not protect SQL/NoSQL query construction.
 The existing Node factory invokes `registerHandlers(io,socket)` after its
 authentication middleware. Flask business handlers must retain the
 validate-before-dispatch rule used in `app.py`; the catch-all protects unknown
-events but does not wrap newly registered known handlers automatically.
+events but does not wrap newly registered known handlers automatically. In
+PR #45's send_message handler, replace `with room_events:` with
+`with live_room_events():` during integration, retaining require_session.
+That owner-handler integration is pending publication/merge; it is not claimed
+as tested by the current base-branch suite.
 
 ## Review and evidence
 
@@ -89,9 +99,11 @@ delivery acknowledgements or the working-product video. The 21 October security
 checklist was executed as catch-up on 22 October: 356 tests passed across both
 backends, including real JWT interoperability and adversarial input comparisons.
 Hrisheek must wire issuance, live session storage/revocation, registration
-sanitisation and the login handler. Yaswanth must wire sanitisation into the actual
-message handler and retain its event/session guard. Owner modules were absent at
-read-back, so these integration acceptance checks remain open. Refer to
+sanitisation and the login handler. As of 23 October, Yaswanth's PR #45 supplies
+actual guarded messaging and sanitizer call sites; its exact head passed 459
+tests. It remains unmerged and needs the Node broadcast-error fix documented in
+PR45_INTEGRATION_REVIEW.md. Soham's branch now passes 357 tests. Actual auth,
+client and end-to-end acceptance remain unavailable. Refer to
 SPRINT_1_DAILY_EXECUTION.md for dates, traceability and publication evidence.
 
 Primary implementation references consulted: [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken),
