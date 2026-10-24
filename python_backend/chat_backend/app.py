@@ -270,8 +270,10 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
             # dispatched (CHAT-F-006). Per-recipient delivery confirmation is CHAT-24/25.
             return {'ok': True, 'data': message}
         except (RoomError, InputError, MessageError) as error:
+            audit('message-send', error.code)
             return failure(error.code, str(error))
         except Exception:
+            audit('message-send', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred')
 
     @socketio.on('*')

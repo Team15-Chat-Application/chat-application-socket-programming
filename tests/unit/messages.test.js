@@ -110,6 +110,7 @@ test('CHAT-14: a failed ID allocation is a defect, never a partial message', () 
 });
 
 test('CHAT-15: a broadcast failure returns a safe error without escaping or acknowledging success', () => {
+  const warning = jest.spyOn(console, 'warn').mockImplementation(() => {});
   const { service, payload } = setup();
   const handlers = {};
   const socket = {
@@ -124,4 +125,7 @@ test('CHAT-15: a broadcast failure returns a safe error without escaping or ackn
   expect(respond).toHaveBeenCalledWith({
     ok: false, error: { code: 'INTERNAL_ERROR', message: 'An internal error occurred' }
   });
+  expect(warning).toHaveBeenCalledWith(JSON.stringify({ event: 'message-send', code: 'INTERNAL_ERROR' }));
+  expect(JSON.stringify(warning.mock.calls)).not.toContain('private adapter detail');
+  warning.mockRestore();
 });

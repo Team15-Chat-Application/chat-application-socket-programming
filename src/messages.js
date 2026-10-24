@@ -2,6 +2,7 @@ const { randomUUID } = require('node:crypto');
 const { AppError, failure } = require('./errors');
 const { sanitizeMessage } = require('./input');
 const { roomChannel } = require('./rooms');
+const { audit } = require('./audit');
 
 // CHAT-F-005/006: the sender's identity comes from the verified token, and content
 // length and markup policy come from the shared helper, never from this module.
@@ -48,6 +49,7 @@ function registerMessageHandlers(socket, service, io) {
       io.to(roomChannel(message.roomId)).emit('message:received', message);
       respond({ ok: true, data: message });
     } catch (error) {
+      audit('message-send', failure(error).error.code);
       respond(failure(error));
     }
   });

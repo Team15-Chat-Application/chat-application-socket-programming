@@ -208,7 +208,7 @@ def test_chat_14_messages_are_delivered_in_send_order_without_loss(setup):
     assert len({m['messageId'] for m in received}) == 20
 
 
-def test_chat_15_an_internal_failure_returns_the_failure_envelope_and_broadcasts_nothing():
+def test_chat_15_an_internal_failure_returns_the_failure_envelope_and_broadcasts_nothing(caplog):
     # The shared store still authorises the socket; only message ID allocation is broken, which
     # mirrors the Node assertion and proves the ack reports the defect instead of a fake success.
     app, socketio, rooms, sessions, client, clients = build(messages_new_id=lambda: None)
@@ -222,6 +222,8 @@ def test_chat_15_an_internal_failure_returns_the_failure_envelope_and_broadcasts
             'ok': False, 'error': {'code': 'INTERNAL_ERROR', 'message': 'An internal error occurred'}}
         assert events(alice, 'message:received') == []
         assert events(bob, 'message:received') == []
+        assert 'message-send' in caplog.text
+        assert 'boom' not in caplog.text
     finally:
         for c in clients:
             if c.is_connected():
