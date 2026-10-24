@@ -1,0 +1,27 @@
+{
+  "recordedDate": "2026-10-20",
+  "timezone": "Asia/Calcutta",
+  "branch": "CHAT-19-rooms-security",
+  "baseBranch": "CHAT-44-part-2-planning",
+  "pullRequest": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/pull/44",
+  "draft": true,
+  "implementationCommit": "b3275a5395ad5f59666ebe31db2800a2068e8c75",
+  "ci": [
+    {"event":"push","runId":39399563724,"conclusion":"success","url":"https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/39399563724"},
+    {"event":"pull_request","runId":39399571122,"conclusion":"success","url":"https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/39399571122"}
+  ],
+  "tests": {"nodeUnit":95,"nodeIntegration":19,"pythonUnit":95,"pythonIntegration":22,"total":231},
+  "nodeIntegrationTransport": "real local HTTP and Socket.IO connections",
+  "pythonIntegrationTransport": "Flask-SocketIO in-process client; existing bcrypt interoperability uses real Node subprocesses",
+  "authEvidence": "actual signed test JWTs and fixture session lookup; no registration/login or production session store",
+  "roomDeliveryEvidence": "test-only room-routing probes; no business messaging implementation",
+  "jiraAndProjectReadBack": {
+    "CHAT-9":"In Review","CHAT-19":"In Review","CHAT-20":"In Review","CHAT-21":"In Review",
+    "CHAT-35":"In Progress","CHAT-36":"In Progress","CHAT-37":"In Progress","CHAT-44":"In Review"
+  },
+  "humanQaApproval": "pending",
+  "ownerReviewAndMerge": "pending",
+  "workingProductDemo": "pending owner modules and UI",
+  "oneMinuteVideo": "pending; coordinator Kalluri Yaswanth",
+  "followUps": {"time":"18:00","dates":["2026-10-21","2026-10-22","2026-10-23"],"automationId":"sprint-1-daily-execution-through-23-october"}
+}

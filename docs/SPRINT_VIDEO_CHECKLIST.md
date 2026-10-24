@@ -1,7 +1,7 @@
 # Working-product outcome recordings
 
 Source: Part 2 deliverables, adopted 11 October 2026. Both videos must show the
-actual working product. The recordings do not exist yet.
+actual working product. The recordings do not exist yet. Use [the executable review/demo checklist](SPRINT_1_REVIEW_DEMO.md) and [requirement/test traceability](SPRINT_1_TRACEABILITY.md) before recording.
 
 ## Sprint 1 - one minute, by 23 October
 

@@ -1,11 +1,29 @@
 {
-  "version": "0.2-proposed",
-  "status": "Team review required; system:ping, room:create and basic room:list are implemented behind the auth adapter",
+  "version": "0.3-proposed",
+  "status": "Team review required; room/security follow-up on 24 October; owner messaging exists on PR #45; real authentication/session and usable UI acceptance remain pending",
   "socketAuthentication": { "token": "JWT string" },
   "verifiedIdentity": { "userId": "JWT sub", "sessionId": "JWT jti" },
+  "jwtVerificationProposal": {
+    "algorithm": "HS256 only; configured secret of at least 32 UTF-8 bytes; no default secret",
+    "issuer": "team15-chat",
+    "audience": "chat-application",
+    "requiredClaims": ["sub", "jti", "iat", "exp", "iss", "aud"],
+    "identityBounds": "sub/jti: 1-128 Unicode code points; reject unpaired surrogates",
+    "timeBounds": "iat/exp/optional nbf and session expiresAt: integer Unix seconds within +/-9007199254740991; recheck expiry after async lookup",
+    "sessionRecord": "{sessionId,userId,expiresAt:integer Unix seconds,revokedAt:null|integer}; fresh lookup on every validation"
+  },
+  "roomPolicy": {
+    "count": "Distinct authenticated user IDs; additional tabs do not increment memberCount",
+    "membership": "Join notice on first user socket; leave notice on final socket; duplicate join/leave is idempotent",
+    "transportChannel": "Server-only roomChannel(roomId) / room_channel(room_id); chat:room: prefix",
+    "catalogue": "Authenticated sockets only; empty rooms retained until process restart",
+    "dispatchBoundsProposal": "Node: 64 outstanding room events/socket; Python: up to three 50 ms room-lock waits. Saturation returns RATE_LIMITED; these are reviewable operational defaults."
+  },
   "acknowledgement": {
     "success": { "ok": true, "data": "event-specific result" },
-    "failure": { "ok": false, "error": { "code": "stable error code", "message": "safe user-facing message" } }
+    "failure": { "ok": false, "error": { "code": "stable error code", "message": "safe user-facing message" } },
+    "unknownEvent": "After successful session validation, acknowledge NOT_FOUND when requested",
+    "invalidSession": "system:error followed by disconnect; callback acknowledgement is not guaranteed after disconnect"
   },
   "clientEvents": {
     "system:ping": { "nonce": "1-64 characters; development diagnostic" },
@@ -13,7 +31,7 @@
     "room:join": { "roomId": "server-issued room ID" },
     "room:leave": { "roomId": "server-issued room ID" },
     "room:list": {},
-    "message:send": { "roomId": "server-issued room ID", "content": "text, maximum 2000 characters" }
+    "message:send": { "roomId": "server-issued room ID", "content": "maximum 2000 Unicode code points before sanitisation; sanitizer helper prepared; send handler belongs to messaging owner" }
   },
   "serverEvents": {
     "system:error": "failure acknowledgement shape",

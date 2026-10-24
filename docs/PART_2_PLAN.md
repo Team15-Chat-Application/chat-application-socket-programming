@@ -1,5 +1,13 @@
 # Part 2 delivery plan
 
+> 23 October execution update: Jira preparation 102 is closed, Sprint 1 (135) is
+> active with its actual 22 October administrative activation, and Sprint 2 (136)
+> remains future. Earlier future-sprint descriptions below are dated planning
+> history. Current tests, PR/review state and incomplete product/video evidence
+> are in [the daily execution record](SPRINT_1_DAILY_EXECUTION.md) and
+> [the owner messaging review](PR45_INTEGRATION_REVIEW.md). No acceptance is implied.
+
+
 Adopted and synchronized on 11 October 2026 (Asia/Calcutta). Source:
 SE_Mini_Project_Delivereables_Part-2.pdf, page 1. This calendar supersedes the
 earlier October 20 target. The original October 2-4 commits and review history

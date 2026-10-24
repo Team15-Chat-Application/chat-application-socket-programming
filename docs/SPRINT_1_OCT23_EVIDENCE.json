@@ -1,0 +1,83 @@
+{
+  "actualDate": "2026-10-23",
+  "scope": "Final available regression, owner-module validation and sprint review evidence",
+  "baseCommit": "5aedbd200d5a78f745e84a59e6ea1ebdb1828105",
+  "previousExactCommitCI": {
+    "head": "5aedbd200d5a78f745e84a59e6ea1ebdb1828105",
+    "pushRun": 39800040861,
+    "prRun": 39800055009,
+    "conclusion": "success",
+    "nodePassed": 174,
+    "pythonPassed": 182,
+    "launcherSmoke": "PASS"
+  },
+  "newFix": {
+    "issue": "CHAT-35 / TC-Sec-03",
+    "problem": "Python signed JWT could expire while waiting for shared room lock and still dispatch",
+    "regression": "python_backend/tests/integration/test_guard_queue.py",
+    "beforeFix": "FAIL (expired client remained connected)",
+    "afterFix": "PASS"
+  },
+  "localVerification": {
+    "startedAt": "2026-10-23T12:44:22.7038644Z",
+    "finishedAt": "2026-10-23T12:44:34.4195994Z",
+    "testedCheckout": "5aedbd200d5a78f745e84a59e6ea1ebdb1828105",
+    "dirtyCheckout": true,
+    "nodePassed": 174,
+    "pythonPassed": 183,
+    "totalPassed": 357,
+    "builds": "PASS",
+    "launcherSmoke": "PASS"
+  },
+  "ownerMessagingPR": {
+    "number": 45,
+    "author": "kalluri088",
+    "head": "9af2ad20f07b2e33d1b578d62d0d7818d45b035a",
+    "state": "open/unmerged",
+    "ciRun": 39824321298,
+    "exactHeadLocalNodePassed": 227,
+    "exactHeadLocalPythonPassed": 232,
+    "candidatePythonPassed": 233,
+    "candidateNote": "Unpublished dirty overlay with Soham guard fix; no exact candidate CI claim",
+    "finding": "Node broadcast error escapes handler; owner handoff in PR45_INTEGRATION_REVIEW.md"
+  },
+  "authPRAvailable": false,
+  "humanReviewsSubmitted": false,
+  "videoRecorded": false,
+  "videoUploaded": false,
+  "deadline": "2026-10-23T18:00:00+05:30",
+  "deadlineStatus": "Acceptance/video were incomplete at the Jira administrative 18:00 checkpoint. Part 2 specifies the date, not a mandatory end hour; no backdated completion or premature final date-failure claim.",
+  "remaining": [
+    "Hrisheek auth/session implementation",
+    "usable demo client and agreed owner",
+    "Yaswanth broadcast error fix",
+    "real integrated acceptance including TC-Msg-01 timing",
+    "genuine QA and repository-owner reviews",
+    "authentic one-minute video upload/playback verification"
+  ],
+  "mergedPRs": [],
+  "closedWorkItems": [],
+  "implementationCommit": "407155ed3279f4ae597ee4a393b44828cb604414",
+  "exactImplementationCI": {
+    "pushRun": 39956171367,
+    "prRun": 39956178311,
+    "conclusion": "success",
+    "nodeUnit": 147,
+    "nodeIntegration": 27,
+    "pythonUnit": 148,
+    "pythonIntegration": 35,
+    "realLauncherSmoke": "PASS"
+  },
+  "trackingReadback": {
+    "sprintId": 135,
+    "total": 21,
+    "To Do": 5,
+    "In Progress": 1,
+    "In Review": 15,
+    "Done": 0,
+    "CHAT-41": "In Review",
+    "CHAT-42": "In Progress",
+    "GitHubProject": "matching reviewed messaging/QA/video/CI states; no Done mutation"
+  },
+  "reviewArtifacts": "Ignored local reports/pr45-review contains exact-head reports and unpublished guard-overlay patch; temporary checkout was removed safely"
+}

@@ -1,5 +1,13 @@
 # Sprint 1 - Software Engineering Mini Project
 
+> 23 October execution update: Jira preparation 102 is closed, Sprint 1 (135) is
+> active with its actual 22 October administrative activation, and Sprint 2 (136)
+> remains future. Earlier future-sprint descriptions below are dated planning
+> history. Current tests, PR/review state and incomplete product/video evidence
+> are in [the daily execution record](SPRINT_1_DAILY_EXECUTION.md) and
+> [the owner messaging review](PR45_INTEGRATION_REVIEW.md). No acceptance is implied.
+
+
 Recorded: 02 October 2026; implementation evidence updated 04 October; Part 2 calendar/tracking updated 11 October 2026 (Asia/Calcutta).
 
 ## Sprint direction

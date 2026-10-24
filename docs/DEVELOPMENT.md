@@ -1,9 +1,11 @@
 # Development setup
 
-The project supplies development servers, room creation/catalogue queries, bcrypt
-helpers, unit/integration tests and CI. Login/registration integration, room
-joining/leaving, live updates, messaging, persistence and the browser UI remain
-feature work. Both launchers reject socket authentication by default.
+The project supplies development servers, room creation/join/leave, live
+membership/catalogue updates, bcrypt helpers, unit/integration tests and CI.
+JWT verification, login limiting and sanitisation helpers have passed component
+security checks; real owner integration remains pending. Login/registration, session storage,
+messaging, persistence and the browser UI remain feature work. Both launchers
+reject socket authentication by default.
 
 ## Runtime decision
 
@@ -87,6 +89,9 @@ PYTHONPATH=python_backend .venv/bin/python -m chat_backend
 | `src/app.js` | Primary HTTP/Socket.IO factory and safe dispatch boundary |
 | `src/config.js` | Validated local host/port configuration |
 | `src/rooms.js` | Named-room store and guarded Socket.IO create/list handlers |
+| `src/jwt-auth.js` | Prepared HS256 verification adapter with fresh session lookup |
+| `src/login-limit.js` | Sliding five-per-minute peer-IP login limit |
+| `src/input.js` | Shared username/message/room text validation and sanitisation |
 | `src/passwords.js` | Asynchronous bcrypt hash/verify helpers |
 | `python_backend/chat_backend` | Secondary Flask-SocketIO factory and launcher |
 | `contracts/events.json` | Proposed shared event names and envelopes |
@@ -97,8 +102,14 @@ PYTHONPATH=python_backend .venv/bin/python -m chat_backend
 Hrisheek supplies the authentication adapter; Soham supplies room handlers and
 coordinates shared security helpers; Yaswanth supplies messaging handlers.
 These follow the existing Jira allocation, which remains proposed until team
-review. The factory's injected test auth adapter is an isolated fixture and does
-not implement JWT validation or satisfy CHAT-SR-003.
+review. Legacy injected auth fixtures remain isolated transport fixtures. New
+membership tests use the actual JWT verifier with signed test tokens and an
+in-memory test session lookup; they do not implement registration/login or a
+production session store. See SOHAM_INTEGRATION_HANDOFF.md for factory signatures.
+
+Jest scripts enable Node's VM module support because the locked sanitizer uses
+an ESM parser. This affects the test runner only; the Node 24 application uses
+native module loading. Keep the locked dependency versions when reproducing CI.
 
 The Python integration suite now requires Node and installed npm dependencies
 because it verifies hashes across both runtimes. The Python CI job explicitly
@@ -122,7 +133,23 @@ destination has been chosen. Production deployment is a later explicit decision.
 Create a branch containing the actual Jira key, commit code and its relevant
 tests, open a PR, and link it in Jira. Use your own identity. Review the contract
 before implementing event handlers and document any change to payloads.
-Yaswanth (kalluri088) and Hrisheek (hrisheekkaraturi) currently have repository
-read access and can use fork PRs under their own identities. Part 2 requires
+Yaswanth (kalluri088) and Hrisheek (hrisheekkaraturi) must use their own identities;
+fork PRs are an option when direct branch access is unavailable. Part 2 requires
 the assigned member to raise the PR and repository owners to review and merge.
 See [the current Part 2 calendar and backlog](PART_2_PLAN.md).
+
+## Sprint 1 review reproduction
+
+Run `scripts/verify_sprint1.ps1` from PowerShell to build, run all current Node/
+Python tests, execute actual launcher smoke checks and save fresh reports under
+`reports/sprint1`. `run.json` records commit, dirty-checkout state, timestamps,
+counts and overall result. A passing component run never certifies the product.
+For Linux/CI, the existing workflow runs builds and suites separately, then
+`python scripts/smoke_startup.py --report reports/launcher-smoke.json` after
+building the Node launcher. It uploads the real launcher result with Python reports.
+
+The smoke check deliberately expects default authentication to remain unavailable.
+It uses real loopback HTTP and Socket.IO polling without injecting users/tokens.
+Once real owner modules are integrated, replace that baseline with genuine login/
+logout/message acceptance checks. See SPRINT_1_TRACEABILITY.md and
+SPRINT_1_REVIEW_DEMO.md for blocked cases, review gates and recording prerequisites.
