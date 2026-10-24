@@ -1,6 +1,7 @@
 const { randomUUID } = require('node:crypto');
 const { AppError, failure } = require('./errors');
-const { sanitizePlainText } = require('./input');
+const { sanitizePlainText, withinCodePoints } = require('./input');
+const { audit } = require('./audit');
 
 const MAX_ROOM_NAME_LENGTH = 64;
 function validateRoomName(payload) {
@@ -9,7 +10,7 @@ function validateRoomName(payload) {
   }
   // Use the same explicit edge whitespace and Unicode code-point count in both backends.
   const name = payload.name.replace(/^[ \t\r\n\f\v]+|[ \t\r\n\f\v]+$/g, '');
-  if (![...name].length || [...name].length > MAX_ROOM_NAME_LENGTH || /[\p{Cc}\p{Cs}]/u.test(name)) {
+  if (!name.length || !withinCodePoints(name, MAX_ROOM_NAME_LENGTH) || /[\p{Cc}\p{Cs}]/u.test(name)) {
     throw new AppError('VALIDATION_ERROR', 'name must contain 1 to 64 characters without control characters');
   }
   const clean = sanitizePlainText(name).replace(/^[ \t\r\n\f\v]+|[ \t\r\n\f\v]+$/g, '');
@@ -18,6 +19,7 @@ function validateRoomName(payload) {
 }
 
 const CATALOGUE_CHANNEL = 'chat:catalogue';
+const MAX_PENDING_ROOM_EVENTS = 64;
 const roomChannel = roomId => `chat:room:${roomId}`;
 function requireIdentity(identity) {
   if (!identity || typeof identity.userId !== 'string' || !identity.userId ||
@@ -106,11 +108,13 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   socket.emit('room:list-updated', { rooms: rooms.list() });
   // Serialise membership operations for one socket, including rapid duplicate requests.
   let pending = Promise.resolve();
+  let queued = 0;
   async function ensureLiveSession() {
     let valid = false;
     try { valid = await validateSession() === true; } catch { /* fail closed */ }
     if (!socket.connected) return false;
     if (!valid) {
+      audit('room-session', 'UNAUTHORIZED');
       socket.emit('system:error', failure(new AppError('UNAUTHORIZED', 'Session is no longer valid')));
       socket.disconnect(true);
     }
@@ -119,6 +123,13 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   function handle(event, operation) {
     socket.on(event, (payload, acknowledge) => {
       const respond = typeof acknowledge === 'function' ? acknowledge : () => {};
+      if (queued >= MAX_PENDING_ROOM_EVENTS) {
+        audit('room-queue', 'RATE_LIMITED');
+        try { if (socket.connected) respond(failure(new AppError('RATE_LIMITED', 'Too many pending room events'))); }
+        catch { audit('room-ack', 'INTERNAL_ERROR'); }
+        return;
+      }
+      queued++;
       pending = pending.then(async () => {
         if (!socket.connected) return;
         try {
@@ -127,8 +138,11 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
           const data = await operation(payload);
           if (socket.connected) respond({ ok: true, data });
         }
-        catch (error) { if (socket.connected) respond(failure(error)); }
-      }).catch(() => {}); // An acknowledgement/transport failure must not poison the next queued event.
+        catch (error) {
+          audit('room-event', failure(error).error.code);
+          if (socket.connected) respond(failure(error));
+        }
+      }).catch(() => { audit('room-ack', 'INTERNAL_ERROR'); }).finally(() => { queued--; });
     });
   }
   handle('room:create', payload => {
@@ -144,9 +158,18 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   });
   handle('room:join', async payload => {
     const room = rooms.get(payload);
-    await socket.join(roomChannel(room.roomId));
-    if (!await ensureLiveSession()) return;
+    const channel = roomChannel(room.roomId);
+    const alreadyJoined = rooms.hasSocket(room.roomId, socket.id);
     const result = rooms.join(socket.data.identity, socket.id, payload);
+    try { await socket.join(channel); }
+    catch (error) {
+      try {
+        if (!alreadyJoined) rooms.leave(socket.data.identity, socket.id, payload);
+        await (alreadyJoined ? socket.join(channel) : socket.leave(channel));
+      } catch { socket.disconnect(true); rooms.disconnect(socket.id); }
+      throw error;
+    }
+    if (!await ensureLiveSession()) return;
     if (result.changed) {
       membership({ roomId: room.roomId, userId: socket.data.identity.userId, action: 'join', memberCount: result.room.memberCount });
       catalogue();
@@ -155,13 +178,23 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   });
   handle('room:leave', async payload => {
     const room = rooms.get(payload);
-    await socket.leave(roomChannel(room.roomId));
-    if (!await ensureLiveSession()) return;
+    const channel = roomChannel(room.roomId);
+    const alreadyJoined = rooms.hasSocket(room.roomId, socket.id);
     const result = rooms.leave(socket.data.identity, socket.id, payload);
+    try { await socket.leave(channel); }
+    catch (error) {
+      try {
+        if (alreadyJoined) rooms.join(socket.data.identity, socket.id, payload);
+        await (alreadyJoined ? socket.join(channel) : socket.leave(channel));
+      } catch { socket.disconnect(true); rooms.disconnect(socket.id); }
+      throw error;
+    }
+    const live = await ensureLiveSession();
     if (result.changed) {
       membership({ roomId: room.roomId, userId: socket.data.identity.userId, action: 'leave', memberCount: result.room.memberCount });
       catalogue();
     }
+    if (!live) return;
     return { roomId: room.roomId };
   });
   socket.on('disconnect', () => {
@@ -170,4 +203,4 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
     if (notices.length) catalogue();
   });
 }
-module.exports = { MAX_ROOM_NAME_LENGTH, CATALOGUE_CHANNEL, roomChannel, validateRoomName, RoomStore, registerRoomHandlers };
+module.exports = { MAX_ROOM_NAME_LENGTH, MAX_PENDING_ROOM_EVENTS, CATALOGUE_CHANNEL, roomChannel, validateRoomName, RoomStore, registerRoomHandlers };

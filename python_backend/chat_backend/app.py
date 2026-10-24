@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_socketio import SocketIO, disconnect, emit, join_room, leave_room
 from functools import wraps
 from contextlib import contextmanager
+import json
 from threading import RLock
 from .rooms import RoomError, RoomStore, CATALOGUE_CHANNEL, room_channel
 from .login_limit import LoginLimiter
@@ -28,6 +29,13 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     identities = {}
     room_events = RLock()
 
+    def audit(event, code):
+        # Never log exception strings, tokens, credentials, payloads or message text.
+        try:
+            app.logger.warning(json.dumps({'event': event, 'code': code}))
+        except Exception:
+            pass  # A broken log sink must not break the event queue.
+
     def catalogue():
         socketio.emit('room:list-updated', {'rooms': rooms.list()}, to=CATALOGUE_CHANNEL)
 
@@ -39,12 +47,14 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         # The peer address is authoritative; forwarded headers cannot reset a limit.
         limit = login_limiter.consume(request.remote_addr)
         if not limit['allowed']:
+            audit('login', 'RATE_LIMITED')
             return failure('RATE_LIMITED', 'Too many login attempts'), 429, {'Retry-After': str(limit['retryAfter'])}
         if login_handler is None:
             return failure('NOT_FOUND', 'Endpoint not found'), 404
         try:
             return login_handler()
         except Exception:
+            audit('login', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred'), 500
 
     @app.after_request
@@ -78,6 +88,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
             join_room(CATALOGUE_CHANNEL)
             emit('room:list-updated', {'rooms': rooms.list()})
         except Exception:
+            audit('socket-connect', 'UNAUTHORIZED')
             return False
 
     @socketio.on('disconnect')
@@ -95,10 +106,12 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         try:
             valid = auth.validate({'token': context['token'], 'identity': dict(context['identity'])}) is True
         except Exception:
+            audit('socket-validation', 'INTERNAL_ERROR')
             valid = False
         return valid and identities.get(request.sid) is context
 
     def reject_session():
+        audit('socket-event', 'UNAUTHORIZED')
         result = failure('UNAUTHORIZED', 'Session is no longer valid')
         emit('system:error', result)
         disconnect()
@@ -110,12 +123,21 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         # lookup must never hold the shared room lock. If acquisition waits,
         # revalidate outside it, then retry without waiting on stale validation.
         context = identities[request.sid]
-        while not room_events.acquire(blocking=False):
-            with room_events:
-                pass
+        acquired = room_events.acquire(blocking=False)
+        # Three bounded waits, not an unbounded validation/lock retry loop.
+        for _attempt in range(3):
+            if acquired:
+                break
+            if not room_events.acquire(timeout=0.05):
+                continue
+            room_events.release()
             if not session_is_live(context):
                 reject_session()
                 raise RoomError('UNAUTHORIZED', 'Session is no longer valid')
+            acquired = room_events.acquire(blocking=False)
+        if not acquired:
+            audit('room-dispatch', 'RATE_LIMITED')
+            raise RoomError('RATE_LIMITED', 'Room dispatch is busy; retry later')
         try:
             yield
         finally:
@@ -157,6 +179,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         except RoomError as error:
             return failure(error.code, str(error))
         except Exception:
+            audit('room-create', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred')
 
     @socketio.on('room:join')
@@ -165,9 +188,20 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         try:
             with live_room_events():
                 room = rooms.get(payload)
-                join_room(room_channel(room['roomId']))
                 identity = identities[request.sid]['identity']
+                channel = room_channel(room['roomId'])
+                already_joined = rooms.has_socket(room['roomId'], request.sid)
                 result = rooms.join(identity, request.sid, payload)
+                try:
+                    join_room(channel)
+                except Exception:
+                    try:
+                        if not already_joined:
+                            rooms.leave(identity, request.sid, payload)
+                        (join_room if already_joined else leave_room)(channel)
+                    except Exception:
+                        disconnect()
+                    raise
                 if result['changed']:
                     membership({'roomId': room['roomId'], 'userId': identity['userId'],
                                 'action': 'join', 'memberCount': result['room']['memberCount']})
@@ -176,6 +210,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         except RoomError as error:
             return failure(error.code, str(error))
         except Exception:
+            audit('room-join', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred')
 
     @socketio.on('room:leave')
@@ -184,9 +219,20 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         try:
             with live_room_events():
                 room = rooms.get(payload)
-                leave_room(room_channel(room['roomId']))
                 identity = identities[request.sid]['identity']
+                channel = room_channel(room['roomId'])
+                already_joined = rooms.has_socket(room['roomId'], request.sid)
                 result = rooms.leave(identity, request.sid, payload)
+                try:
+                    leave_room(channel)
+                except Exception:
+                    try:
+                        if already_joined:
+                            rooms.join(identity, request.sid, payload)
+                        (join_room if already_joined else leave_room)(channel)
+                    except Exception:
+                        disconnect()
+                    raise
                 if result['changed']:
                     membership({'roomId': room['roomId'], 'userId': identity['userId'],
                                 'action': 'leave', 'memberCount': result['room']['memberCount']})
@@ -195,6 +241,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         except RoomError as error:
             return failure(error.code, str(error))
         except Exception:
+            audit('room-leave', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred')
 
     @socketio.on('room:list')
@@ -205,6 +252,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         try:
             return {'ok': True, 'data': {'rooms': rooms.list()}}
         except Exception:
+            audit('room-list', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred')
 
     @socketio.on('*')

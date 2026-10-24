@@ -117,3 +117,19 @@ review initially returned a usage error. A fresh approved retry subsequently
 succeeded; the service restriction is resolved. The approved full run passed
 176 Node + 185 Python tests and both launcher probes. Publication, owner messaging
 integration, exact-commit CI and dependency-order merges follow as separate steps.
+
+## 24 October human-review follow-up
+
+The new reviews are COMMENTED, with no approvals on #22/#23/#43/#44. The concrete
+fixes/dispositions and retained security decisions are recorded in
+OCT24_REVIEW_DISPOSITION.md. Store/channel rollback, bounded dispatch, redacted
+audit reasons, unknown-event responses, fixture propagation and bounded Unicode
+counting are implemented for new review. The operational 64-event/three-50ms
+bounds are proposed defaults, not accepted course capacity targets.
+
+Additional proposed follow-ups: catalogue update coalescing/deltas with measured
+capacity, explicit browser-origin/deployment policy, structured-log collection
+and retention, and platform-complete hashed Python dependency artifacts. Existing
+S2-ROOM-CAPACITY/S2-PROXY-IP entries remain open. Dual commit/PR CI is intentionally
+retained to meet the adopted testing instructions. Do not treat these disclosed
+follow-ups as implemented mitigations or use COMMENTED reviews as approvals.

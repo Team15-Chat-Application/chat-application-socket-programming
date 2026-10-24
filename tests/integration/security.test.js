@@ -45,7 +45,9 @@ test.each(events)('TC-Sec-03 actual JWT expiry after connection rejects %s and r
 });
 test('TC-Sec-03 expiry during delayed join cannot mutate membership or execute a queued request',async()=>{
   const entered=deferred(),release=deferred(),queued=deferred();
+  let serverSocket;
   await start({registerHandlers:(_io,socket)=>{
+    serverSocket = socket;
     const join=socket.join.bind(socket);
     socket.join=async channel=>{
       if(channel===roomChannel(roomId)){entered.resolve();await release.promise;}
@@ -59,8 +61,9 @@ test('TC-Sec-03 expiry during delayed join cannot mutate membership or execute a
   const denied=once(socket,'system:error'),gone=once(socket,'disconnect');
   now=BASE+2;release.resolve();
   expect(await denied).toMatchObject({error:{code:'UNAUTHORIZED'}});await gone;
-  expect(joined).not.toHaveBeenCalled();expect(rooms.list()).toHaveLength(1);
+  expect(joined).toHaveBeenCalledTimes(1);expect(rooms.list()).toHaveLength(1);
   expect(rooms.hasMember(roomId,'user')).toBe(false);
+  expect(serverSocket.rooms.has(roomChannel(roomId))).toBe(false);
 });
 test('TC-Sec-04 concurrent HTTP attempts admit exactly five, then recover at the rolling boundary',async()=>{
   let time=0,calls=0;

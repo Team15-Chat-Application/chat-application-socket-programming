@@ -28,7 +28,7 @@ class JwtAuth:
             if not isinstance(token, str) or len(token) > 8192:
                 raise ValueError()
             claims = jwt.decode(token, self._secret, algorithms=['HS256'], issuer=ISSUER, audience=AUDIENCE,
-                                options={'require': ['sub', 'jti', 'iat', 'exp', 'iss', 'aud']})
+                                options={'verify_iat': True, 'require': ['sub', 'jti', 'iat', 'exp', 'iss', 'aud']})
             if not all(isinstance(claims[k], str) and 1 <= len(claims[k]) <= 128 and
                        not any(category(c) == 'Cs' for c in claims[k]) for k in ('sub', 'jti')) or not all(
                 valid_number(claims[k]) for k in ('iat', 'exp')

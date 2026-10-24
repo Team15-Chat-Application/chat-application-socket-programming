@@ -1,9 +1,11 @@
 """Dispatch isolation and acknowledgement-failure recovery; no real login claim."""
 from threading import Event, Thread
+from threading import RLock
 import pytest
 from socketio import packet
 from chat_backend.app import create_application
 from chat_backend.rooms import RoomStore
+from chat_backend import app as app_module
 
 
 class FixtureAuth:
@@ -34,7 +36,7 @@ def test_slow_session_lookup_does_not_hold_other_users_room_or_ping_dispatch():
 
     def slow_request():
         try:
-            results['slow'] = slow.emit('room:list', {}, callback=True)
+            results['slow'] = slow.emit('room:create', {'name': 'Slow'}, callback=True)
         except Exception as error:
             errors.append(error)
 
@@ -90,6 +92,50 @@ def test_dispatch_recovers_after_ack_transport_failure(monkeypatch):
         assert result['ok'] is True
         assert [room['name'] for room in result['data']['rooms']] == ['First']
         assert client.emit('room:create', {'name': 'Second'}, callback=True)['ok'] is True
+    finally:
+        if client.is_connected():
+            client.disconnect()
+
+
+def test_room_contention_has_a_bounded_budget_and_recovers(monkeypatch):
+    class BusyLock:
+        def __init__(self):
+            self.calls = []
+            self.available = False
+
+        def acquire(self, blocking=True, timeout=-1):
+            self.calls.append((blocking, timeout))
+            return self.available
+
+        def release(self):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            pass
+
+    busy = BusyLock()
+    first = [True]
+
+    def lock_factory():
+        if first[0]:
+            first[0] = False
+            return busy
+        return RLock()
+
+    monkeypatch.setattr(app_module, 'RLock', lock_factory)
+    rooms = RoomStore()
+    app, socketio = create_application(FixtureAuth(), rooms)
+    client = socketio.test_client(app, auth={'token': 'alice'})
+    try:
+        result = client.emit('room:create', {'name': 'Busy'}, callback=True)
+        assert result['error']['code'] == 'RATE_LIMITED'
+        assert busy.calls == [(False, -1), (True, 0.05), (True, 0.05), (True, 0.05)]
+        assert rooms.list() == []
+        busy.available = True
+        assert client.emit('room:create', {'name': 'Recovered'}, callback=True)['ok']
     finally:
         if client.is_connected():
             client.disconnect()
