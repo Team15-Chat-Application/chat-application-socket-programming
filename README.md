@@ -1,11 +1,16 @@
 # chat-application-socket-programming
 Real-time Chat Application using Socket Programming, WebSockets, Node.js and Flask-SocketIO developed as a Software Engineering mini-project.
 
-## Sprint 1
+## Part 2 delivery
 
-Sprint 1 runs from **2 to 20 October 2026**. The proposed increment covers authentication, room messaging, room management and their required security controls.
+The adopted Part 2 calendar sets backlog/estimates due **12 October**, optional practice **12-16 October**, **Sprint 1 on 19-23 October** and **Sprint 2 on 26-30 October 2026**. Existing October 2-4 work remains preparatory history. Scope and point estimates remain proposed for team review.
 
 - [Sprint 1 plan, responsibilities and review evidence](docs/SPRINT_1.md)
+- [Part 2 plan, full backlog, points and deliverables](docs/PART_2_PLAN.md)
+- [Linked GitHub Project](https://github.com/orgs/Team15-Chat-Application/projects/1)
+- [Sprint 2 milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/3)
+- [Working-product video checklist](docs/SPRINT_VIDEO_CHECKLIST.md)
+- [Deviation log](docs/DEVIATIONS.md)
 - [Sprint 1 issues and milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/1)
 - [Jira board](https://jsohamrao.atlassian.net/jira/software/projects/CHAT/boards/35)
 

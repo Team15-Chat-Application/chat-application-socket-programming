@@ -1,0 +1,439 @@
+{
+  "verified": "2026-10-11",
+  "project": {
+    "id": "PVT_kwDOE6yNHs4BmieS",
+    "number": 1,
+    "url": "https://github.com/orgs/Team15-Chat-Application/projects/1"
+  },
+  "milestones": {
+    "Preparation": {
+      "number": 2,
+      "title": "Preparation / Dry Run",
+      "due_on": "2026-10-16T00:00:00Z",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/2"
+    },
+    "Sprint 1": {
+      "number": 1,
+      "title": "Sprint 1 (19-23 Oct 2026)",
+      "due_on": "2026-10-23T00:00:00Z",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/1"
+    },
+    "Sprint 2": {
+      "number": 3,
+      "title": "Sprint 2 (26-30 Oct 2026)",
+      "due_on": "2026-10-30T00:00:00Z",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/3"
+    }
+  },
+  "items": {
+    "CHAT-9": {
+      "number": 24,
+      "node_id": "I_kwDOUds2AM8AAAABWaiY9g",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/24",
+      "phase": "Preparation",
+      "points": 2,
+      "owner": "JSohamRao",
+      "due": "2026-10-12",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-10": {
+      "number": 6,
+      "node_id": "I_kwDOUds2AM8AAAABUmTp-A",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/6",
+      "phase": "Sprint 1",
+      "points": 5,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-001"
+    },
+    "CHAT-11": {
+      "number": 7,
+      "node_id": "I_kwDOUds2AM8AAAABUmTq_w",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/7",
+      "phase": "Sprint 1",
+      "points": 5,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-002"
+    },
+    "CHAT-12": {
+      "number": 8,
+      "node_id": "I_kwDOUds2AM8AAAABUmTsHw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/8",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-003"
+    },
+    "CHAT-13": {
+      "number": 9,
+      "node_id": "I_kwDOUds2AM8AAAABUmTtNw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/9",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-004"
+    },
+    "CHAT-14": {
+      "number": 10,
+      "node_id": "I_kwDOUds2AM8AAAABUmTuiA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/10",
+      "phase": "Sprint 1",
+      "points": 8,
+      "owner": "kalluri088",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-005"
+    },
+    "CHAT-15": {
+      "number": 11,
+      "node_id": "I_kwDOUds2AM8AAAABUmTwXA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/11",
+      "phase": "Sprint 1",
+      "points": 2,
+      "owner": "kalluri088",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-006"
+    },
+    "CHAT-16": {
+      "number": 12,
+      "node_id": "I_kwDOUds2AM8AAAABUmTyIQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/12",
+      "phase": "Sprint 1",
+      "points": 1,
+      "owner": "kalluri088",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-007"
+    },
+    "CHAT-17": {
+      "number": 13,
+      "node_id": "I_kwDOUds2AM8AAAABUmTzkA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/13",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "kalluri088",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-008"
+    },
+    "CHAT-18": {
+      "number": 14,
+      "node_id": "I_kwDOUds2AM8AAAABUmT06A",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/14",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-009"
+    },
+    "CHAT-19": {
+      "number": 15,
+      "node_id": "I_kwDOUds2AM8AAAABUmT2GQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/15",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-010"
+    },
+    "CHAT-20": {
+      "number": 16,
+      "node_id": "I_kwDOUds2AM8AAAABUmT4OQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/16",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-011"
+    },
+    "CHAT-21": {
+      "number": 17,
+      "node_id": "I_kwDOUds2AM8AAAABUmT5jw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/17",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-F-012"
+    },
+    "CHAT-22": {
+      "number": 25,
+      "node_id": "I_kwDOUds2AM8AAAABWaijRg",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/25",
+      "phase": "Sprint 2",
+      "points": 5,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-013"
+    },
+    "CHAT-23": {
+      "number": 26,
+      "node_id": "I_kwDOUds2AM8AAAABWaij_A",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/26",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-014"
+    },
+    "CHAT-24": {
+      "number": 27,
+      "node_id": "I_kwDOUds2AM8AAAABWaik0Q",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/27",
+      "phase": "Sprint 2",
+      "points": 2,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-015"
+    },
+    "CHAT-25": {
+      "number": 28,
+      "node_id": "I_kwDOUds2AM8AAAABWailiQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/28",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-016"
+    },
+    "CHAT-26": {
+      "number": 29,
+      "node_id": "I_kwDOUds2AM8AAAABWaimXw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/29",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-017"
+    },
+    "CHAT-27": {
+      "number": 30,
+      "node_id": "I_kwDOUds2AM8AAAABWainBQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/30",
+      "phase": "Sprint 2",
+      "points": 2,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-018"
+    },
+    "CHAT-28": {
+      "number": 31,
+      "node_id": "I_kwDOUds2AM8AAAABWainwA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/31",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "CHAT-F-019"
+    },
+    "CHAT-29": {
+      "number": 32,
+      "node_id": "I_kwDOUds2AM8AAAABWaioaQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/32",
+      "phase": "Sprint 2",
+      "points": 5,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "CHAT-NF-001"
+    },
+    "CHAT-30": {
+      "number": 33,
+      "node_id": "I_kwDOUds2AM8AAAABWaipKQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/33",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "CHAT-NF-002"
+    },
+    "CHAT-31": {
+      "number": 34,
+      "node_id": "I_kwDOUds2AM8AAAABWaipwg",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/34",
+      "phase": "Sprint 2",
+      "points": 5,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-30",
+      "requirement": "CHAT-NF-003"
+    },
+    "CHAT-32": {
+      "number": 35,
+      "node_id": "I_kwDOUds2AM8AAAABWaiqdw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/35",
+      "phase": "Sprint 2",
+      "points": 5,
+      "owner": "kalluri088",
+      "due": "2026-10-30",
+      "requirement": "CHAT-NF-004"
+    },
+    "CHAT-33": {
+      "number": 36,
+      "node_id": "I_kwDOUds2AM8AAAABWaircw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/36",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "CHAT-SR-001"
+    },
+    "CHAT-34": {
+      "number": 18,
+      "node_id": "I_kwDOUds2AM8AAAABUmT63A",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/18",
+      "phase": "Sprint 1",
+      "points": 2,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-SR-002"
+    },
+    "CHAT-35": {
+      "number": 19,
+      "node_id": "I_kwDOUds2AM8AAAABUmT8Nw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/19",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-SR-003"
+    },
+    "CHAT-36": {
+      "number": 20,
+      "node_id": "I_kwDOUds2AM8AAAABUmT-VA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/20",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-SR-004"
+    },
+    "CHAT-37": {
+      "number": 21,
+      "node_id": "I_kwDOUds2AM8AAAABUmT_wA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/21",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "CHAT-SR-005"
+    },
+    "CHAT-38": {
+      "number": 37,
+      "node_id": "I_kwDOUds2AM8AAAABWaivOw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/37",
+      "phase": "Sprint 2",
+      "points": 5,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-30",
+      "requirement": "CHAT-NF-005"
+    },
+    "CHAT-39": {
+      "number": 1,
+      "node_id": "I_kwDOUds2AM8AAAABUmTidg",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/1",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "hrisheekkaraturi",
+      "due": "2026-10-23",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-40": {
+      "number": 2,
+      "node_id": "I_kwDOUds2AM8AAAABUmTkCQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/2",
+      "phase": "Sprint 1",
+      "points": 5,
+      "owner": "kalluri088",
+      "due": "2026-10-23",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-41": {
+      "number": 3,
+      "node_id": "I_kwDOUds2AM8AAAABUmTlNA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/3",
+      "phase": "Sprint 1",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-42": {
+      "number": 4,
+      "node_id": "I_kwDOUds2AM8AAAABUmTmgA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/4",
+      "phase": "Sprint 1",
+      "points": 2,
+      "owner": "JSohamRao",
+      "due": "2026-10-23",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-43": {
+      "number": 5,
+      "node_id": "I_kwDOUds2AM8AAAABUmToIQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/5",
+      "phase": "Sprint 1",
+      "points": 2,
+      "owner": "kalluri088",
+      "due": "2026-10-23",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-44": {
+      "number": 38,
+      "node_id": "I_kwDOUds2AM8AAAABWai0PA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/38",
+      "phase": "Preparation",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-12",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-45": {
+      "number": 39,
+      "node_id": "I_kwDOUds2AM8AAAABWai1AQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/39",
+      "phase": "Preparation",
+      "points": 2,
+      "owner": "kalluri088",
+      "due": "2026-10-16",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-46": {
+      "number": 40,
+      "node_id": "I_kwDOUds2AM8AAAABWai1rQ",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/40",
+      "phase": "Sprint 2",
+      "points": 2,
+      "owner": "kalluri088",
+      "due": "2026-10-30",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-47": {
+      "number": 41,
+      "node_id": "I_kwDOUds2AM8AAAABWai2ZA",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/41",
+      "phase": "Sprint 2",
+      "points": 3,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "Support / deliverable"
+    },
+    "CHAT-48": {
+      "number": 42,
+      "node_id": "I_kwDOUds2AM8AAAABWai3Bw",
+      "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/issues/42",
+      "phase": "Sprint 2",
+      "points": 2,
+      "owner": "JSohamRao",
+      "due": "2026-10-30",
+      "requirement": "Support / deliverable"
+    }
+  },
+  "verification": {
+    "date": "2026-10-11",
+    "items": 40,
+    "requirements": 29,
+    "project_link": true,
+    "points_owners_sprints_dates": "Verified by GitHub API read-back",
+    "estimates": "proposed",
+    "project_url": "https://github.com/orgs/Team15-Chat-Application/projects/1"
+  }
+}
