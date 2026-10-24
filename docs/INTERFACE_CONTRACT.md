@@ -130,6 +130,26 @@ operations; HTML sanitisation is not SQL-query protection.
 
 ## Review decisions still needed
 
+24 October follow-up: room store/transport errors are rolled back together, with
+disconnect if repair fails. Node caps outstanding room events at 64 per socket;
+Python uses at most three 50 ms room-lock waits and revalidates outside the global
+lock after contention. Saturation returns RATE_LIMITED. These operational bounds
+are proposed defaults requiring review, not agreed SRS capacity promises.
+
+Unknown authenticated events acknowledge NOT_FOUND. Expiry/revocation emits
+system:error and disconnects; callbacks are not guaranteed after disconnect.
+Keep fresh validation after a queue/transport wait. Store canonical sanitized
+message output once; do not run the same escaping again when persisting history.
+The UI owner must agree readable entity rendering without injecting decoded
+untrusted HTML. Rendered-XSS acceptance and persistence remain pending.
+
+Only POST /api/auth/login consumes the IP limit, including successful logins.
+Registration, refresh/logout and socket handshakes are not automatically limited.
+Adding those routes requires an explicit reviewed policy and tests. Credential
+lockout remains a separate per-account requirement. Agree an explicit browser
+origin policy before deploying a UI on a different origin. Default development
+launchers are not evidence of a production origin/monitoring policy.
+
 - [ ] Authentication owner confirms token claims, signing and revocation interface.
 - [ ] Room and messaging owners accept event names and acknowledgement envelopes.
 - [ ] Team agrees on member-count and room-name/lifecycle rules.

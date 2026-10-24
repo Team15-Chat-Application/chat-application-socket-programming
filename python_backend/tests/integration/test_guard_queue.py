@@ -29,10 +29,10 @@ def test_signed_jwt_expiring_while_waiting_for_shared_room_lock_cannot_mutate(mo
             self.acquire()
             return self
 
-        def acquire(self, blocking=True):
+        def acquire(self, blocking=True, timeout=-1):
             if current_thread().name == 'guard-waiter':
                 waiting.set()
-            return self.inner.acquire(blocking=blocking)
+            return self.inner.acquire(blocking=blocking, timeout=timeout)
 
         def release(self):
             self.inner.release()

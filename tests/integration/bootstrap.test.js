@@ -16,8 +16,14 @@ let url;
 let clients;
 let valid;
 const testAuth = {
-  async authenticate() { return { userId: 'fixture-user', sessionId: 'fixture-session' }; },
-  async validate() { return valid; }
+  async authenticate(credentials) {
+    expect(credentials).toEqual({ token: 'test-fixture-only' });
+    return { userId: 'fixture-user', sessionId: 'fixture-session' };
+  },
+  async validate(context) {
+    expect(context).toEqual({ token: 'test-fixture-only', identity: { userId: 'fixture-user', sessionId: 'fixture-session' } });
+    return valid;
+  }
 };
 async function start(options) {
   app = createApplication(options);
@@ -73,4 +79,27 @@ test('a session that becomes invalid after connection is disconnected before its
   expect(await rejected).toMatchObject({ ok: false, error: { code: 'UNAUTHORIZED' } });
   await disconnected;
   expect(socket.connected).toBe(false);
+});
+
+test('verified identity is propagated to registered handlers and unknown events acknowledge NOT_FOUND', async () => {
+  await start({ auth: testAuth, registerHandlers: (_io, socket) => {
+    socket.on('test:identity', (_payload, respond) => respond(socket.data.identity));
+  } });
+  const socket = client();
+  const connected = once(socket, 'connect'); socket.connect(); await connected;
+  const emit = event => new Promise(resolve => socket.emit(event, {}, resolve));
+  expect(await emit('test:identity')).toEqual({ userId: 'fixture-user', sessionId: 'fixture-session' });
+  expect(await emit('unknown:event')).toEqual({ ok: false, error: { code: 'NOT_FOUND', message: 'Event not found' } });
+});
+
+test('authentication exceptions log a redacted reason without exception or credential contents', async () => {
+  const warning = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  try {
+    await start({ auth: { authenticate: async () => { throw new Error('private-token-password'); } } });
+    const socket = client(); const denied = once(socket, 'connect_error'); socket.connect();
+    expect((await denied).data.code).toBe('INTERNAL_ERROR');
+    expect(warning).toHaveBeenCalledWith(JSON.stringify({ event: 'socket-connect', code: 'INTERNAL_ERROR' }));
+    expect(JSON.stringify(warning.mock.calls)).not.toContain('private-token-password');
+    expect(JSON.stringify(warning.mock.calls)).not.toContain('test-fixture-only');
+  } finally { warning.mockRestore(); }
 });

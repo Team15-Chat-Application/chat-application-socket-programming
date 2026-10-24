@@ -49,5 +49,5 @@ Do not backdate commits, approvals, sprint history or test execution.
   execution, review and demo evidence; helper modules tested with fixtures are not
   automatically a working end-to-end product.
 
-See `PART_2_DELIVERY_REQUIREMENTS.md` for the source-grounded checklist and the
+See `docs/PART_2_PLAN.md` for the source-grounded checklist and the
 distinction between adopted requirements and work still needing verification.

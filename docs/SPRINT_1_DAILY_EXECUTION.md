@@ -397,3 +397,25 @@ obtain actual required human review before retrying dependency-order merges.
 These changes are attributed to Soham, with maintainer edits enabled on the
 existing owner PR. They do not impersonate Yaswanth or establish QA/test-case,
 working-product or video approval. Authentication/client acceptance remains open.
+
+## 24 October explicit review-and-merge request
+
+Re-read the actual new kalluri088 reviews on #22/#23/#43/#44. Each was submitted
+as COMMENTED; none is a formal approval. #23 reports no actionable defect. #43
+identified a dangling guidance reference, now fixed on its existing branch at
+96bfcbb with passing CI. #22/#44 findings are mapped, checked and dispositioned
+in OCT24_REVIEW_DISPOSITION.md, with remaining scope/policy decisions explicit.
+
+Confirmed fixes include store/channel repair on failed joins/leaves in both
+backends, bounded Node room queues and Python room-lock waits, redacted structured
+audit reasons, stronger credential/identity and transport-membership assertions,
+unknown-event responses and bounded Unicode counting. Kept fresh validation after
+waiting; it must not be removed to reduce lookup cost. Existing launcher CI is
+retained. No review comment is rewritten as approval or fabricated author work.
+
+Full local follow-up: **183 Node + 191 Python = 374 passed**, Node build, Python
+compile and both actual launcher health/login-limit/socket-denial probes passed.
+The corrected #43 guidance was merged into this development branch without any
+default-branch merge. Publication/current-head CI and the owner messaging branch
+integration still require their own exact-commit checks. Actual course QA,
+working-product authentication/client acceptance and outcome video remain pending.

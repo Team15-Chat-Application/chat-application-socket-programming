@@ -6,10 +6,12 @@ class FixtureAuth:
     def __init__(self):
         self.valid = True
 
-    def authenticate(self, _credentials):
+    def authenticate(self, credentials):
+        assert credentials == {'token': 'fixture-only'}
         return {'userId': 'fixture-user', 'sessionId': 'fixture-session'}
 
-    def validate(self, _context):
+    def validate(self, context):
+        assert context == {'token': 'fixture-only', 'identity': {'userId': 'fixture-user', 'sessionId': 'fixture-session'}}
         return self.valid
 
 

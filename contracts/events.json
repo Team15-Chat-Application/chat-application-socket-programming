@@ -1,6 +1,6 @@
 {
   "version": "0.3-proposed",
-  "status": "Team review required; rooms and security components verified on 22 October; real authentication/session, business messaging and UI integration remain pending",
+  "status": "Team review required; room/security follow-up on 24 October; owner messaging exists on PR #45; real authentication/session and usable UI acceptance remain pending",
   "socketAuthentication": { "token": "JWT string" },
   "verifiedIdentity": { "userId": "JWT sub", "sessionId": "JWT jti" },
   "jwtVerificationProposal": {
@@ -16,11 +16,14 @@
     "count": "Distinct authenticated user IDs; additional tabs do not increment memberCount",
     "membership": "Join notice on first user socket; leave notice on final socket; duplicate join/leave is idempotent",
     "transportChannel": "Server-only roomChannel(roomId) / room_channel(room_id); chat:room: prefix",
-    "catalogue": "Authenticated sockets only; empty rooms retained until process restart"
+    "catalogue": "Authenticated sockets only; empty rooms retained until process restart",
+    "dispatchBoundsProposal": "Node: 64 outstanding room events/socket; Python: up to three 50 ms room-lock waits. Saturation returns RATE_LIMITED; these are reviewable operational defaults."
   },
   "acknowledgement": {
     "success": { "ok": true, "data": "event-specific result" },
-    "failure": { "ok": false, "error": { "code": "stable error code", "message": "safe user-facing message" } }
+    "failure": { "ok": false, "error": { "code": "stable error code", "message": "safe user-facing message" } },
+    "unknownEvent": "After successful session validation, acknowledge NOT_FOUND when requested",
+    "invalidSession": "system:error followed by disconnect; callback acknowledgement is not guaranteed after disconnect"
   },
   "clientEvents": {
     "system:ping": { "nonce": "1-64 characters; development diagnostic" },

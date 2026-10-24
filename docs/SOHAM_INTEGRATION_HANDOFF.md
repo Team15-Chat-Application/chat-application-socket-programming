@@ -1,6 +1,6 @@
 # Soham room and security integration handoff
 
-Prepared 20 October, updated 23 October 2026 for the existing assigned owners. This is a concrete
+Prepared 20 October, updated 24 October 2026 for the existing assigned owners. This is a concrete
 integration proposal, not evidence of their agreement or contribution.
 
 ## Authentication handoff for Hrisheek
@@ -22,11 +22,13 @@ lookup may return a promise; the Python lookup is synchronous. Logout must
 persist revocation so the next event's lookup sees it. The helpers verify
 signature, time, identity and revocation on every validation. Node rechecks
 token/session expiry after asynchronous lookup; room handlers revalidate after
-awaited transport join/leave before mutating membership.
+awaited transport join/leave before confirming the operation and publishing notices.
 Python validates under the per-socket context lock, without holding the global
 room lock during a session lookup. Room mutations/dispatch use live_room_events:
 after any contended room-lock wait, revalidate outside the global lock and retry
-nonblocking acquisition before mutation. Retain both the guard and this mutation
+nonblocking acquisition before mutation. Retries are bounded to three 50 ms waits,
+then RATE_LIMITED. Node retains at most 64 pending room events per socket. Retain
+both the guard and this mutation
 boundary when integrating known handlers. test_guard_queue.py covers expiry
 during the wait; test_dispatch_recovery.py covers slow-lookup isolation.
 
