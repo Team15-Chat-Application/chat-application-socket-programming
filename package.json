@@ -1,0 +1,29 @@
+{
+  "name": "team15-chat-application",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sprint 1 development foundation for the Team 15 chat application",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/index.js",
+    "dev": "node --watch --env-file-if-exists=.env src/index.js",
+    "build": "node scripts/build.js",
+    "start:built": "node --env-file-if-exists=.env dist/index.js",
+    "test": "jest --runInBand",
+    "test:unit": "jest --runInBand tests/unit",
+    "test:integration": "jest --runInBand tests/integration"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 5000
+  },
+  "dependencies": {
+    "socket.io": "4.8.4"
+  },
+  "devDependencies": {
+    "jest": "30.5.2",
+    "socket.io-client": "4.8.4"
+  }
+}
