@@ -13,11 +13,12 @@ Development, unit/integration testing, Git/GitHub tracking and automatic build/t
 
 ## Run locally
 
-The development foundation now includes a Node/Socket.IO primary backend, a Flask-SocketIO secondary backend, startup/transport tests and push/PR CI. Authentication, rooms, messaging, persistence and the chat UI are still planned. Socket authentication is denied until the real authentication module is supplied.
+The project includes Node/Socket.IO and Flask-SocketIO backends, named-room creation and catalogue queries, shared bcrypt helpers, unit/integration tests and push/PR CI. Login/JWT integration, room joining/leaving, live room updates, messaging, persistence and the chat UI remain planned. Socket authentication is denied until the real authentication module is supplied.
 
 - [Complete setup and PowerShell commands](docs/DEVELOPMENT.md)
 - [Shared interface proposal for team review](docs/INTERFACE_CONTRACT.md)
-- [Today's setup and validation boundaries](docs/DAY_1_SETUP.md)
+- [02 October setup evidence](docs/DAY_1_SETUP.md)
+- [04 October room creation and bcrypt handoff](docs/OCT_04_PROGRESS.md)
 
 After installing the locked dependencies, start Node with `npm start` and Flask with `scripts/run_flask.ps1` in separate terminals. Health endpoints are `http://127.0.0.1:3000/api/health` and `http://127.0.0.1:5000/api/health`. These are local development servers.
 

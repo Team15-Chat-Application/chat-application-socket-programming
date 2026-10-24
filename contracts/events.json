@@ -1,6 +1,6 @@
 {
-  "version": "0.1-proposed",
-  "status": "Team review required; only system:ping is implemented",
+  "version": "0.2-proposed",
+  "status": "Team review required; system:ping, room:create and basic room:list are implemented behind the auth adapter",
   "socketAuthentication": { "token": "JWT string" },
   "verifiedIdentity": { "userId": "JWT sub", "sessionId": "JWT jti" },
   "acknowledgement": {
@@ -9,7 +9,7 @@
   },
   "clientEvents": {
     "system:ping": { "nonce": "1-64 characters; development diagnostic" },
-    "room:create": { "name": "room display name" },
+    "room:create": { "name": "1-64 Unicode code points after ASCII edge-whitespace trimming; no control characters or unpaired surrogates" },
     "room:join": { "roomId": "server-issued room ID" },
     "room:leave": { "roomId": "server-issued room ID" },
     "room:list": {},

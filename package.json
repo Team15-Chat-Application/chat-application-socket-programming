@@ -20,6 +20,7 @@
     "testTimeout": 5000
   },
   "dependencies": {
+    "bcrypt": "6.0.0",
     "socket.io": "4.8.4"
   },
   "devDependencies": {

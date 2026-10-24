@@ -1,5 +1,7 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, disconnect, emit
+from functools import wraps
+from .rooms import RoomError, RoomStore
 
 
 def failure(code, message):
@@ -14,8 +16,9 @@ class UnavailableAuth:
         return False
 
 
-def create_application(auth=None):
+def create_application(auth=None, rooms=None):
     auth = auth if auth is not None else UnavailableAuth()
+    rooms = rooms if rooms is not None else RoomStore()
     app = Flask(__name__)
     socketio = SocketIO(app, async_mode='threading')
     identities = {}
@@ -50,22 +53,50 @@ def create_application(auth=None):
     def disconnected(_reason=None):
         identities.pop(request.sid, None)
 
-    # Every future business handler must use the same validate-before-dispatch rule.
+    # Every future business handler must retain this guard.
+    def require_session(handler):
+        @wraps(handler)
+        def guarded(*args, **kwargs):
+            context = identities.get(request.sid)
+            try:
+                valid = context is not None and auth.validate(context) is True
+            except Exception:
+                valid = False
+            if not valid:
+                result = failure('UNAUTHORIZED', 'Session is no longer valid')
+                emit('system:error', result)
+                disconnect()
+                return result
+            return handler(*args, **kwargs)
+        return guarded
+
     @socketio.on('system:ping')
-    def ping(payload):
-        context = identities.get(request.sid)
-        try:
-            valid = context is not None and auth.validate(context) is True
-        except Exception:
-            valid = False
-        if not valid:
-            result = failure('UNAUTHORIZED', 'Session is no longer valid')
-            emit('system:error', result)
-            disconnect()
-            return result
+    @require_session
+    def ping(payload=None):
         nonce = payload.get('nonce') if isinstance(payload, dict) else None
         if not isinstance(nonce, str) or not 1 <= len(nonce) <= 64:
             return failure('VALIDATION_ERROR', 'nonce must contain 1 to 64 characters')
         return {'ok': True, 'data': {'nonce': nonce}}
+
+    @socketio.on('room:create')
+    @require_session
+    def create_room(payload=None):
+        try:
+            room = rooms.create(identities[request.sid]['identity'], payload)
+            return {'ok': True, 'data': room}
+        except RoomError as error:
+            return failure(error.code, str(error))
+        except Exception:
+            return failure('INTERNAL_ERROR', 'An internal error occurred')
+
+    @socketio.on('room:list')
+    @require_session
+    def list_rooms(payload=None):
+        if not isinstance(payload, dict):
+            return failure('VALIDATION_ERROR', 'payload must be an object')
+        try:
+            return {'ok': True, 'data': {'rooms': rooms.list()}}
+        except Exception:
+            return failure('INTERNAL_ERROR', 'An internal error occurred')
 
     return app, socketio

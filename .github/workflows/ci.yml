@@ -51,6 +51,11 @@ jobs:
           cache: pip
           cache-dependency-path: python_backend/requirements-dev.lock.txt
       - run: python -m pip install -r python_backend/requirements-dev.lock.txt
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci # Cross-backend bcrypt interoperability tests call the Node helper.
       - id: build
         run: python -m compileall -q python_backend/chat_backend
       - run: mkdir -p reports
