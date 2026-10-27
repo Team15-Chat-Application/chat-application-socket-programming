@@ -20,6 +20,6 @@ function finish(ok) {
 const timer = setTimeout(() => finish(false), 5000);
 socket.on('connect', () => finish(false));
 socket.on('connect_error', error => finish(service === 'node'
-  ? error.data?.code === 'AUTH_NOT_IMPLEMENTED'
+  ? ['AUTH_NOT_IMPLEMENTED', 'UNAUTHORIZED'].includes(error.data?.code)
   : error.message === 'Connection rejected by server'));
 socket.connect();
