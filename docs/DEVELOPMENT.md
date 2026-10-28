@@ -20,7 +20,7 @@ The Python PowerShell launcher reads whitelisted `.env` values. On Linux, export
 
 ## Configuration / TLS
 
-See `.env.example`. Setup creates a random `JWT_SECRET` only if `.env` is absent. It preserves existing configuration. A missing/short secret leaves development authentication unavailable. Never reuse isolated test secrets.
+See `.env.example`. Setup generates a random `JWT_SECRET` when it is missing, preserving an existing secret and the rest of the configuration. A missing/short secret leaves development authentication unavailable. Never reuse isolated test secrets.
 
 Set both `TLS_CERT_PATH` and `TLS_KEY_PATH` to enable TLS. Both launchers reject `NODE_ENV=production` without TLS and a secret of at least 32 bytes. Minimum protocol is TLS 1.2. Flask/Werkzeug remains a development server even when demonstrating TLS; production hosting, trusted certificates, workers, backups and monitoring require a deployment decision.
 
