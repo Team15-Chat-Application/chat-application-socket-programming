@@ -157,3 +157,10 @@ See [current delivery record](DELIVERY_2026_10_28.md) for integrated authenticat
 ## 28 October repository visibility decision
 
 CHAT-9's recorded setup criterion specified a private repository. The repository was already public. On 28 October 2026 the owner explicitly instructed: "Keep public; document the deviation." Public visibility is therefore retained as an owner-authorized deviation. No repository access/visibility change was made, no earlier approval is inferred, and the original private criterion remains visible for traceability. Explain this decision during the final demo. This decision resolves the visibility question only; Jira development-indexing evidence is assessed separately.
+
+
+## 28 October Soham close-out preparation and regression fix
+
+Prepared the STP's isolated 10-user/5-room/200-message fixture with guarded creation and truthful synthetic-state labels. Two deterministic Node account-lockout interleavings were reproduced: post-expiry failure-count overwrite and a new lock cleared after a pending successful password check. Both regressions failed before the correction. Current account/time are now rechecked after bcrypt for success and failure; all 251 Node tests and both actual process-restart flows pass locally. The new high-priority bug CHAT-53 remains subject to Hrisheek/Yaswanth review in the current PR. No prior owner authorship, approval or accepted ticket is rewritten.
+
+Explicit member submission/review/scope tasks CHAT-49 through CHAT-52 were assigned by Soham's 28 October request, with proposed estimates/29 October targets. These are new coordination assignments, not point values or approvals supplied by the PDFs. See SOHAM_DELIVERY_HANDOFF.md. The monthly availability window and final Product Owner freeze remain genuine open dependencies.

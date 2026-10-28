@@ -38,6 +38,9 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:integration -- --json --outputFile=reports/node-integration.json
 
+      - name: Isolated STP seed fixture and overwrite guards
+        run: node scripts/seed_review.js --check
+
       - name: Upload available test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

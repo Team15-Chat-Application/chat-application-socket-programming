@@ -38,7 +38,7 @@ node scripts/performance_check.js
 node scripts/tls_check.js
 ```
 
-On 28 October 2026, **249 Node tests, 255 Python tests and 2 browser tests passed**. Actual network tests also passed against both launchers, including real account issuance and history/read receipts/logout revocation surviving process restart. Local receiver p90 was **10.44 ms** with 50 users and 100 concurrent WebSocket connections. These are scoped measurements, not WAN/monthly availability guarantees.
+On 28 October 2026, **251 Node tests passed after two additional lockout regressions**; the preceding hosted baseline passed 255 Python tests and 2 browser tests. Actual network tests also passed against both launchers, including real account issuance and history/read receipts/logout revocation surviving process restart. Local receiver p90 was **10.44 ms** with 50 users and 100 concurrent WebSocket connections. These are scoped measurements, not WAN/monthly availability guarantees.
 
 GitHub Actions builds/tests both backends on pushes and PRs, retains reports/build artifacts, and runs browser/accessibility, real network/restart, load and TLS checks. CI/CD owner: Jamula Soham Rao. Read hosted results at the actual PR/branch head; local results are separate evidence.
 
@@ -47,6 +47,8 @@ GitHub Actions builds/tests both backends on pushes and PRs, retains reports/bui
 - [Setup, configuration and operations](docs/DEVELOPMENT.md)
 - [Current architecture, traceability, evidence and limitations](docs/DELIVERY_2026_10_28.md)
 - [Owner handoff and final review checklist](docs/FINAL_HANDOFF.md)
+- [Soham delivery and explicit teammate assignments](docs/SOHAM_DELIVERY_HANDOFF.md)
+- [Isolated review fixture and operations runbook](docs/OPERATIONS_REVIEW.md)
 - [One-minute Sprint 1 outcome — recorded 28 October, late delivery](https://github.com/Team15-Chat-Application/chat-application-socket-programming/blob/CHAT-43-46-outcome-handoff/videos/sprint-1-outcome-2026-10-28.webm)
 - [Two-minute Sprint 2 outcome — recorded 28 October](https://github.com/Team15-Chat-Application/chat-application-socket-programming/blob/CHAT-43-46-outcome-handoff/videos/sprint-2-outcome-2026-10-28.webm)
 - [Technical execution evidence](docs/evidence/2026-10-28/)

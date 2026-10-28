@@ -28,3 +28,8 @@ For TC-UX-01 manually check keyboard-only signup/login, room creation/join/leave
 - [ ] Product Owner/team records actual final accepted commit, deviations/defects and freeze date after review, without backdating/signature fabrication.
 
 Ready implementation can coexist with genuine human/time/deployment gates. Keep criterion-specific status: monthly monitoring or video review does not automatically reopen accepted unit-test/CI/tracking work.
+
+
+## Explicit 28 October action assignments
+
+The concrete actions, peer owners, due targets and dependencies are in [Soham delivery handoff](SOHAM_DELIVERY_HANDOFF.md). Hrisheek owns CHAT-49/52 plus existing concurrency/accessibility checks; Yaswanth owns CHAT-50/51 plus the existing TLS/video submission. The seed fixture and operations steps are in [the review runbook](OPERATIONS_REVIEW.md). Both recordings are already uploaded and playback-verified; the remaining video step is Yaswanth's genuine member-owned PR/final integration, not fabrication of another recording. Soham retains monthly operational acceptance and final Product Owner freeze.

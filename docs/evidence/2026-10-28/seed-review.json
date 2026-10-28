@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-10-28T09:34:16.937Z",
+  "file": "reports/review-fixtures/check-a122d3a4-283f-461d-a0b8-f29661bb2c56.sqlite",
+  "users": 10,
+  "rooms": 5,
+  "messages": 200,
+  "recipientReadReceipts": 50,
+  "bcryptCostAtLeast10": true,
+  "credentialRoundTripAndRevocation": true,
+  "scope": "Isolated synthetic STP seed data; seeded delivery/read states are not evidence of network delivery, UAT or human approval",
+  "passwordsAndTokensPrinted": false,
+  "guards": {
+    "existingDatabasePreserved": true,
+    "pathTraversalRejected": true,
+    "missingPasswordRejected": true
+  }
+}

@@ -55,3 +55,8 @@ Real JSONL observations and summary go under `reports/`. Short samples explicitl
 ## CI / contributions
 
 The push/PR workflow installs pinned dependencies, builds both backends and runs unit/integration, real launcher/system, browser/accessibility, delivery/load and TLS checks. Reports and build artifacts are uploaded. Hosted results must be verified at the actual branch/PR head. Resolve failures at the actual head. Use genuine Jira keys in branches/commits/PRs and preserve authorship. Assigned members raise their own PRs; owners review/merge; QA Lead reviews test cases/execution. Requested review, automated review and green CI are not human approval. See `FINAL_HANDOFF.md`.
+
+
+## Reproducible review fixture
+
+Run `node scripts/seed_review.js --check` for the STP's isolated 10-user/5-room/200-message dataset and overwrite/path/password guards. The check also runs in Node CI. For an interactive fixture with a privately chosen dummy password, follow [OPERATIONS_REVIEW.md](OPERATIONS_REVIEW.md); existing databases are never replaced and seeded states are not transport/UAT proof.
