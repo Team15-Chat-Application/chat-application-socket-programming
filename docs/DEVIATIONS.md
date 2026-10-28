@@ -147,3 +147,8 @@ and retention, and platform-complete hashed Python dependency artifacts. Existin
 S2-ROOM-CAPACITY/S2-PROXY-IP entries remain open. Dual commit/PR CI is intentionally
 retained to meet the adopted testing instructions. Do not treat these disclosed
 follow-ups as implemented mitigations or use COMMENTED reviews as approvals.
+
+
+## 28 October working-product update
+
+See [current delivery record](DELIVERY_2026_10_28.md) for integrated authentication, persistence, browser UI, actual network/restart, load/TLS and video evidence. Earlier missing-feature and unmerged-PR statements remain historical snapshots. Runtime/database decisions and late Sprint 1 delivery are explicitly recorded there. Monthly availability, manual accessibility review and genuine owner/QA/final acceptance are not inferred from automated tests.

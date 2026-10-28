@@ -1,8 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, disconnect, emit, join_room, leave_room
 from functools import wraps
 from contextlib import contextmanager
 import json
+import time
+from threading import Timer
 from threading import RLock
 from .rooms import RoomError, RoomStore, CATALOGUE_CHANNEL, room_channel
 from .input import InputError
@@ -22,7 +24,8 @@ class UnavailableAuth:
         return False
 
 
-def create_application(auth=None, rooms=None, login_limiter=None, login_handler=None, messages=None):
+def create_application(auth=None, rooms=None, login_limiter=None, login_handler=None, messages=None,
+                       register_handler=None, logout_handler=None, asset_root=None, vendor_root=None):
     auth = auth if auth is not None else UnavailableAuth()
     rooms = rooms if rooms is not None else RoomStore()
     login_limiter = login_limiter if login_limiter is not None else LoginLimiter()
@@ -31,7 +34,9 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     app = Flask(__name__)
     socketio = SocketIO(app, async_mode='threading')
     identities = {}
+    app.extensions['chat_identities']=identities
     room_events = RLock()
+    typing_last,typing_timers={},{}
 
     def audit(event, code):
         # Never log exception strings, tokens, credentials, payloads or message text.
@@ -45,6 +50,22 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
 
     def membership(notice):
         socketio.emit('room:membership', notice, to=room_channel(notice['roomId']))
+        socketio.emit('presence:changed',{'roomId':notice['roomId'],'userId':notice['userId'],
+            'status':'online' if notice['action']=='join' else 'offline'},to=room_channel(notice['roomId']))
+
+    if register_handler is not None:
+        app.add_url_rule('/api/auth/register','register',register_handler,methods=['POST'])
+    if logout_handler is not None:
+        app.add_url_rule('/api/auth/logout','logout',logout_handler,methods=['POST'])
+    if asset_root is not None:
+        @app.get('/')
+        def index():return send_from_directory(asset_root,'index.html')
+        @app.get('/app.js')
+        def client_js():return send_from_directory(asset_root,'app.js')
+        @app.get('/style.css')
+        def client_css():return send_from_directory(asset_root,'style.css')
+        @app.get('/vendor/socket.io.min.js')
+        def socket_client():return send_from_directory(vendor_root,'socket.io.min.js')
 
     @app.post('/api/auth/login')
     def login():
@@ -64,6 +85,9 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     @app.after_request
     def no_cache(response):
         response.headers['Cache-Control'] = 'no-store'
+        response.headers['X-Content-Type-Options']='nosniff'
+        response.headers['Referrer-Policy']='no-referrer'
+        response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' ws: wss:; base-uri 'none'; frame-ancestors 'none'"
         return response
 
     @app.get('/api/health')
@@ -97,6 +121,8 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
 
     @socketio.on('disconnect')
     def disconnected(_reason=None):
+        for key,timer in list(typing_timers.items()):
+            if key[0]==request.sid:timer.cancel();typing_timers.pop(key,None);typing_last.pop(key,None)
         context = identities.pop(request.sid, None)
         if context is not None:
             with context['lock'], room_events:
@@ -316,6 +342,40 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         except Exception:
             audit('message-history','INTERNAL_ERROR')
             return failure('INTERNAL_ERROR','An internal error occurred')
+
+    @socketio.on('presence:list')
+    @require_session
+    def presence_list(payload=None):
+        try:
+            with live_room_events():
+                room=rooms.get(payload)
+                if not rooms.has_socket(room['roomId'],request.sid):raise RoomError('FORBIDDEN','Join the room first')
+                user_ids={v['identity']['userId'] for sid,v in identities.items() if rooms.has_socket(room['roomId'],sid)}
+                return {'ok':True,'data':{'roomId':room['roomId'],'users':[{'userId':uid,'username':getattr(messages.history,'username_for',lambda x:x[:8])(uid),'status':'online'} for uid in sorted(user_ids)]}}
+        except RoomError as error:return failure(error.code,str(error))
+
+    @socketio.on('typing:set')
+    @require_session
+    def typing_set(payload=None):
+        try:
+            with live_room_events():
+                room=rooms.get(payload);sid=request.sid
+                if not rooms.has_socket(room['roomId'],sid):raise RoomError('FORBIDDEN','Join the room first')
+                if type(payload.get('typing')) is not bool:raise RoomError('VALIDATION_ERROR','typing must be boolean')
+                key=(sid,room['roomId']);now=time.monotonic()
+                if payload['typing'] and now-typing_last.get(key,-1)<0.5:return {'ok':True,'data':{'debounced':True}}
+                typing_last[key]=now
+                old=typing_timers.pop(key,None)
+                if old:old.cancel()
+                data={'roomId':room['roomId'],'userId':identities[sid]['identity']['userId'],'typing':payload['typing']}
+                socketio.emit('presence:typing',data,to=room_channel(room['roomId']),skip_sid=sid)
+                if payload['typing']:
+                    def expire():
+                        typing_timers.pop(key,None)
+                        if sid in identities:socketio.emit('presence:typing',dict(data,typing=False),to=room_channel(room['roomId']),skip_sid=sid)
+                    timer=Timer(1.5,expire);timer.daemon=True;typing_timers[key]=timer;timer.start()
+                return {'ok':True,'data':{'accepted':True}}
+        except RoomError as error:return failure(error.code,str(error))
 
     @socketio.on('*')
     @require_session

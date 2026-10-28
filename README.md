@@ -1,35 +1,57 @@
-# chat-application-socket-programming
-Real-time Chat Application using Socket Programming, WebSockets, Node.js and Flask-SocketIO developed as a Software Engineering mini-project.
+# Common Room — Team 15 Chat Application
 
-## Part 2 delivery
+A working browser chat application with equivalent Node/Socket.IO and Python/Flask-SocketIO backends. Register/sign in, create/join/leave rooms, exchange safe text messages, see online members/typing, receive unread badges, and recover the latest 50 messages after restart. SQLite stores accounts, revocable sessions, rooms, messages and per-recipient read receipts.
 
-The adopted Part 2 calendar sets backlog/estimates due **12 October**, optional practice **12-16 October**, **Sprint 1 on 19-23 October** and **Sprint 2 on 26-30 October 2026**. Existing October 2-4 work remains preparatory history. Scope and point estimates remain proposed for team review.
+## Run
 
-- [Sprint 1 plan, responsibilities and review evidence](docs/SPRINT_1.md)
-- [Part 2 plan, full backlog, points and deliverables](docs/PART_2_PLAN.md)
-- [20-23 October daily execution and verified progress](docs/SPRINT_1_DAILY_EXECUTION.md)
-- [Linked GitHub Project](https://github.com/orgs/Team15-Chat-Application/projects/1)
-- [Sprint 2 milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/3)
-- [Sprint 1 requirement/test traceability](docs/SPRINT_1_TRACEABILITY.md)
-- [Sprint 1 contribution and tracking review package](docs/SPRINT_1_CONTRIBUTIONS.md)
-- [Final regression, review and demo checklist](docs/SPRINT_1_REVIEW_DEMO.md)
-- [Working-product video checklist](docs/SPRINT_VIDEO_CHECKLIST.md)
-- [Deviation log](docs/DEVIATIONS.md)
-- [Sprint 1 issues and milestone](https://github.com/Team15-Chat-Application/chat-application-socket-programming/milestone/1)
-- [Jira board](https://jsohamrao.atlassian.net/jira/software/projects/CHAT/boards/35)
+Requires Node **24**, Python **3.12** for the secondary backend, and Git. In PowerShell at the repository root:
 
-Development, unit/integration testing, Git/GitHub tracking and automatic build/test CI/CD progress together. Feature scope remains proposed pending reconciliation with the approved plan.
+```powershell
+npm ci
+npm run setup
+npm start
+```
 
-## Run locally
+Open **http://127.0.0.1:3000**, create an account, and use a second browser profile for another user. Setup creates an ignored `.env` with a random signing secret. Preserve it and `data/` across restarts; never commit either. No external database or native SQLite build toolchain is required.
 
-The project includes Node/Socket.IO and Flask-SocketIO backends, room creation/join/leave, distinct-user membership counts, room notices, authenticated live catalogue updates, shared bcrypt helpers, unit/integration tests and push/PR CI. The room/security branch passed 174 Node and 183 Python tests on 23 October, including the Python expiry-during-lock-wait regression. Yaswanth's unmerged messaging PR #45 is separately validated and has an outstanding broadcast-error finding. Registration/login, live session issuance/revocation and a usable chat client remain missing; the default launchers deny socket authentication until a real adapter is supplied. Message history/persistence remains proposed Sprint 2 scope. Component checks do not establish working-product acceptance.
+For the equivalent Python backend:
 
-- [Complete setup and PowerShell commands](docs/DEVELOPMENT.md)
-- [Shared interface proposal for team review](docs/INTERFACE_CONTRACT.md)
-- [Authentication and messaging integration handoff](docs/SOHAM_INTEGRATION_HANDOFF.md)
-- [02 October setup evidence](docs/DAY_1_SETUP.md)
-- [04 October room creation and bcrypt handoff](docs/OCT_04_PROGRESS.md)
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r python_backend/requirements-dev.lock.txt
+.\scripts\run_flask.ps1
+```
 
-After installing the locked dependencies, start Node with `npm start` and Flask with `scripts/run_flask.ps1` in separate terminals. Health endpoints are `http://127.0.0.1:3000/api/health` and `http://127.0.0.1:5000/api/health`. These are local development servers.
+Open **http://127.0.0.1:5000**. These are independent alternative servers with separate default databases, not a horizontally scaled cluster or hosted production deployment.
 
-CI/CD owner: **Jamula Soham Rao**. The workflow builds both components and runs their available unit/integration tests on every push and pull request, retaining reports and development artifacts. Production deployment is not configured.
+## Verify
+
+```powershell
+npm run build
+npm test
+.\.venv\Scripts\python.exe -m pytest python_backend/tests -q
+npm run browser:install
+npm run test:browser
+node scripts/system_check.js
+node scripts/performance_check.js
+.\.venv\Scripts\python.exe scripts/generate_test_tls.py
+node scripts/tls_check.js
+```
+
+On 28 October 2026, **249 Node tests, 255 Python tests and 2 browser tests passed**. Actual network tests also passed against both launchers, including real account issuance and history/read receipts/logout revocation surviving process restart. Local receiver p90 was **10.44 ms** with 50 users and 100 concurrent WebSocket connections. These are scoped measurements, not WAN/monthly availability guarantees.
+
+GitHub Actions builds/tests both backends on pushes and PRs and retains reports/build artifacts. An expanded workflow adding browser/accessibility, real network/restart, load and TLS checks is prepared; publishing that workflow requires the additional GitHub CLI workflow permission. CI/CD owner: Jamula Soham Rao. Read hosted results at the actual PR/branch head; local results are separate evidence.
+
+## Delivery
+
+- [Setup, configuration and operations](docs/DEVELOPMENT.md)
+- [Current architecture, traceability, evidence and limitations](docs/DELIVERY_2026_10_28.md)
+- [Owner handoff and final review checklist](docs/FINAL_HANDOFF.md)
+- [One-minute Sprint 1 outcome — recorded 28 October, late delivery](videos/sprint-1-outcome-2026-10-28.webm)
+- [Two-minute Sprint 2 outcome — recorded 28 October](videos/sprint-2-outcome-2026-10-28.webm)
+- [Technical execution evidence](docs/evidence/2026-10-28/)
+- [GitHub Project](https://github.com/orgs/Team15-Chat-Application/projects/1)
+- [Part 2 plan and proposed estimates](docs/PART_2_PLAN.md)
+- [Historical deviation log](docs/DEVIATIONS.md)
+
+The adopted calendar is Sprint 1 **19–23 October** and Sprint 2 **26–30 October 2026**. Earlier dated documents remain historical snapshots. The current delivery record supersedes their statements that authentication, persistence or the UI are missing. Human review, full accessibility sign-off, a full-month availability record and formal release/freeze remain distinct acceptance steps. No signatures or earlier completion dates are invented.

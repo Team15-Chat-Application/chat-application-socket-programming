@@ -7,6 +7,9 @@
     "node": ">=24 <25"
   },
   "scripts": {
+    "setup": "node scripts/setup.js",
+    "test:browser": "node scripts/browser-test.js test",
+    "browser:install": "node scripts/browser-test.js install chromium",
     "start": "node --env-file-if-exists=.env src/index.js",
     "dev": "node --watch --env-file-if-exists=.env src/index.js",
     "build": "node scripts/build.js",
@@ -16,6 +19,7 @@
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand tests/integration"
   },
   "jest": {
+    "testPathIgnorePatterns": ["/node_modules/", "/e2e/"],
     "testEnvironment": "node",
     "testTimeout": 5000
   },

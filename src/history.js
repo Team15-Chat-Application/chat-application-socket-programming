@@ -27,7 +27,7 @@ class HistoryStore {
   get(messageId) {
     const row = this.db.prepare('SELECT message_id AS messageId,room_id AS roomId,sender_id AS senderId,content,created_at AS createdAt,status FROM messages WHERE message_id=?').get(messageId);
     if (!row) throw new AppError('NOT_FOUND', 'Message not found');
-    return { ...row, readBy: this.db.prepare('SELECT user_id AS userId,read_at AS readAt FROM receipts WHERE message_id=? ORDER BY user_id').all(messageId) };
+    return { ...row, ...(this.usernameFor ? {senderName:this.usernameFor(row.senderId)}:{}), readBy: this.db.prepare('SELECT user_id AS userId,read_at AS readAt FROM receipts WHERE message_id=? ORDER BY user_id').all(messageId) };
   }
   history(roomId) {
     return this.db.prepare('SELECT message_id FROM messages WHERE room_id=? ORDER BY seq DESC LIMIT 50').all(roomId)

@@ -33,4 +33,8 @@ function copySource(from, to) {
   }
 }
 copySource(source, destination);
+fs.mkdirSync(path.join(destination,'public'),{recursive:true});
+copySource(path.join(root,'public'),path.join(destination,'public'));
+fs.mkdirSync(path.join(destination,'public','vendor'),{recursive:true});
+fs.copyFileSync(path.join(root,'node_modules','socket.io','client-dist','socket.io.min.js'),path.join(destination,'public','vendor','socket.io.min.js'));
 console.log('Validated server JavaScript and built dist/. Run npm run start:built to use the build.');
