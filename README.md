@@ -40,7 +40,7 @@ node scripts/tls_check.js
 
 On 28 October 2026, **249 Node tests, 255 Python tests and 2 browser tests passed**. Actual network tests also passed against both launchers, including real account issuance and history/read receipts/logout revocation surviving process restart. Local receiver p90 was **10.44 ms** with 50 users and 100 concurrent WebSocket connections. These are scoped measurements, not WAN/monthly availability guarantees.
 
-GitHub Actions builds/tests both backends on pushes and PRs and retains reports/build artifacts. An expanded workflow adding browser/accessibility, real network/restart, load and TLS checks is prepared; publishing that workflow requires the additional GitHub CLI workflow permission. CI/CD owner: Jamula Soham Rao. Read hosted results at the actual PR/branch head; local results are separate evidence.
+GitHub Actions builds/tests both backends on pushes and PRs, retains reports/build artifacts, and runs browser/accessibility, real network/restart, load and TLS checks. CI/CD owner: Jamula Soham Rao. Read hosted results at the actual PR/branch head; local results are separate evidence.
 
 ## Delivery
 

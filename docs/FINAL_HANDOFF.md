@@ -23,7 +23,7 @@ For TC-UX-01 manually check keyboard-only signup/login, room creation/join/leave
 - [ ] Exact final merged commit passes hosted CI, including browser/system/TLS/load checks.
 - [ ] Authentic videos are retained; Sprint 1's late delivery is explicit.
 - [ ] Manual accessibility findings resolved or explicitly dispositioned.
-- [ ] Original private-repository criterion reconciled with the owner's actual visibility decision. No access change or approved deviation is inferred.
+- [x] Repository visibility decision: on 28 October the owner explicitly chose to keep the existing repository public and document the deviation from CHAT-9's original private-repository setup criterion. No visibility/access change was made. See the deviation log.
 - [ ] Availability evaluated over a full operational month; hosting/monitoring responsibility agreed. Brief local samples are insufficient.
 - [ ] Product Owner/team records actual final accepted commit, deviations/defects and freeze date after review, without backdating/signature fabrication.
 

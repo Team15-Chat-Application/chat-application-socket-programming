@@ -152,3 +152,8 @@ follow-ups as implemented mitigations or use COMMENTED reviews as approvals.
 ## 28 October working-product update
 
 See [current delivery record](DELIVERY_2026_10_28.md) for integrated authentication, persistence, browser UI, actual network/restart, load/TLS and video evidence. Earlier missing-feature and unmerged-PR statements remain historical snapshots. Runtime/database decisions and late Sprint 1 delivery are explicitly recorded there. Monthly availability, manual accessibility review and genuine owner/QA/final acceptance are not inferred from automated tests.
+
+
+## 28 October repository visibility decision
+
+CHAT-9's recorded setup criterion specified a private repository. The repository was already public. On 28 October 2026 the owner explicitly instructed: "Keep public; document the deviation." Public visibility is therefore retained as an owner-authorized deviation. No repository access/visibility change was made, no earlier approval is inferred, and the original private criterion remains visible for traceability. Explain this decision during the final demo. This decision resolves the visibility question only; Jira development-indexing evidence is assessed separately.
