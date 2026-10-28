@@ -46,6 +46,23 @@ jobs:
           path: reports/*.json
           if-no-files-found: warn
 
+      - name: Real receiver delivery and persistence measurements
+        run: node scripts/performance_check.js
+
+      - name: Local TLS and authenticated WSS checks
+        run: |
+          python scripts/generate_test_tls.py
+          node scripts/tls_check.js
+
+      - name: Upload measured transport evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: transport-evidence
+          path: |
+            reports/performance.json
+            reports/tls.json
+
       - name: Upload Node build
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -96,6 +113,9 @@ jobs:
           JWT_SECRET: smoke-test-only-key-not-for-production-123456
         run: python scripts/smoke_startup.py --report reports/launcher-smoke.json
 
+      - name: Actual network account-to-chat flow and restart persistence
+        run: node scripts/system_check.js
+
       - name: Upload available test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -104,6 +124,7 @@ jobs:
           path: |
             reports/*.xml
             reports/launcher-smoke.json
+            reports/system.json
           if-no-files-found: warn
 
       - name: Upload secondary backend
@@ -113,4 +134,28 @@ jobs:
           path: |
             python_backend/chat_backend/*.py
             python_backend/requirements-dev.lock.txt
+            public/
+            dist/public/vendor/
+
+  browser:
+    name: Browser product and accessibility acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run browser:install -- --with-deps
+      - run: npm run test:browser
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: browser-evidence
+          path: |
+            reports/browser-results.json
+            reports/chat-*.png
           if-no-files-found: error
