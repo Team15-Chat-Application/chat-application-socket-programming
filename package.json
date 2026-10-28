@@ -21,12 +21,13 @@
   },
   "dependencies": {
     "bcrypt": "6.0.0",
-    "better-sqlite3": "^13.0.3",
     "jsonwebtoken": "9.0.3",
     "sanitize-html": "2.18.1",
     "socket.io": "4.8.4"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "axe-core": "4.14.0",
     "jest": "30.5.2",
     "socket.io-client": "4.8.4"
   }

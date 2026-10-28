@@ -23,12 +23,13 @@ class MessageService:
     the payload, and length/markup policy comes from the shared sanitisation helper.
     """
 
-    def __init__(self, rooms, new_id=None, clock=None):
+    def __init__(self, rooms, new_id=None, clock=None, history=None):
         if rooms is None:
             raise ValueError('a RoomStore instance is required')
         self._rooms = rooms
         self._new_id = new_id if new_id is not None else lambda: str(uuid4())
         self._clock = clock if clock is not None else utc_timestamp
+        self.history = history
 
     def send(self, identity, socket_id, payload):
         require_identity(identity)
@@ -40,5 +41,8 @@ class MessageService:
         if not isinstance(message_id, str) or not message_id:
             # Same convention as rooms.py: an allocation failure is a defect, not a contract error.
             raise RuntimeError('Message ID allocation failed')
-        return {'messageId': message_id, 'roomId': room['roomId'],
+        message = {'messageId': message_id, 'roomId': room['roomId'],
                 'senderId': identity['userId'], 'content': content, 'createdAt': self._clock()}
+        if self.history is not None:
+            self.history.save(message)
+        return message

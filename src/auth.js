@@ -88,9 +88,13 @@ function createAuthService({ database, secret, clock = () => Date.now() }) {
     const passwordIsValid = await verifyPassword(password, user.passwordHash);
 
     if (!passwordIsValid) {
+      const current = database.findUserByUsername(validUsername);
+      if (current.lockedUntil != null && current.lockedUntil > now) {
+        throw new AppError('ACCOUNT_LOCKED', 'Account is temporarily locked');
+      }
       const attempts = user.lockedUntil != null && user.lockedUntil <= now
         ? 1
-        : user.failedAttempts + 1;
+        : current.failedAttempts + 1;
 
       const lockedUntil = attempts >= MAX_FAILED_ATTEMPTS
         ? now + LOCKOUT_SECONDS

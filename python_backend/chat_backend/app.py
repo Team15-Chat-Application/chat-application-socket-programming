@@ -192,6 +192,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         try:
             with live_room_events():
                 room = rooms.get(payload)
+                history = rooms.repository.history(room['roomId']) if rooms.repository is not None else None
                 identity = identities[request.sid]['identity']
                 channel = room_channel(room['roomId'])
                 already_joined = rooms.has_socket(room['roomId'], request.sid)
@@ -210,7 +211,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                     membership({'roomId': room['roomId'], 'userId': identity['userId'],
                                 'action': 'join', 'memberCount': result['room']['memberCount']})
                     catalogue()
-                return {'ok': True, 'data': result['room']}
+                return {'ok': True, 'data': dict(result['room'], history=history) if history is not None else result['room']}
         except RoomError as error:
             return failure(error.code, str(error))
         except Exception:
@@ -266,6 +267,9 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
             with live_room_events():
                 message = messages.send(identities[request.sid]['identity'], request.sid, payload)
                 socketio.emit('message:received', message, to=room_channel(message['roomId']))
+                if messages.history is not None:
+                    message = messages.history.delivered(message['messageId'])
+                    socketio.emit('message:status', message, to=room_channel(message['roomId']))
             # The sender's acknowledgement is returned only after the broadcast is
             # dispatched (CHAT-F-006). Per-recipient delivery confirmation is CHAT-24/25.
             return {'ok': True, 'data': message}
@@ -275,6 +279,43 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         except Exception:
             audit('message-send', 'INTERNAL_ERROR')
             return failure('INTERNAL_ERROR', 'An internal error occurred')
+
+    @socketio.on('room:history')
+    @require_session
+    def room_history(payload=None):
+        return history_event(payload, False)
+
+    @socketio.on('message:read')
+    @require_session
+    def read_message(payload=None):
+        return history_event(payload, True)
+
+    def history_event(payload, mark_read):
+        try:
+            with live_room_events():
+                if messages.history is None:
+                    raise RoomError('NOT_FOUND','History storage is unavailable')
+                if not isinstance(payload, dict):
+                    raise RoomError('VALIDATION_ERROR','payload must be an object')
+                room_id = payload.get('roomId')
+                if mark_read:
+                    mid = payload.get('messageId')
+                    if not isinstance(mid,str) or not 1 <= len(mid) <= 128:
+                        raise RoomError('VALIDATION_ERROR','Invalid messageId')
+                    room_id = messages.history.get(mid)['roomId']
+                rooms.get({'roomId':room_id})
+                if not rooms.has_socket(room_id,request.sid):
+                    raise RoomError('FORBIDDEN','Join the room first')
+                if not mark_read:
+                    return {'ok':True,'data':{'roomId':room_id,'messages':messages.history.history(room_id)}}
+                message = messages.history.read(mid,identities[request.sid]['identity']['userId'])
+                socketio.emit('message:status',message,to=room_channel(room_id))
+                return {'ok':True,'data':message}
+        except RoomError as error:
+            return failure(error.code,str(error))
+        except Exception:
+            audit('message-history','INTERNAL_ERROR')
+            return failure('INTERNAL_ERROR','An internal error occurred')
 
     @socketio.on('*')
     @require_session

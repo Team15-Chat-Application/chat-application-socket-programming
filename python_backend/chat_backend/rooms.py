@@ -40,12 +40,16 @@ def require_identity(identity):
 
 class RoomStore:
     """Process-local catalogue; snapshots never expose mutable internal records."""
-    def __init__(self, new_id=None):
+    def __init__(self, new_id=None, repository=None):
         self._new_id = new_id if new_id is not None else lambda: str(uuid4())
         self._rooms = {}
         self._members = {}
         self._sockets = {}
         self._lock = RLock()
+        self.repository = repository
+        for room in repository.rooms() if repository is not None else []:
+            self._rooms[room['roomId']] = room
+            self._members[room['roomId']] = {}
 
     def create(self, identity, payload):
         require_identity(identity)
@@ -55,6 +59,8 @@ class RoomStore:
             if not isinstance(room_id, str) or not room_id or room_id in self._rooms:
                 raise RuntimeError('Room ID allocation failed')
             room = {'roomId': room_id, 'name': name, 'memberCount': 0}
+            if self.repository is not None:
+                self.repository.create_room(room, identity)
             self._rooms[room_id] = room
             self._members[room_id] = {}
             return dict(room)
