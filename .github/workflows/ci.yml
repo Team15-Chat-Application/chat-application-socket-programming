@@ -119,6 +119,11 @@ jobs:
       - name: Actual network account-to-chat flow and restart persistence
         run: node scripts/system_check.js
 
+      - name: Actual Flask TLS/WSS production launcher and CSP
+        run: |
+          python scripts/generate_test_tls.py
+          node scripts/python_tls_check.js
+
       - name: Upload available test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -128,6 +133,7 @@ jobs:
             reports/*.xml
             reports/launcher-smoke.json
             reports/system.json
+            reports/python-tls.json
           if-no-files-found: warn
 
       - name: Upload secondary backend

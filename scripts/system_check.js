@@ -8,7 +8,7 @@ async function freePort(){const server=net.createServer();await new Promise(reso
 async function check(backend){
  const port=await freePort(),url='http://127.0.0.1:'+port;
  const filename=path.resolve('reports','system-'+backend+'-'+randomUUID()+'.sqlite');
- const env={...process.env,NODE_ENV:'test',JWT_SECRET:randomBytes(48).toString('hex'),NODE_PORT:String(port),FLASK_PORT:String(port),NODE_HOST:'127.0.0.1',FLASK_HOST:'127.0.0.1',NODE_DB_PATH:filename,FLASK_DB_PATH:filename,TLS_CERT_PATH:'',TLS_KEY_PATH:'',PYTHONPATH:path.join(ROOT,'python_backend')};
+ const env={...process.env,NODE_ENV:'test',FLASK_ENV:'test',JWT_SECRET:randomBytes(48).toString('hex'),NODE_PORT:String(port),FLASK_PORT:String(port),NODE_HOST:'127.0.0.1',FLASK_HOST:'127.0.0.1',NODE_DB_PATH:filename,FLASK_DB_PATH:filename,TLS_CERT_PATH:'',TLS_KEY_PATH:'',PYTHONPATH:path.join(ROOT,'python_backend')};
  const python=process.env.PYTHON_EXECUTABLE||(fs.existsSync(path.join(ROOT,'.venv','Scripts','python.exe'))?path.join(ROOT,'.venv','Scripts','python.exe'):'python');
  let child,logs='',clients=[];
  async function start(){

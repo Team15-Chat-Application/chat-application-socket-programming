@@ -6,14 +6,14 @@ from .history import HistoryStore
 from .rooms import RoomStore
 from .messages import MessageService
 from .app import create_application, failure
+from .tls_config import read_tls_config
 
 
 def create_runtime(env=None, filename=None):
     env=os.environ if env is None else env
+    cert_path,_key_path=read_tls_config(env)
     secret=env.get('JWT_SECRET')
     root=Path(__file__).resolve().parents[2]
-    if env.get('NODE_ENV')=='production' and (not env.get('TLS_CERT_PATH') or not env.get('TLS_KEY_PATH') or not secret or len(secret.encode())<32):
-        raise ValueError('Production requires JWT_SECRET and TLS certificate/key')
     filename=filename or env.get('FLASK_DB_PATH') or env.get('CHAT_DB_PATH') or str(root/'data'/'flask.sqlite')
     accounts=Accounts(filename,secret) if isinstance(secret,str) and len(secret.encode())>=32 else None
     history=HistoryStore(filename)
@@ -46,7 +46,7 @@ def create_runtime(env=None, filename=None):
     vendor=next((p for p in candidates if (p/'socket.io.min.js').is_file()),candidates[-1])
     app,socketio=create_application(auth=accounts.auth() if accounts is not None else None,rooms=rooms,messages=messages,
         login_handler=account_route('login'),register_handler=account_route('register'),logout_handler=account_route('logout'),
-        asset_root=root/'public',vendor_root=vendor)
+        asset_root=root/'public',vendor_root=vendor,secure_transport=bool(cert_path))
 
     def close():
         history.close()

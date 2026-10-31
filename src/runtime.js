@@ -45,8 +45,10 @@ function createRuntime({ env=process.env, filename, secret=env.JWT_SECRET }={}) 
       if(operation==='logout'){
         const header=req.headers.authorization;
         if(typeof header!=='string'||!header.startsWith('Bearer '))throw new AppError('UNAUTHORIZED','Authentication required');
-        const token=header.slice(7);await authService.logout({token});
-        for(const peer of app.io.of('/').sockets.values())if(peer.data.token===token)peer.disconnect(true);
+        const token=header.slice(7);
+        const identity=await authService.getJwtAuth().authenticate({token});
+        await authService.logout({token});
+        for(const peer of app.io.of('/').sockets.values())if(peer.data.identity?.sessionId===identity.sessionId)peer.disconnect(true);
         res.statusCode=204;res.end();return;
       }
       const result=await authService[operation](await readBody(req));
@@ -67,7 +69,8 @@ function createRuntime({ env=process.env, filename, secret=env.JWT_SECRET }={}) 
       }
       const item=files[pathname];if(!item)return false;
       res.setHeader('Content-Type',item[1]);
-      res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' ws: wss:; base-uri 'none'; frame-ancestors 'none'");
+      const connections=tls?"'self' wss:":"'self' ws: wss:";
+      res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'; style-src 'self'; connect-src ${connections}; base-uri 'none'; frame-ancestors 'none'`);
       res.end(fs.readFileSync(path.join(assets,item[0])));return true;
     },
     registerHandlers(io,socket){

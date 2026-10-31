@@ -57,11 +57,17 @@ def check(service, command, port_key):
         port_key: str(port),
         'NODE_HOST': '127.0.0.1',
         'FLASK_HOST': '127.0.0.1',
+        'NODE_ENV': 'test',
+        'FLASK_ENV': 'test',
+        'TLS_CERT_PATH': '',
+        'TLS_KEY_PATH': '',
         'PYTHONPATH': str(ROOT / 'python_backend')
     })
 
-    env.setdefault("JWT_SECRET",secrets.token_urlsafe(48))
-    env["CHAT_DB_PATH"]=str(ROOT/"reports"/("smoke-"+service+"-"+uuid4().hex+".sqlite"))
+    env['JWT_SECRET']=secrets.token_urlsafe(48)
+    filename=str(ROOT/"reports"/("smoke-"+service+"-"+uuid4().hex+".sqlite"))
+    for key in ('CHAT_DB_PATH','NODE_DB_PATH','FLASK_DB_PATH'):
+        env[key]=filename
     process = subprocess.Popen(
         command,
         cwd=ROOT,

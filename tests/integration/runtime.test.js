@@ -1,5 +1,6 @@
 const { createRuntime }=require('../../src/runtime');
 const { io:connect }=require('socket.io-client');
+const jwt=require('jsonwebtoken');
 const secret='test-real-account-issuer-only-not-for-production-123456';
 let runtime,url,clients;
 const ack=(socket,event,payload)=>new Promise((resolve,reject)=>socket.timeout(3000).emit(event,payload,(err,result)=>err?reject(err):resolve(result)));
@@ -26,6 +27,18 @@ test('logout revokes real issued JWT and immediately disconnects its live socket
  expect((await request('logout',undefined,a.token)).status).toBe(204);await gone;
  const denied=connect(url,{autoConnect:false,reconnection:false,auth:{token:a.token}});clients.push(denied);
  const result=new Promise(resolve=>denied.once('connect_error',resolve));denied.connect();expect((await result).data.code).toBe('UNAUTHORIZED');
+});
+test('logout closes every socket for the verified session while preserving a different login',async()=>{
+ const a=await user('Alice');const first=await client(a);
+ const sameSession={...a,token:jwt.sign({...jwt.decode(a.token),tab:'second'},secret,{algorithm:'HS256'})};
+ expect(sameSession.token===a.token).toBe(false);
+ const second=await client(sameSession);
+ const otherLogin=(await request('login',{username:'Alice',password:'test-password'})).body.data;
+ const other=await client(otherLogin);
+ const gone=Promise.all([first,second].map(s=>new Promise(resolve=>s.once('disconnect',resolve))));
+ expect((await request('logout',undefined,a.token)).status).toBe(204);await gone;
+ expect(other.connected).toBe(true);
+ expect((await ack(other,'system:ping',{nonce:'remaining-session'})).ok).toBe(true);
 });
 test('actual login handler keeps five-per-minute limit and rejects malformed JSON',async()=>{
  for(let i=0;i<5;i++)expect((await request('login',{})).status).toBe(401);

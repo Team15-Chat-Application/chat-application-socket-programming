@@ -25,7 +25,8 @@ class UnavailableAuth:
 
 
 def create_application(auth=None, rooms=None, login_limiter=None, login_handler=None, messages=None,
-                       register_handler=None, logout_handler=None, asset_root=None, vendor_root=None):
+                       register_handler=None, logout_handler=None, asset_root=None, vendor_root=None,
+                       secure_transport=False):
     auth = auth if auth is not None else UnavailableAuth()
     rooms = rooms if rooms is not None else RoomStore()
     login_limiter = login_limiter if login_limiter is not None else LoginLimiter()
@@ -87,7 +88,8 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         response.headers['Cache-Control'] = 'no-store'
         response.headers['X-Content-Type-Options']='nosniff'
         response.headers['Referrer-Policy']='no-referrer'
-        response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' ws: wss:; base-uri 'none'; frame-ancestors 'none'"
+        connections="'self' wss:" if secure_transport else "'self' ws: wss:"
+        response.headers['Content-Security-Policy']=f"default-src 'self'; script-src 'self'; style-src 'self'; connect-src {connections}; base-uri 'none'; frame-ancestors 'none'"
         return response
 
     @app.get('/api/health')
