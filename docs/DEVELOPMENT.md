@@ -22,7 +22,7 @@ The Python PowerShell launcher reads whitelisted `.env` values. On Linux, export
 
 See `.env.example`. Setup generates a random `JWT_SECRET` when it is missing, preserving an existing secret and the rest of the configuration. A missing/short secret leaves development authentication unavailable. Never reuse isolated test secrets.
 
-Set both `TLS_CERT_PATH` and `TLS_KEY_PATH` to enable TLS. Both launchers reject `NODE_ENV=production` without TLS and a secret of at least 32 bytes. Minimum protocol is TLS 1.2. Flask/Werkzeug remains a development server even when demonstrating TLS; production hosting, trusted certificates, workers, backups and monitoring require a deployment decision.
+Set both `TLS_CERT_PATH` and `TLS_KEY_PATH` to enable TLS. The Node launcher rejects `NODE_ENV=production` without TLS and a secret of at least 32 bytes. Flask enforces the same policy when either `NODE_ENV=production` or `FLASK_ENV=production` is selected, including conflicting flags. Either TLS path requires both paths in every mode; invalid paths fail before the CLI listener starts. Minimum protocol is TLS 1.2. Flask/Werkzeug remains a development server even when demonstrating TLS; production hosting, trusted certificates, workers, backups and monitoring require a deployment decision.
 
 `scripts/generate_test_tls.py` uses OpenSSL (including Git for Windows' bundled version) for an ignored short-lived localhost certificate. The TLS check explicitly trusts only that certificate, verifies 1.2/1.3 and authenticated WSS, and rejects plaintext/legacy TLS. No system trust is changed or certificate verification disabled. Never publish the private key.
 
@@ -60,3 +60,8 @@ The push/PR workflow installs pinned dependencies, builds both backends and runs
 ## Reproducible review fixture
 
 Run `node scripts/seed_review.js --check` for the STP's isolated 10-user/5-room/200-message dataset and overwrite/path/password guards. The check also runs in Node CI. For an interactive fixture with a privately chosen dummy password, follow [OPERATIONS_REVIEW.md](OPERATIONS_REVIEW.md); existing databases are never replaced and seeded states are not transport/UAT proof.
+
+
+## 31 October review corrections
+
+See [review response](OCT31_REVIEW_RESPONSE.md) for reproduced/fixed Python production/partial-TLS findings and session/CSP parity. After `scripts/generate_test_tls.py`, run `node scripts/python_tls_check.js` for actual Flask HTTPS/WSS, negative startup and secure-CSP checks; this now runs in Python CI and uploads `reports/python-tls.json`. No external hosting or monthly SLA is inferred. The [scope decision](OCT31_SCOPE_DECISION_BRIEF.md) explicitly defers uncontracted admin/private features while retaining the 29 numbered requirements and genuine remaining acceptance gates.

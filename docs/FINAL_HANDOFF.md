@@ -33,3 +33,8 @@ Ready implementation can coexist with genuine human/time/deployment gates. Keep 
 ## Explicit 28 October action assignments
 
 The concrete actions, peer owners, due targets and dependencies are in [Soham delivery handoff](SOHAM_DELIVERY_HANDOFF.md). Hrisheek owns CHAT-49/52 plus existing concurrency/accessibility checks; Yaswanth owns CHAT-50/51 plus the existing TLS/video submission. The seed fixture and operations steps are in [the review runbook](OPERATIONS_REVIEW.md). Both recordings are already uploaded and playback-verified; the remaining video step is Yaswanth's genuine member-owned PR/final integration, not fabrication of another recording. Soham retains monthly operational acceptance and final Product Owner freeze.
+
+
+## 31 October actual review and scope update
+
+Yaswanth requested changes on 577a69e; the reproduced TLS gaps and optional CSP/logout recommendations are corrected for current-head re-review. See OCT31_REVIEW_RESPONSE.md. Under Soham's delegated choice, Option A explicitly defers uncontracted admin/private features; see OCT31_SCOPE_DECISION_BRIEF.md. Both decisions/corrections are dated after the official 30 October Sprint 2 end, without backdating. Yaswanth's complete reconciliation/QA report, peer/member PRs, actual corrected-head approval, remaining manual/operational evidence and final merged-head CI still precede a real freeze.

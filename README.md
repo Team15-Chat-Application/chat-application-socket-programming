@@ -48,6 +48,8 @@ GitHub Actions builds/tests both backends on pushes and PRs, retains reports/bui
 - [Current architecture, traceability, evidence and limitations](docs/DELIVERY_2026_10_28.md)
 - [Owner handoff and final review checklist](docs/FINAL_HANDOFF.md)
 - [Soham delivery and explicit teammate assignments](docs/SOHAM_DELIVERY_HANDOFF.md)
+- [31 October blocking-review corrections](docs/OCT31_REVIEW_RESPONSE.md)
+- [Recorded admin/private scope decision](docs/OCT31_SCOPE_DECISION_BRIEF.md)
 - [Isolated review fixture and operations runbook](docs/OPERATIONS_REVIEW.md)
 - [One-minute Sprint 1 outcome — recorded 28 October, late delivery](https://github.com/Team15-Chat-Application/chat-application-socket-programming/blob/CHAT-43-46-outcome-handoff/videos/sprint-1-outcome-2026-10-28.webm)
 - [Two-minute Sprint 2 outcome — recorded 28 October](https://github.com/Team15-Chat-Application/chat-application-socket-programming/blob/CHAT-43-46-outcome-handoff/videos/sprint-2-outcome-2026-10-28.webm)
