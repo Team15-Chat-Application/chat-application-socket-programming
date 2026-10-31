@@ -1,0 +1,47 @@
+{
+  "recordedAt": "2026-10-28T05:31:12.446091+00:00",
+  "scope": "Actual local execution on Windows, Node 24.15.0 and Python 3.12.10; not a hosted CI claim",
+  "node": {
+    "command": "npm test -- --runInBand",
+    "suitesPassed": 17,
+    "testsPassed": 249,
+    "exitCode": 0
+  },
+  "python": {
+    "command": ".venv/Scripts/python.exe -m pytest python_backend/tests --junitxml=reports/python-final.xml -q",
+    "testsPassed": 255,
+    "exitCode": 0
+  },
+  "browser": {
+    "stats": {
+      "startTime": "2026-10-28T04:54:47.363Z",
+      "duration": 7876.072000000001,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "tests": [
+      {
+        "title": "actual two-browser product: rooms, messages, receipts, unread badges and keyboard access",
+        "ok": true,
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 4738
+          }
+        ]
+      },
+      {
+        "title": "login form and mobile layout pass automated accessibility checks",
+        "ok": true,
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 676
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+[
+  {
+    "backend": "node",
+    "recordedAt": "2026-10-31T16:41:32.552Z",
+    "realHttpCredentials": true,
+    "realWebSocketTransport": true,
+    "persistedMessages": 55,
+    "last50AfterProcessRestart": true,
+    "readReceiptPersisted": true,
+    "logoutRevocationPersisted": true,
+    "pass": true
+  },
+  {
+    "backend": "flask",
+    "recordedAt": "2026-10-31T16:41:45.107Z",
+    "realHttpCredentials": true,
+    "realWebSocketTransport": true,
+    "persistedMessages": 55,
+    "last50AfterProcessRestart": true,
+    "readReceiptPersisted": true,
+    "logoutRevocationPersisted": true,
+    "pass": true
+  }
+]

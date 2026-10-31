@@ -81,23 +81,27 @@ function createAuthService({ database, secret, clock = () => Date.now() }) {
       throw new AppError('ACCOUNT_LOCKED', 'Account is temporarily locked');
     }
 
-    if (user.lockedUntil != null && user.lockedUntil <= now) {
-      database.resetFailedLogins(user.userId);
-    }
-
     const passwordIsValid = await verifyPassword(password, user.passwordHash);
 
+    // Password comparison yields: another login may change the account meanwhile.
+    // Use the current state/time for both success and failure, without clearing a
+    // newly acquired lock or resetting concurrent post-expiry failure increments.
+    const checkedAt = nowSeconds();
+    const current = database.findUserByUsername(validUsername);
+    if (!current || current.userId !== user.userId) {
+      throw new AppError('UNAUTHORIZED', 'Invalid username or password');
+    }
+    if (current.lockedUntil != null && current.lockedUntil > checkedAt) {
+      throw new AppError('ACCOUNT_LOCKED', 'Account is temporarily locked');
+    }
+
     if (!passwordIsValid) {
-      const current = database.findUserByUsername(validUsername);
-      if (current.lockedUntil != null && current.lockedUntil > now) {
-        throw new AppError('ACCOUNT_LOCKED', 'Account is temporarily locked');
-      }
-      const attempts = user.lockedUntil != null && user.lockedUntil <= now
+      const attempts = current.lockedUntil != null && current.lockedUntil <= checkedAt
         ? 1
         : current.failedAttempts + 1;
 
       const lockedUntil = attempts >= MAX_FAILED_ATTEMPTS
-        ? now + LOCKOUT_SECONDS
+        ? checkedAt + LOCKOUT_SECONDS
         : null;
 
       database.recordFailedLogin(user.userId, attempts, lockedUntil);

@@ -7,7 +7,7 @@ if (-not $SkipEnvironmentFile) {
     $environmentFile = Join-Path $projectRoot '.env'
     if (Test-Path -LiteralPath $environmentFile) {
         foreach ($line in Get-Content -LiteralPath $environmentFile) {
-            if ($line -match '^\s*(FLASK_HOST|FLASK_PORT)\s*=\s*(.+?)\s*$') {
+            if ($line -match '^\s*(FLASK_HOST|FLASK_PORT|JWT_SECRET|FLASK_DB_PATH|CHAT_DB_PATH|TLS_CERT_PATH|TLS_KEY_PATH|NODE_ENV|FLASK_ENV)\s*=\s*(.+?)\s*$') {
                 [Environment]::SetEnvironmentVariable($Matches[1], $Matches[2], 'Process')
             }
         }
