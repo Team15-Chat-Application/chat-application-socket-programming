@@ -98,6 +98,10 @@ function createDatabase(dbPath = path.join(__dirname, '..', 'data', 'chat.sqlite
     )
   `);
 
+  // CHAT-23: Retrieve the newest messages first.
+  // rowid provides deterministic insertion ordering when timestamps
+  // are identical. The getRecentMessages function reverses the result
+  // to return messages in chronological order.
   const findMessages = db.prepare(`
     SELECT
       message_id AS messageId,
@@ -108,7 +112,7 @@ function createDatabase(dbPath = path.join(__dirname, '..', 'data', 'chat.sqlite
       delivery_status AS deliveryStatus
     FROM messages
     WHERE room_id = ?
-    ORDER BY created_at DESC, message_id DESC
+    ORDER BY created_at DESC, rowid DESC
     LIMIT ?
   `);
 
@@ -255,6 +259,7 @@ function createDatabase(dbPath = path.join(__dirname, '..', 'data', 'chat.sqlite
       return findReadReceipts.all(messageId);
     },
 
+    // CHAT-23: Return the latest messages in chronological order.
     getRecentMessages(roomId, limit = 50) {
       if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
         throw new RangeError(
