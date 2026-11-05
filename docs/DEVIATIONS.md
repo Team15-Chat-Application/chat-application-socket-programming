@@ -173,3 +173,11 @@ Yaswanth submitted CHANGES_REQUESTED on PR #47 at 577a69e. Independently reprodu
 Soham replied "whatever u think is best" to the concrete admin/private scope options and delegated the choice. Option A was selected on 31 October: keep the 29 numbered SRS requirements as this delivery baseline and explicitly defer uncontracted admin/private functionality described in SAD/STP. Original source scope is retained and the departure must be explained during the demo. See OCT31_SCOPE_DECISION_BRIEF.md for rationale/impacts and remaining genuine team/course review. No numbered NFR/security requirement, monthly uptime, manual accessibility, owner PR or final acceptance is waived.
 
 The scheduled Sprint 2 end was 30 October. This work is dated 31 October and is late completion; formal freeze is still pending. The reviewer's referenced local branch/report was not available in the visible remote refs; no unpublished authored work is claimed integrated.
+
+
+## 31 October — QA Lead reconciliation report and test-method disposition
+
+Kalluri Yaswanth prepared the formal reconciliation report and test-method disposition (see `docs/ADMIN_PRIVATE_SCOPE_RECONCILIATION.md` and `docs/QA_TEST_SUMMARY_SPRINT2.md`):
+- Confirms alignment with the Product Owner's Option A scope decision: the 29 numbered SRS requirements constitute the verified Sprint 2 delivery baseline, and uncontracted admin/private features are deferred as future backlog items.
+- Documents tool and environment deviations (Socket.IO client load testing in lieu of JMeter; unit/integration/TLS assertions in lieu of OWASP ZAP; SQLite in WAL mode; automated Axe-core Chromium in lieu of manual Firefox/screen-reader audit).
+- Provides end-to-end traceability across all 29 requirements with test IDs and failure/pass boundaries.
