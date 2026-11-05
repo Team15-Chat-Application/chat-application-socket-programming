@@ -14,6 +14,11 @@ async function main(){
  const negativeStartupChecks={};
  for(const [name,settings,message] of [
   ['flaskProductionPlaintextRefused',{FLASK_ENV:'production',NODE_ENV:'development',TLS_CERT_PATH:'',TLS_KEY_PATH:''},'Production requires'],
+  // run_flask.ps1 copies .env values verbatim, so these spellings reach the
+  // process environment exactly as written and must still refuse plaintext.
+  ['flaskProductionCapitalisedRefused',{FLASK_ENV:'Production',NODE_ENV:'development',TLS_CERT_PATH:'',TLS_KEY_PATH:''},'Production requires'],
+  ['flaskProductionQuotedRefused',{FLASK_ENV:'"production"',NODE_ENV:'development',TLS_CERT_PATH:'',TLS_KEY_PATH:''},'Production requires'],
+  ['flaskProductionPaddedRefused',{FLASK_ENV:'production ',NODE_ENV:'development',TLS_CERT_PATH:'',TLS_KEY_PATH:''},'Production requires'],
   ['certificateOnlyRefused',{FLASK_ENV:'development',NODE_ENV:'development',TLS_CERT_PATH:cert,TLS_KEY_PATH:''},'Both TLS_CERT_PATH and TLS_KEY_PATH'],
   ['keyOnlyRefused',{FLASK_ENV:'development',NODE_ENV:'development',TLS_CERT_PATH:'',TLS_KEY_PATH:key},'Both TLS_CERT_PATH and TLS_KEY_PATH']
  ]){
