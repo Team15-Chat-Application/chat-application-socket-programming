@@ -11,10 +11,21 @@ const unavailableAuth = {
 };
 
 function createApplication({ auth = unavailableAuth, registerHandlers = () => {}, rooms = new RoomStore(),
-  loginLimiter = new LoginLimiter(), loginHandler } = {}) {
-  const httpServer = createServer((req, res) => {
+  loginLimiter = new LoginLimiter(), loginHandler, registerHandler, logoutHandler, requestHandler, tls } = {}) {
+  const serve = (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    const pathname = req.url.split('?')[0];
+    const handler = req.method === 'POST' && (pathname === '/api/auth/register' ? registerHandler : pathname === '/api/auth/logout' ? logoutHandler : null);
+    if (typeof handler === 'function') {
+      Promise.resolve().then(()=>handler(req,res)).catch(()=>{
+        if (!res.headersSent) res.statusCode=500;
+        if (!res.writableEnded) res.end(JSON.stringify(failure(new Error())));
+      });
+      return;
+    }
     if (req.method === 'POST' && req.url.split('?')[0] === '/api/auth/login') {
       // Forwarded headers are untrusted until a deployment proxy policy is configured.
       const limit = loginLimiter.consume(req.socket.remoteAddress);
@@ -39,9 +50,11 @@ function createApplication({ auth = unavailableAuth, registerHandlers = () => {}
       res.end(JSON.stringify({ ok: true, data: { status: 'ok', service: 'node', stage: 'development-foundation' } }));
       return;
     }
+    if (typeof requestHandler === 'function' && requestHandler(req,res) === true) return;
     res.statusCode = 404;
     res.end(JSON.stringify(failure(new AppError('NOT_FOUND', 'Endpoint not found'))));
-  });
+  };
+  const httpServer = tls ? require('node:https').createServer({ ...tls, minVersion:'TLSv1.2' },serve) : createServer(serve);
   const io = new Server(httpServer);
   io.use(async (socket, next) => {
     try {

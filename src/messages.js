@@ -37,7 +37,7 @@ class MessageService {
       createdAt: this.clock()
     };
     this.history?.save(message);
-    return message;
+    return this.history ? this.history.get(message.messageId) : message;
   }
 }
 

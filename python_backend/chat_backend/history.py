@@ -40,6 +40,7 @@ class HistoryStore:
             if row is None:
                 raise RoomError('NOT_FOUND','Message not found')
             result = dict(row)
+            if hasattr(self,'username_for'):result['senderName']=self.username_for(result['senderId'])
             result['readBy'] = [dict(r) for r in self.db.execute('SELECT user_id AS userId,read_at AS readAt FROM receipts WHERE message_id=? ORDER BY user_id',(message_id,))]
             return result
 

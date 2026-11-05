@@ -45,4 +45,4 @@ class MessageService:
                 'senderId': identity['userId'], 'content': content, 'createdAt': self._clock()}
         if self.history is not None:
             self.history.save(message)
-        return message
+        return self.history.get(message_id) if self.history is not None else message

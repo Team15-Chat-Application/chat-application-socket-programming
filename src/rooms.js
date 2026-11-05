@@ -110,7 +110,10 @@ class RoomStore {
 
 function registerRoomHandlers(socket, rooms, io, validateSession) {
   const catalogue = () => io.to(CATALOGUE_CHANNEL).emit('room:list-updated', { rooms: rooms.list() });
-  const membership = data => io.to(roomChannel(data.roomId)).emit('room:membership', data);
+  const membership = data => {
+    io.to(roomChannel(data.roomId)).emit('room:membership', data);
+    io.to(roomChannel(data.roomId)).emit('presence:changed', {roomId:data.roomId,userId:data.userId,status:data.action==='join'?'online':'offline'});
+  };
   socket.join(CATALOGUE_CHANNEL);
   socket.emit('room:list-updated', { rooms: rooms.list() });
   // Serialise membership operations for one socket, including rapid duplicate requests.

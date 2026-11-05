@@ -1,0 +1,24 @@
+{
+  "executedAt": "2026-10-31T16:41:50.651886+00:00",
+  "workingProductVerified": false,
+  "scope": "Real default launchers; polling transport; no authentication or messaging fixtures",
+  "services": [
+    {
+      "service": "node",
+      "unauthenticatedSocketRejected": true,
+      "transport": "polling",
+      "health": "PASS",
+      "loginHandler": "AVAILABLE_REJECTS_INVALID_INPUT",
+      "loginRateLimit": "PASS"
+    },
+    {
+      "service": "flask",
+      "unauthenticatedSocketRejected": true,
+      "transport": "polling",
+      "health": "PASS",
+      "loginHandler": "AVAILABLE_REJECTS_INVALID_INPUT",
+      "loginRateLimit": "PASS"
+    }
+  ],
+  "status": "PASS"
+}
