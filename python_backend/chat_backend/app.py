@@ -355,6 +355,9 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                 user_ids={v['identity']['userId'] for sid,v in identities.items() if rooms.has_socket(room['roomId'],sid)}
                 return {'ok':True,'data':{'roomId':room['roomId'],'users':[{'userId':uid,'username':getattr(messages.history,'username_for',lambda x:x[:8])(uid),'status':'online'} for uid in sorted(user_ids)]}}
         except RoomError as error:return failure(error.code,str(error))
+        except Exception:
+            audit('presence-list','INTERNAL_ERROR')
+            return failure('INTERNAL_ERROR','An internal error occurred')
 
     @socketio.on('typing:set')
     @require_session
@@ -378,6 +381,9 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                     timer=Timer(1.5,expire);timer.daemon=True;typing_timers[key]=timer;timer.start()
                 return {'ok':True,'data':{'accepted':True}}
         except RoomError as error:return failure(error.code,str(error))
+        except Exception:
+            audit('typing-set','INTERNAL_ERROR')
+            return failure('INTERNAL_ERROR','An internal error occurred')
 
     @socketio.on('*')
     @require_session

@@ -45,8 +45,16 @@ test('actual login handler keeps five-per-minute limit and rejects malformed JSO
  expect((await request('login',{})).status).toBe(429);
  expect((await request('register',[])).status).toBe(400);
 });
-test('production refuses a plaintext listener and missing signing configuration',()=>{
- expect(()=>createRuntime({env:{NODE_ENV:'production'}})).toThrow('TLS');
+test('production refuses plaintext, weak signing configuration and flag spellings',()=>{
+ const dir=require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(),'chat-tls-'));
+ try{
+  require('node:fs').writeFileSync(dir+'/cert.pem','placeholder');require('node:fs').writeFileSync(dir+'/key.pem','placeholder');
+  for(const spelling of ['production','Production','PRODUCTION','production ','"production"']){
+   expect(()=>createRuntime({env:{NODE_ENV:spelling}})).toThrow('TLS');
+   expect(()=>createRuntime({env:{NODE_ENV:spelling,TLS_CERT_PATH:dir+'/cert.pem',TLS_KEY_PATH:dir+'/key.pem'},filename:':memory:'})).toThrow('JWT_SECRET');
+  }
+ }finally{require('node:fs').rmSync(dir,{recursive:true,force:true});}
+ expect(()=>createRuntime({env:{NODE_ENV:'development',TLS_CERT_PATH:'unused.pem'}})).toThrow('Both TLS_CERT_PATH and TLS_KEY_PATH');
 });
 test('typing debounce, room-scoped presence, and outsider rejection use real credentials',async()=>{
  const a=await user('Alice'),b=await user('Bob');const sa=await client(a),sb=await client(b);

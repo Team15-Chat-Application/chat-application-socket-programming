@@ -181,3 +181,44 @@ Kalluri Yaswanth prepared the formal reconciliation report and test-method dispo
 - Confirms alignment with the Product Owner's Option A scope decision: the 29 numbered SRS requirements constitute the verified Sprint 2 delivery baseline, and uncontracted admin/private features are deferred as future backlog items.
 - Documents tool and environment deviations (Socket.IO client load testing in lieu of JMeter; unit/integration/TLS assertions in lieu of OWASP ZAP; SQLite in WAL mode; automated Axe-core Chromium in lieu of manual Firefox/screen-reader audit).
 - Provides end-to-end traceability across all 29 requirements with test IDs and failure/pass boundaries.
+
+
+## 5 November — independent review findings and dispositions
+
+An independent review of PR #47 head `140da7f` re-checked Yaswanth's two blocking findings and the two
+recommendations. All four are genuinely corrected in `c16bba9`. The review then found one remaining
+instance of the same fail-open class, now fixed, plus items that are recorded rather than changed.
+
+Fixed in this increment (test-first, both backends):
+
+| Finding | Correction | Evidence |
+| --- | --- | --- |
+| Production mode matched the literal string `production` only. `run_flask.ps1` copies `.env` values verbatim, so `FLASK_ENV=Production`, `"production"` or `production ` selected plaintext, while Node's `--env-file` strips quotes and failed closed on the same file. | `tls_config._is_production` trims one layer of surrounding quotes and compares case-insensitively; Node normalises identically so one `.env` cannot open one backend and close the other. | New parametrised `test_tls_startup.py` cases; extended `tests/integration/runtime.test.js` (which now also asserts the previously untested production `JWT_SECRET` refusal); `scripts/python_tls_check.js` spawns the real CLI for the plain/capitalised/quoted/padded flags and asserts non-zero exit, expected stderr and no database file. Confirmed the new checks fail against the pre-fix validator. |
+| Flask `presence:list` and `typing:set` caught only `RoomError`, so a malformed payload propagated out of the handler instead of returning an envelope, unlike every sibling handler and unlike Node's `presence.js`, which acknowledges a safe envelope. | Both handlers now return the structured `INTERNAL_ERROR` envelope and audit a fixed label. | Existing envelope-shape assertions; no behaviour change for valid payloads. |
+
+Recorded, not changed — each needs a requirement or product decision that is outside this PR:
+
+- **Unthrottled registration and logout.** `app.py:57-60` and the Node account routes apply the limiter
+  only to login. CHAT-SR-004 contracts five login attempts/minute/IP, so extending it is a requirements
+  decision for QA, not a private fix. bcrypt runs per registration, so this is a CPU-cost exposure.
+- **Per-IP limiter counts successful logins.** The contracted wording is *attempts*, so a shared campus
+  NAT address can reach 429 after five legitimate sign-ins. Needs a product decision on per-account or
+  per-IP-plus-per-account limiting and a trusted-proxy policy; `S2-PROXY-IP` above already tracks it.
+- **Message `status` is one aggregate column.** Per-recipient state is in `readBy`, but the client renders
+  the aggregate, so a `Read` receipt means "someone read it". Owned by the CHAT-24/25 messaging author.
+- **`connect-src 'self' wss:`/`ws:`** permits connections to any host of that scheme, not just this origin.
+  Yaswanth's recommendation (drop `ws:` under TLS) is implemented; narrowing to same-host only is a further
+  hardening step that also changes the `secureCsp` assertion, so it is proposed for his ratification.
+- **No WSGI entry point.** `create_application` is importable without the TLS validator, but returns an
+  application with `UnavailableAuth`, so it cannot serve chat; `docs/DEVELOPMENT.md` already records that
+  production hosting awaits a deployment decision, and Werkzeug is not a production server.
+- **Test isolation seam.** `create_runtime(env=...)` validates the injected mapping, so an injected
+  non-production env ignores ambient production flags. Every real entry point passes no `env` and reads
+  `os.environ`; test and CI harnesses rely on the injected isolation.
+- **Client state.** `public/app.js` never trims `messages`/`unread` for rooms left, and read receipts fire
+  per rendered message. Bounded for this deployment size; tracked as follow-up.
+
+Local verification for this increment: 252 Node tests (17 suites), 281 Python tests, real Node and Flask
+TLS/WSS checks including the new fail-closed subprocess cases, and both real process-restart system checks
+passing. The Python suite grew from 266 to 281; earlier figures stay valid for their own heads. No
+approval, monthly availability or manual accessibility result is inferred from these automated results.
