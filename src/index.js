@@ -74,9 +74,8 @@ function bearerToken(req) {
 async function main() {
   const config = readConfig();
   const rooms = new RoomStore();
-  const messages = new MessageService({ rooms });
-
   const database = createDatabase();
+  const messages = new MessageService({ rooms, database });
   const secret = process.env.JWT_SECRET;
   let authService = null;
 

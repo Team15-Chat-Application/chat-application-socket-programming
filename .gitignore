@@ -158,3 +158,5 @@ reports/
 *.egg-info/
 dist/
 build/
+# Local application database
+data/
