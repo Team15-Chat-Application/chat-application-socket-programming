@@ -147,3 +147,29 @@ and retention, and platform-complete hashed Python dependency artifacts. Existin
 S2-ROOM-CAPACITY/S2-PROXY-IP entries remain open. Dual commit/PR CI is intentionally
 retained to meet the adopted testing instructions. Do not treat these disclosed
 follow-ups as implemented mitigations or use COMMENTED reviews as approvals.
+
+
+## 28 October working-product update
+
+See [current delivery record](DELIVERY_2026_10_28.md) for integrated authentication, persistence, browser UI, actual network/restart, load/TLS and video evidence. Earlier missing-feature and unmerged-PR statements remain historical snapshots. Runtime/database decisions and late Sprint 1 delivery are explicitly recorded there. Monthly availability, manual accessibility review and genuine owner/QA/final acceptance are not inferred from automated tests.
+
+
+## 28 October repository visibility decision
+
+CHAT-9's recorded setup criterion specified a private repository. The repository was already public. On 28 October 2026 the owner explicitly instructed: "Keep public; document the deviation." Public visibility is therefore retained as an owner-authorized deviation. No repository access/visibility change was made, no earlier approval is inferred, and the original private criterion remains visible for traceability. Explain this decision during the final demo. This decision resolves the visibility question only; Jira development-indexing evidence is assessed separately.
+
+
+## 28 October Soham close-out preparation and regression fix
+
+Prepared the STP's isolated 10-user/5-room/200-message fixture with guarded creation and truthful synthetic-state labels. Two deterministic Node account-lockout interleavings were reproduced: post-expiry failure-count overwrite and a new lock cleared after a pending successful password check. Both regressions failed before the correction. Current account/time are now rechecked after bcrypt for success and failure; all 251 Node tests and both actual process-restart flows pass locally. The new high-priority bug CHAT-53 remains subject to Hrisheek/Yaswanth review in the current PR. No prior owner authorship, approval or accepted ticket is rewritten.
+
+Explicit member submission/review/scope tasks CHAT-49 through CHAT-52 were assigned by Soham's 28 October request, with proposed estimates/29 October targets. These are new coordination assignments, not point values or approvals supplied by the PDFs. See SOHAM_DELIVERY_HANDOFF.md. The monthly availability window and final Product Owner freeze remain genuine open dependencies.
+
+
+## 31 October — actual blocking review, corrections and delegated scope decision
+
+Yaswanth submitted CHANGES_REQUESTED on PR #47 at 577a69e. Independently reproduced the Python fail-open findings (8 failing/3 passing new startup cases), then implemented shared production-flag/partial-TLS validation. Both flags are honored for Flask; incomplete TLS is rejected before listening/database creation. TLS-mode CSP and session-based Node logout cleanup were also hardened. All 11 new regressions, the 252-test Node and 266-test Python suites, and actual Node/Flask TLS/WSS checks passed locally. See OCT31_REVIEW_RESPONSE.md; these results request actual re-review rather than converting a blocking review into approval.
+
+Soham replied "whatever u think is best" to the concrete admin/private scope options and delegated the choice. Option A was selected on 31 October: keep the 29 numbered SRS requirements as this delivery baseline and explicitly defer uncontracted admin/private functionality described in SAD/STP. Original source scope is retained and the departure must be explained during the demo. See OCT31_SCOPE_DECISION_BRIEF.md for rationale/impacts and remaining genuine team/course review. No numbered NFR/security requirement, monthly uptime, manual accessibility, owner PR or final acceptance is waived.
+
+The scheduled Sprint 2 end was 30 October. This work is dated 31 October and is late completion; formal freeze is still pending. The reviewer's referenced local branch/report was not available in the visible remote refs; no unpublished authored work is claimed integrated.

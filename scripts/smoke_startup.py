@@ -9,6 +9,8 @@ import socket
 import subprocess
 import sys
 import time
+import secrets
+from uuid import uuid4
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -55,9 +57,17 @@ def check(service, command, port_key):
         port_key: str(port),
         'NODE_HOST': '127.0.0.1',
         'FLASK_HOST': '127.0.0.1',
+        'NODE_ENV': 'test',
+        'FLASK_ENV': 'test',
+        'TLS_CERT_PATH': '',
+        'TLS_KEY_PATH': '',
         'PYTHONPATH': str(ROOT / 'python_backend')
     })
 
+    env['JWT_SECRET']=secrets.token_urlsafe(48)
+    filename=str(ROOT/"reports"/("smoke-"+service+"-"+uuid4().hex+".sqlite"))
+    for key in ('CHAT_DB_PATH','NODE_DB_PATH','FLASK_DB_PATH'):
+        env[key]=filename
     process = subprocess.Popen(
         command,
         cwd=ROOT,
@@ -96,7 +106,7 @@ def check(service, command, port_key):
 
         url = f'http://127.0.0.1:{port}'
 
-        if service == 'node':
+        if service in ('node', 'flask'):
             # The Node launcher now has real authentication routes.
             # Send invalid JSON-shaped credentials and ensure they are rejected.
             invalid_login = json.dumps({
@@ -134,33 +144,6 @@ def check(service, command, port_key):
             )
 
             login_handler = 'AVAILABLE_REJECTS_INVALID_INPUT'
-
-        else:
-            # The Flask launcher is expected to keep authentication unavailable.
-            for _ in range(5):
-                status, body, _headers = http_result(
-                    url + '/api/auth/login',
-                    'POST'
-                )
-                require(
-                    status == 404
-                    and body.get('error', {}).get('code') == 'NOT_FOUND',
-                    f'{service}: login handler is unexpectedly available'
-                )
-
-            status, body, headers = http_result(
-                url + '/api/auth/login',
-                'POST'
-            )
-            require(
-                status == 429
-                and body.get('error', {}).get('code') == 'RATE_LIMITED'
-                and 1 <= int(headers.get('Retry-After', '0')) <= 60
-                and headers.get('Cache-Control') == 'no-store',
-                f'{service}: launcher login limiter failed'
-            )
-
-            login_handler = 'UNAVAILABLE'
 
         probe = subprocess.run(
             ['node', 'scripts/probe_default_socket.js', url, service],

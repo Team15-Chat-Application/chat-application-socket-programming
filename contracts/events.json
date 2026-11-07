@@ -1,13 +1,25 @@
 {
-  "version": "0.3-proposed",
-  "status": "Team review required; room/security follow-up on 24 October; owner messaging exists on PR #45; real authentication/session and usable UI acceptance remain pending",
-  "socketAuthentication": { "token": "JWT string" },
-  "verifiedIdentity": { "userId": "JWT sub", "sessionId": "JWT jti" },
+  "version": "0.4-review-candidate",
+  "status": "Integrated 28 October 2026; owner/QA review and final freeze remain separate",
+  "socketAuthentication": {
+    "token": "JWT string"
+  },
+  "verifiedIdentity": {
+    "userId": "JWT sub",
+    "sessionId": "JWT jti"
+  },
   "jwtVerificationProposal": {
     "algorithm": "HS256 only; configured secret of at least 32 UTF-8 bytes; no default secret",
     "issuer": "team15-chat",
     "audience": "chat-application",
-    "requiredClaims": ["sub", "jti", "iat", "exp", "iss", "aud"],
+    "requiredClaims": [
+      "sub",
+      "jti",
+      "iat",
+      "exp",
+      "iss",
+      "aud"
+    ],
     "identityBounds": "sub/jti: 1-128 Unicode code points; reject unpaired surrogates",
     "timeBounds": "iat/exp/optional nbf and session expiresAt: integer Unix seconds within +/-9007199254740991; recheck expiry after async lookup",
     "sessionRecord": "{sessionId,userId,expiresAt:integer Unix seconds,revokedAt:null|integer}; fresh lookup on every validation"
@@ -16,28 +28,107 @@
     "count": "Distinct authenticated user IDs; additional tabs do not increment memberCount",
     "membership": "Join notice on first user socket; leave notice on final socket; duplicate join/leave is idempotent",
     "transportChannel": "Server-only roomChannel(roomId) / room_channel(room_id); chat:room: prefix",
-    "catalogue": "Authenticated sockets only; empty rooms retained until process restart",
+    "catalogue": "Authenticated sockets only; named rooms persisted in SQLite across restart; live membership reconstructed",
     "dispatchBoundsProposal": "Node: 64 outstanding room events/socket; Python: up to three 50 ms room-lock waits. Saturation returns RATE_LIMITED; these are reviewable operational defaults."
   },
   "acknowledgement": {
-    "success": { "ok": true, "data": "event-specific result" },
-    "failure": { "ok": false, "error": { "code": "stable error code", "message": "safe user-facing message" } },
+    "success": {
+      "ok": true,
+      "data": "event-specific result"
+    },
+    "failure": {
+      "ok": false,
+      "error": {
+        "code": "stable error code",
+        "message": "safe user-facing message"
+      }
+    },
     "unknownEvent": "After successful session validation, acknowledge NOT_FOUND when requested",
     "invalidSession": "system:error followed by disconnect; callback acknowledgement is not guaranteed after disconnect"
   },
   "clientEvents": {
-    "system:ping": { "nonce": "1-64 characters; development diagnostic" },
-    "room:create": { "name": "1-64 Unicode code points after ASCII edge-whitespace trimming; no control characters or unpaired surrogates" },
-    "room:join": { "roomId": "server-issued room ID" },
-    "room:leave": { "roomId": "server-issued room ID" },
+    "system:ping": {
+      "nonce": "1-64 characters; development diagnostic"
+    },
+    "room:create": {
+      "name": "1-64 Unicode code points after ASCII edge-whitespace trimming; no control characters or unpaired surrogates"
+    },
+    "room:join": {
+      "roomId": "server-issued room ID"
+    },
+    "room:leave": {
+      "roomId": "server-issued room ID"
+    },
     "room:list": {},
-    "message:send": { "roomId": "server-issued room ID", "content": "maximum 2000 Unicode code points before sanitisation; sanitizer helper prepared; send handler belongs to messaging owner" }
+    "message:send": {
+      "roomId": "server-issued room ID",
+      "content": "1-2000 raw Unicode code points before server sanitisation; safe text only"
+    },
+    "room:history": {
+      "roomId": "joined room ID"
+    },
+    "message:read": {
+      "messageId": "server-issued ID; only joined non-sender recipient may mark Read"
+    },
+    "presence:list": {
+      "roomId": "joined room ID"
+    },
+    "typing:set": {
+      "roomId": "joined room ID",
+      "typing": "boolean; true debounced 500ms, expires 1500ms"
+    }
   },
   "serverEvents": {
     "system:error": "failure acknowledgement shape",
-    "room:membership": { "roomId": "string", "userId": "string", "action": "join or leave", "memberCount": "integer" },
-    "room:list-updated": { "rooms": "array of {roomId,name,memberCount}" },
-    "message:received": { "messageId": "server-issued ID", "roomId": "string", "senderId": "verified user ID", "content": "sanitised text", "createdAt": "UTC ISO 8601" }
+    "room:membership": {
+      "roomId": "string",
+      "userId": "string",
+      "action": "join or leave",
+      "memberCount": "integer"
+    },
+    "room:list-updated": {
+      "rooms": "array of {roomId,name,memberCount}"
+    },
+    "message:received": {
+      "messageId": "server-issued ID",
+      "roomId": "string",
+      "senderId": "verified user ID",
+      "content": "sanitised text",
+      "createdAt": "UTC ISO 8601",
+      "senderName": "actual username",
+      "status": "Sent at initial broadcast; message:status follows",
+      "readBy": "array of {userId,readAt}"
+    },
+    "message:status": "persisted message including status Sent|Delivered|Read and readBy recipient array",
+    "presence:changed": {
+      "roomId": "string",
+      "userId": "string",
+      "status": "online|offline"
+    },
+    "presence:typing": {
+      "roomId": "string",
+      "userId": "string",
+      "typing": "boolean"
+    }
   },
-  "errorCodes": ["AUTH_NOT_IMPLEMENTED", "UNAUTHORIZED", "FORBIDDEN", "VALIDATION_ERROR", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+  "errorCodes": [
+    "AUTH_NOT_IMPLEMENTED",
+    "UNAUTHORIZED",
+    "FORBIDDEN",
+    "VALIDATION_ERROR",
+    "NOT_FOUND",
+    "RATE_LIMITED",
+    "INTERNAL_ERROR"
+  ],
+  "persistence": {
+    "joinAcknowledgement": "room:join data includes history array when persistence configured",
+    "history": "last 50 ordered by insertion; rooms/messages/receipts persist; membership live",
+    "delivered": "stored after broadcast dispatch; not per-endpoint receive confirmation",
+    "read": "idempotent per recipient; group Read means at least one recipient; inspect readBy"
+  },
+  "httpAccounts": {
+    "register": "POST /api/auth/register {username,password}: 201 user; does not issue token",
+    "login": "POST /api/auth/login {username,password}: 200 {ok,data:{token,user}} plus legacy token/user aliases",
+    "logout": "POST /api/auth/logout with Authorization: Bearer JWT: 204, revokes and disconnects live matching sockets"
+  }
 }

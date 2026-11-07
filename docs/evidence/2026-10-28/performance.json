@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-10-28T05:08:33.880Z",
+  "runtime": "v24.15.0",
+  "platform": "win32",
+  "transport": "real loopback WebSocket",
+  "credentialSetup": "50 actual account-service registrations and bcrypt logins; signed DB-backed sessions, not manually signed fixture tokens",
+  "distinctUsers": 50,
+  "concurrentConnections": 100,
+  "receivingRoomMembers": 50,
+  "messages": 30,
+  "receiverSamples": 1500,
+  "receiverP90Ms": 10.43760000000475,
+  "receiverMaximumMs": 42.9209000000119,
+  "persistenceMaximumMs": 2.4948999999905936,
+  "pass": true,
+  "scope": "This host and loopback environment only; no WAN or monthly availability claim"
+}

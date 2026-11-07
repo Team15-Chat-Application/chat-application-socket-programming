@@ -1,0 +1,12 @@
+{
+  "recordedAt": "2026-10-31T16:38:43.592Z",
+  "protocol": "TLSv1.3",
+  "tls12": "TLSv1.2",
+  "health": 200,
+  "plaintextRejected": true,
+  "legacyRejected": true,
+  "authenticatedWss": true,
+  "secureCsp": true,
+  "certificate": "Fresh local test certificate explicitly trusted by this client; not a public CA or deployment",
+  "pass": true
+}
