@@ -1,5 +1,5 @@
 
-const { DatabaseSync: Database } = require('node:sqlite');
+const Database = require('better-sqlite3');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -9,7 +9,8 @@ function createDatabase(dbPath = path.join(__dirname, '..', 'data', 'chat.sqlite
 
   const db = new Database(dbPath);
 
-  db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+  db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -179,14 +180,10 @@ function createDatabase(dbPath = path.join(__dirname, '..', 'data', 'chat.sqlite
     },
 
     createUser({ userId, username, passwordHash }) {
-      try { db.prepare(`
+      db.prepare(`
         INSERT INTO users (user_id, username, password_hash)
         VALUES (?, ?, ?)
-      `).run(userId, username, passwordHash); }
-      catch (error) {
-        if (error.errcode === 2067 || error.errcode === 1555) error.code = 'SQLITE_CONSTRAINT_UNIQUE';
-        throw error;
-      }
+      `).run(userId, username, passwordHash);
     },
 
     recordFailedLogin(userId, failedAttempts, lockedUntil) {
