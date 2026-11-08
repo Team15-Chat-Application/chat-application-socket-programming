@@ -32,13 +32,7 @@ class RoomStore {
   #rooms = new Map();
   #members = new Map();
   #sockets = new Map();
-  constructor({ newId = randomUUID, repository = null } = {}) {
-    this.newId = newId; this.repository = repository;
-    for (const room of repository?.rooms() || []) {
-      this.#rooms.set(room.roomId, Object.freeze({ ...room }));
-      this.#members.set(room.roomId, new Map());
-    }
-  }
+  constructor({ newId = randomUUID } = {}) { this.newId = newId; }
   create(identity, payload) {
     requireIdentity(identity);
     const name = validateRoomName(payload);
@@ -47,7 +41,6 @@ class RoomStore {
       throw new Error('Room ID allocation failed');
     }
     const room = Object.freeze({ roomId, name, memberCount: 0 });
-    this.repository?.createRoom(room, identity);
     this.#rooms.set(roomId, room);
     this.#members.set(roomId, new Map());
     return { ...room };
@@ -110,10 +103,7 @@ class RoomStore {
 
 function registerRoomHandlers(socket, rooms, io, validateSession) {
   const catalogue = () => io.to(CATALOGUE_CHANNEL).emit('room:list-updated', { rooms: rooms.list() });
-  const membership = data => {
-    io.to(roomChannel(data.roomId)).emit('room:membership', data);
-    io.to(roomChannel(data.roomId)).emit('presence:changed', {roomId:data.roomId,userId:data.userId,status:data.action==='join'?'online':'offline'});
-  };
+  const membership = data => io.to(roomChannel(data.roomId)).emit('room:membership', data);
   socket.join(CATALOGUE_CHANNEL);
   socket.emit('room:list-updated', { rooms: rooms.list() });
   // Serialise membership operations for one socket, including rapid duplicate requests.
@@ -168,7 +158,6 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
   });
   handle('room:join', async payload => {
     const room = rooms.get(payload);
-    const history = rooms.repository?.history(room.roomId);
     const channel = roomChannel(room.roomId);
     const alreadyJoined = rooms.hasSocket(room.roomId, socket.id);
     const result = rooms.join(socket.data.identity, socket.id, payload);
@@ -185,7 +174,7 @@ function registerRoomHandlers(socket, rooms, io, validateSession) {
       membership({ roomId: room.roomId, userId: socket.data.identity.userId, action: 'join', memberCount: result.room.memberCount });
       catalogue();
     }
-    return history ? { ...result.room, history } : result.room;
+    return result.room;
   });
   handle('room:leave', async payload => {
     const room = rooms.get(payload);

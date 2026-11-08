@@ -158,12 +158,5 @@ reports/
 *.egg-info/
 dist/
 build/
-
-# Never commit accounts, messages, signing keys or browser/test artifacts.
+# Local application database
 data/
-*.sqlite
-*.sqlite-shm
-*.sqlite-wal
-certs/
-test-results/
-playwright-report/
