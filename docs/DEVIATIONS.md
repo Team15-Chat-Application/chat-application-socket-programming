@@ -214,3 +214,34 @@ Local verification for this increment: 252 Node tests (17 suites), 281 Python te
 TLS/WSS checks including the new fail-closed subprocess cases, and both real process-restart system checks
 passing. The Python suite grew from 266 to 281; earlier figures stay valid for their own heads. No
 approval, monthly availability or manual accessibility result is inferred from these automated results.
+
+## 7-8 November 2026: Sprint 2 merge incident and pending protocol decision
+
+- **What happened.** On 7 November, 8555c53 merged `CHAT-26-sprint2-delivery` into `main` from a stale local
+  copy (140da7f). It kept the `HistoryStore`-based `src/messages.js` together with PR #53's `src/database.js`
+  message schema and tests. Both create a `messages` table in the same SQLite file, so the server failed to
+  start (`no such column: seq`) and 10 CHAT-23/24/25 integration tests failed (CI runs #76 and #77). The
+  merge also missed a6b78bf, d1d0662 and 27eef79 from PR #47. The Sprint 2 window had already closed on
+  30 October; this is late integration work and is recorded with its actual dates.
+- **Recovery.** PR #56 reverted e73d66c and 8555c53 on 8 November, restoring the tree of 6877800 (PR #53
+  merge). CI run #81 passed on `main`. Jira CHAT-22 to CHAT-25, CHAT-31 and CHAT-4, briefly moved to Done on
+  7 November, were moved back to In Review with a correction comment.
+- **Two protocols for one requirement set.** PR #53 implements history and status with `message:history`,
+  `message:delivered` and a `database.js` message store. `contracts/events.json`, the browser client and the
+  Flask backend use `room:history`, `message:status` and the `HistoryStore` `seq`/`status` schema. The
+  proposed decision is to keep the contract protocol for Node/Flask parity and port PR #53's tests to it.
+  **This is a proposal pending Hrisheek's agreement (owner of CHAT-22 to CHAT-25), not a recorded team
+  decision.**
+- **Integration branch.** Draft PR #57 (`sprint2-integration`) restores the reverted work, adds the three
+  missing PR #47 commits, and initialises `HistoryStore` before `createDatabase` so the server starts.
+  The remaining failures are 11 PR #53 tests mapped in `docs/SPRINT2_INTEGRATION_HANDOFF.md`.
+- **Full-suite determinism (CHAT-41 follow-up from PR #47).** Measured on `sprint2-integration` on
+  8 November with `--runInBand` in one process, the `npm test` path. `--detectOpenHandles` reported no open
+  handles for the unit suites or for the integration suites other than `messaging.test.js`. 22 consecutive
+  runs without `messaging.test.js` and 10 runs with it each produced the same verdict (1 and 11 failures,
+  all of them the PR #53 tests awaiting porting), printed a summary every time, and never hit "Jest did not
+  exit". The verdict-less run seen on 27eef79 was not reproduced. **Caveat:** this machine has Node 22, so
+  Jest loaded `sanitize-html` 2.13.1 (CommonJS) through a local `moduleNameMapper` instead of the locked
+  2.18.1; CI still runs the locked versions on Node 24. Treat this as "not reproduced", not "fixed", and
+  re-check on Node 24 after the PR #53 tests are ported, because their leaked 3-second timers are a known
+  source of cross-suite noise.
