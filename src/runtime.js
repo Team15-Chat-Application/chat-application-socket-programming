@@ -28,8 +28,14 @@ function createRuntime({ env=process.env, filename, secret=env.JWT_SECRET }={}) 
     if(!env.TLS_CERT_PATH||!env.TLS_KEY_PATH)throw Error('Both TLS_CERT_PATH and TLS_KEY_PATH are required');
     tls={cert:fs.readFileSync(env.TLS_CERT_PATH),key:fs.readFileSync(env.TLS_KEY_PATH)};
   }
-  if(env.NODE_ENV==='production'&&!tls)throw Error('Production requires TLS certificate and key');
-  if(env.NODE_ENV==='production'&&(!secret||Buffer.byteLength(secret)<32))throw Error('Production requires JWT_SECRET of at least 32 bytes');
+  // The shared .env is read two ways: --env-file strips quotes, a PowerShell
+  // launcher would not. Normalise identically to the Flask validator so one file
+  // can never select fail-closed here and plaintext there.
+  const flag=String(env.NODE_ENV??'').trim();
+  const quoted=flag.length>1&&(flag[0]==='"'||flag[0]==="'")&&flag[flag.length-1]===flag[0];
+  const production=(quoted?flag.slice(1,-1).trim():flag).toLowerCase()==='production';
+  if(production&&!tls)throw Error('Production requires TLS certificate and key');
+  if(production&&(!secret||Buffer.byteLength(secret)<32))throw Error('Production requires JWT_SECRET of at least 32 bytes');
   const file=filename||env.NODE_DB_PATH||env.CHAT_DB_PATH||path.join(process.cwd(),'data','chat.sqlite');
   const database=createDatabase(file),history=new HistoryStore(file),rooms=new RoomStore({repository:history});
   const authService=typeof secret==='string'&&Buffer.byteLength(secret)>=32 ? createAuthService({database,secret}) : null;
