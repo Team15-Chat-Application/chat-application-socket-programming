@@ -1,0 +1,20 @@
+{
+  "recordedAt": "2026-10-31T16:39:37.658Z",
+  "backend": "flask",
+  "productionFlag": "FLASK_ENV=production with NODE_ENV=development",
+  "protocol": "TLSv1.3",
+  "tls12": "TLSv1.2",
+  "health": 200,
+  "plaintextRejected": true,
+  "legacyRejected": true,
+  "secureCsp": true,
+  "realHttpsCredentials": true,
+  "authenticatedWss": true,
+  "negativeStartupChecks": {
+    "flaskProductionPlaintextRefused": true,
+    "certificateOnlyRefused": true,
+    "keyOnlyRefused": true
+  },
+  "scope": "Actual local Flask CLI listener and explicitly trusted temporary test certificate; not a public hosted endpoint",
+  "pass": true
+}
