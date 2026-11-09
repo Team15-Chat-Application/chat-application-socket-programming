@@ -173,3 +173,23 @@ client's HTML and CSS at 320 px: with six rooms the page grew to 822 px. Fix: th
 rooms heading are positioned containers. With the fix the page stayed at 320 px with six rooms, and keyboard
 focus on the last room scrolled the room list rather than the page. The Playwright regression now creates
 three long-named rooms and checks for overflow after each. Row 15 in Chrome needs re-running at the new head.
+
+
+## Chrome row 15 re-run at 82e6929
+
+Date: **9 November 2026 (Asia/Calcutta)**. Tester: **Codex / Playwright isolated keyboard automation**. Ran `git pull --ff-only origin CHAT-38-accessibility`; `git rev-parse --short HEAD` returned **82e6929** before and after testing. Node: **v24.15.0**.
+
+Setup matched the Chrome run at 0c23af0: installed Chrome **157.0.8103.38**, headless with `channel: chrome` and `chromiumSandbox: true`; two isolated browser contexts, a 1280 x 800 initial viewport and reduced-motion emulation. The Chrome version was observed from the running browser API; About Chrome was not re-tested. A new temporary SQLite database/signing key and previously unused loopback **port 31340** were used. The existing app/database and open browser windows were not used.
+
+Using `alice_c_a11y` and `bob_c_a11y`, recreated the two-user room membership, unread update and ten-message project conversation from the earlier setup. Created `Sandbox Project Chrome` and `Sandbox Other Chrome`. Resized the viewport to **320 x 800**, measured document-element widths, opened the other room with **Space**, sent `320 px keyboard message Chrome` with **Enter**, and created/opened the third room, **`Narrow room Chrome with a long name for accessibility testing`** (61 characters). App interaction used only Tab/Shift+Tab, Enter, Space, arrow keys and keyboard text input; no clicks, locator fills or DOM focus calls.
+
+**Result: Pass.** The workspace reflowed to one column. All three recorded keyboard actions completed, and there was no horizontal page overflow at either measurement point.
+
+| Measurement point | clientWidth (px) | scrollWidth (px) | Rooms | Workspace direction |
+|---|---:|---:|---:|---|
+| Before keyboard actions, populated project room open | 320 | 320 | 2 | column |
+| After switching room, sending and creating the third, long-named room | 320 | 320 | 3 | column |
+
+A full-page screenshot was captured and inspected: the long conversation heading wrapped within the column. Raw observations and screenshot are temporary artifacts in `C:\Users\soham\AppData\Local\Temp\chat-a11y-82e6929-HL8mQt` (`results.json`, `Chrome-320px.png`). This records the same scoped row-15 keyboard/reflow check as the earlier re-run; it does not complete the full manual WCAG audit. Firefox, other rows, the manual table, NVDA notes and QA sign-off were not changed or evaluated by this run.
+
+Cleanup: stopped the isolated `npm start` server with **Ctrl+C**. A subsequent health request to `http://127.0.0.1:31340/api/health` returned **ECONNREFUSED**. Only this documentation section was appended; no other repository file was edited, and no commit or push was made.
