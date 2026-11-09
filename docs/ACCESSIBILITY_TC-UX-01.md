@@ -130,3 +130,36 @@ Cleanup: the isolated server was stopped with Ctrl+C; a subsequent health reques
   (signed out and signed in with a room open) and that a repeat sign-in announces the signed-in user. They
   run in the CI browser job.
 - Rows 3 and 15 need re-running against the new head; row 14 and the manual and NVDA columns are still open.
+
+
+## Re-run of rows 3 and 15 at 0c23af0
+
+Date: **9 November 2026 (Asia/Calcutta)**. Tester: **Codex / Playwright keyboard automation**. Pulled explicitly with `git pull --ff-only origin CHAT-38-accessibility` after plain `git pull` reported no tracking branch; `git rev-parse --short HEAD` returned **0c23af0** before and after the run. Node: **v24.15.0**.
+
+Setup matched the earlier isolated keyboard run: installed Chrome **157.0.8103.38**, headless with `channel: chrome` and `chromiumSandbox: true`; Playwright-managed Firefox **157.0** (build 1555), headless. Each browser had two separate contexts, a 1280 x 800 initial viewport and reduced-motion emulation. Versions were observed from the running browser API; About pages were not re-tested. A fresh temporary SQLite database and signing key were created for this re-run, shared sequentially by the Chrome and Firefox runs as before. The loopback server used previously unused **port 31339**. The existing app/database and open browser windows were not used.
+
+Accounts were `alice_c_a11y` / `bob_c_a11y` in Chrome and `alice_f_a11y` / `bob_f_a11y` in Firefox, with the same test password length as the earlier run. App actions used only Tab/Shift+Tab, Enter, Space and keyboard text input; there were no clicks, field fills or DOM focus calls. The earlier project/other-room names, two-user membership, unread update and ten-message conversation state were recreated before the narrow-layout check.
+
+| Row | Chrome | Firefox |
+|---|---|---|
+| 3: sign out and sign in again; check focus and exposed signed-in status | **Pass** | **Pass** |
+| 15: 320 px viewport; reflow, room switching, message sending and room creation | **Fail** | **Pass** |
+
+**Row 3 observations:** after the repeat sign-in, Chrome exposed `Signed in as alice_c_a11y.` and Firefox exposed `Signed in as alice_f_a11y.` in `#notice`. Both had focus on `#room-name` (Create a room). In both browsers, the notice had `role="status"` and `aria-live="polite"`; the final status was not replaced by `Reconnected.`. Chrome native accessibility-tree data and computed accessible snapshots were captured. As in the earlier run, Firefox used a computed accessible DOM snapshot and actual ARIA attributes; its native platform accessibility tree was not available. No screen-reader speech is claimed.
+
+**Row 15 measurements:** resize the viewport to 320 x 800 with the project conversation open. Measure document-element `clientWidth` / `scrollWidth`, then use Space to open the other room, Enter to send a message, and the keyboard to create/open `Narrow room Chrome` or `Narrow room Firefox`. All three recorded keyboard actions completed in both browsers.
+
+| Browser | Measurement point | clientWidth (px) | scrollWidth (px) | Workspace direction |
+|---|---|---:|---:|---|
+| Chrome | Before keyboard actions | 320 | 391 | column |
+| Chrome | After keyboard actions | 320 | 566 | column |
+| Firefox | Before keyboard actions | 320 | 320 | column |
+| Firefox | After keyboard actions | 320 | 320 | column |
+
+**Remaining failure — row 15, Chrome:** with the 320 px viewport, open the populated project room and measure the page, then switch rooms, send and create a room using the keyboard. Expected: column reflow and no horizontal page overflow (`scrollWidth <= clientWidth`). Observed: the workspace reflowed to a column and the actions worked, but scrollWidth was **391** before the actions and **566** afterward, with clientWidth **320**. The header account area now ended at x=305; this observation does not identify the cause of the remaining overflow. Firefox measured **320 / 320** before and after and passed the scoped check. Full-page screenshots were captured and inspected.
+
+**Setup retry:** the first Firefox setup auto-login was rate-limited by the server (`RATE_LIMITED`, five login attempts per IP per 60 seconds), before either requested Firefox row ran. The account had already been created. After that window elapsed, a fresh Firefox session used keyboard sign-in, sign-out and repeat sign-in with that account, then recreated the room/message state. The rate limit was not disabled or changed; the incomplete setup attempt was not counted as a row failure.
+
+Only rows 3 and 15 were evaluated for this re-run. The earlier results, manual table, all NVDA cells and QA sign-off were left unchanged. These remain scoped isolated keyboard observations, not a completed manual WCAG audit. Temporary raw observations are in `C:\Users\soham\AppData\Local\Temp\chat-a11y-0c23af0-o1pzOu` (`results.json`, `results-firefox-retry.json`, `Chrome-320px.png`, `Firefox-320px.png`); no other repository file was edited.
+
+Cleanup: the isolated `npm start` server was stopped with **Ctrl+C**. A subsequent request to `http://127.0.0.1:31339/api/health` failed with **ECONNREFUSED**. No commit or push was made.
