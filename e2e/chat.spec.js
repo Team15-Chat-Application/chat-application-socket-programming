@@ -34,9 +34,12 @@ const overflows=page=>page.evaluate(()=>document.documentElement.scrollWidth>doc
 test('TC-UX-01 row 15: 320 px viewport reflows without horizontal page overflow',async({page})=>{
  await page.setViewportSize({width:320,height:800});await page.goto('/');expect(await overflows(page)).toBe(false);
  const name='Narrow_'+Date.now();await signUp(page,name);
- await page.getByLabel('Create a room',{exact:true}).fill('Narrow room');await page.getByRole('button',{name:'Create room',exact:true}).click();
- await expect(page.locator('#room-title')).toHaveText('# Narrow room');
- expect(await overflows(page)).toBe(false);
+ for(const room of ['Narrow room','Another very long room name here','Design reviews']){
+  await page.getByLabel('Create a room',{exact:true}).fill(room);await page.getByRole('button',{name:'Create room',exact:true}).click();
+  await expect(page.locator('#room-title')).toHaveText('# '+room);
+  expect(await overflows(page)).toBe(false);
+ }
+ await page.getByRole('button',{name:/# Narrow room/}).focus();expect(await overflows(page)).toBe(false);
  await page.screenshot({path:'reports/chat-320px.png',fullPage:true});
 });
 test('TC-UX-01 row 3: signing in again announces the signed-in user, not a reconnect',async({page})=>{

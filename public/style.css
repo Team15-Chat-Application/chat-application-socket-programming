@@ -8,3 +8,4 @@
 .create-row input{min-width:0}
 .welcome h1,.conversation-head h1{overflow-wrap:break-word}
 .conversation-head>div{min-width:0}
+#room-list,.room-button,.section-title{position:relative}

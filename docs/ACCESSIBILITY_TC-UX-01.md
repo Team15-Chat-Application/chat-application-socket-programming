@@ -163,3 +163,13 @@ Accounts were `alice_c_a11y` / `bob_c_a11y` in Chrome and `alice_f_a11y` / `bob_
 Only rows 3 and 15 were evaluated for this re-run. The earlier results, manual table, all NVDA cells and QA sign-off were left unchanged. These remain scoped isolated keyboard observations, not a completed manual WCAG audit. Temporary raw observations are in `C:\Users\soham\AppData\Local\Temp\chat-a11y-0c23af0-o1pzOu` (`results.json`, `results-firefox-retry.json`, `Chrome-320px.png`, `Firefox-320px.png`); no other repository file was edited.
 
 Cleanup: the isolated `npm start` server was stopped with **Ctrl+C**. A subsequent request to `http://127.0.0.1:31339/api/health` failed with **ECONNREFUSED**. No commit or push was made.
+
+### Fix for the remaining Chrome row 15 failure
+
+Cause: the visually hidden screen-reader text added in c67451e uses `position:absolute`, and the room
+buttons and room list had no positioned ancestor. When room buttons scrolled out of the horizontal room list,
+their hidden spans escaped the list's clipping and widened the page in Chrome. Reproduced in Chromium with the
+client's HTML and CSS at 320 px: with six rooms the page grew to 822 px. Fix: the room list, room buttons and
+rooms heading are positioned containers. With the fix the page stayed at 320 px with six rooms, and keyboard
+focus on the last room scrolled the room list rather than the page. The Playwright regression now creates
+three long-named rooms and checks for overflow after each. Row 15 in Chrome needs re-running at the new head.
