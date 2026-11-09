@@ -30,3 +30,20 @@ test('login form and mobile layout pass automated accessibility checks',async({p
  await page.keyboard.press('Tab');await expect(page.locator('.skip')).toBeFocused();
  await page.screenshot({path:'reports/chat-mobile.png',fullPage:true});
 });
+const overflows=page=>page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
+test('TC-UX-01 row 15: 320 px viewport reflows without horizontal page overflow',async({page})=>{
+ await page.setViewportSize({width:320,height:800});await page.goto('/');expect(await overflows(page)).toBe(false);
+ const name='Narrow_'+Date.now();await signUp(page,name);
+ await page.getByLabel('Create a room',{exact:true}).fill('Narrow room');await page.getByRole('button',{name:'Create room',exact:true}).click();
+ await expect(page.locator('#room-title')).toHaveText('# Narrow room');
+ expect(await overflows(page)).toBe(false);
+ await page.screenshot({path:'reports/chat-320px.png',fullPage:true});
+});
+test('TC-UX-01 row 3: signing in again announces the signed-in user, not a reconnect',async({page})=>{
+ const name='Again_'+Date.now();await signUp(page,name);
+ await page.getByRole('button',{name:'Sign out'}).click();await expect(page.locator('#auth')).toBeVisible();
+ await page.getByLabel('Username',{exact:true}).fill(name);await page.getByLabel('Password',{exact:true}).fill('Browser-test-password');
+ await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.locator('#connection')).toHaveText('Connected');
+ await expect(page.locator('#room-name')).toBeFocused();
+ await expect(page.locator('#notice')).toHaveText('Signed in as '+name+'.');
+});

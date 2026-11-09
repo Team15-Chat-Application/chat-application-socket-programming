@@ -83,7 +83,7 @@ async function openRoom(roomId){
   renderRooms();renderMessages();await refreshPeople();$('message').focus();
 }
 function resetSession(text='Signed out.'){
-  socket?.disconnect();socket=null;session=null;active=null;rooms.clear();joined.clear();messages.clear();unread.clear();reading.clear();
+  socket?.disconnect();socket=null;session=null;reconnecting=false;retrying=false;active=null;rooms.clear();joined.clear();messages.clear();unread.clear();reading.clear();
   delete $('messages').dataset.room;$('messages').replaceChildren();document.title='Common Room · Team 15 Chat';
   $('auth').hidden=false;$('workspace').hidden=true;$('logout').hidden=true;$('account-name').textContent='';$('auth-error').textContent='';notice(text);$('username').focus();
 }
@@ -94,7 +94,7 @@ function connect(){
     for(const roomId of joined){try{const result=await emit('room:join',{roomId});if(result.history)merge(roomId,result.history);}catch{joined.delete(roomId);}}
     if(active){renderMessages();refreshPeople();}
   });
-  socket.on('disconnect',()=>{$('connection').textContent='Reconnecting…';if(session){reconnecting=true;notice('Connection lost. Reconnecting…');}});
+  socket.on('disconnect',reason=>{if(reason==='io client disconnect')return;$('connection').textContent='Reconnecting…';if(session){reconnecting=true;notice('Connection lost. Reconnecting…');}});
   socket.on('connect_error',error=>{if(error.data?.code==='UNAUTHORIZED'||error.data?.code==='AUTH_NOT_IMPLEMENTED')resetSession(error.message);else{retrying=true;notice('Unable to connect. Retrying…');}});
   socket.on('system:error',result=>resetSession(result.error?.message||'Please sign in again.'));
   socket.on('room:list-updated',data=>{rooms.clear();for(const room of data.rooms)rooms.set(room.roomId,room);renderRooms();});

@@ -116,3 +116,17 @@ Row 14 remains untested: actual 200% browser zoom was not established; CSS zoom 
 Evidence (ignored local artifacts): [combined results](../reports/a11y-sandbox-1794206349610/combined-results.json), [Chrome and initial Firefox run](../reports/a11y-sandbox-1794206349610/results.json), [Firefox keyboard retry](../reports/a11y-sandbox-1794206349610/results-firefox.json), [long-input, repeat-login and About-page checks](../reports/a11y-sandbox-1794206349610/results-extra.json), [Chrome 320 px screenshot](../reports/a11y-sandbox-1794206349610/Chrome-320px.png), [Firefox 320 px screenshot](../reports/a11y-sandbox-1794206349610/Firefox-320px.png), [Firefox long-input screenshot](../reports/a11y-sandbox-1794206349610/Firefox-2001-characters.png).
 
 Cleanup: the isolated server was stopped with Ctrl+C; a subsequent health request to port 31338 returned ECONNREFUSED. Only this tracked documentation file was edited; generated browser profiles, database and reports are ignored artifacts. No source fix, commit or push was made.
+
+### Fixes after the 9 November run
+
+- **Row 3.** Cause: signing out called `socket.disconnect()` while the session was still set, so the
+  disconnect handler treated it as a dropped connection and the next sign-in announced "Reconnected.".
+  Fix: a client-initiated disconnect (`io client disconnect`) is ignored and the reconnect flags are reset on
+  sign-out. The jsdom harness reproduces the failure at 7285098 and passes after the fix (28/28).
+- **Row 15.** Cause: at 320 px the header account area did not wrap, and the room-creation label was forced
+  onto one line beside an input with an intrinsic minimum width. Fix: the narrow header wraps, the label sits
+  above the field, the input may shrink, and long names and headings wrap.
+- **Regression tests.** `e2e/chat.spec.js` now checks that a 320 px viewport has no horizontal page overflow
+  (signed out and signed in with a room open) and that a repeat sign-in announces the signed-in user. They
+  run in the CI browser job.
+- Rows 3 and 15 need re-running against the new head; row 14 and the manual and NVDA columns are still open.
