@@ -12,6 +12,7 @@ test('actual two-browser product: rooms, messages, receipts, unread badges and k
   await b.getByLabel('Message',{exact:true}).fill('Working together');await expect(a.locator('#typing')).toContainText('typing');
   await b.getByLabel('Message',{exact:true}).press('Enter');await expect(a.locator('#messages')).toContainText('Working together');
   await a.getByLabel('Create a room',{exact:true}).fill('Another Room');await a.getByRole('button',{name:'Create room',exact:true}).click();
+  await expect(a.locator('#room-title')).toHaveText('# Another Room');
   await b.getByLabel('Message',{exact:true}).fill('One more update');await b.getByRole('button',{name:'Send message'}).click();
   await expect(a.locator('.unread')).toHaveText('1');await a.getByRole('button',{name:/# Project Team/}).click();await expect(a.locator('#messages')).toContainText('One more update');
   await a.getByLabel('Message',{exact:true}).fill('<img src=x onerror="window.pwned=1">Safe <b>text</b> & comparison');await a.getByRole('button',{name:'Send message'}).click();
