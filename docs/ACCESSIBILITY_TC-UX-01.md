@@ -34,20 +34,20 @@ Mark each cell Pass / Fail / Note. Firefox is required by the submitted operatin
 |---|---|---|---|---|
 | 1 | Tab from page load: "Skip to conversation" appears first and moves focus to the main area | | | |
 | 2 | Create an account, then sign in, using only the keyboard; errors are read out | | | |
-| 3 | After sign-in, focus lands on "Create a room"; "Signed in as …" is announced | | | |
+| 3 | After sign-in, focus lands on "Create a room"; "Signed in as …" is announced | | | Pass (real NVDA 2026.3 / Firefox 157.0, continuous speech): “Signed in as nvda alice 2.”; focus on Create a room. |
 | 4 | Create a room and open another from the list with Enter/Space; current room is indicated | | | |
-| 5 | Room buttons read as "# name, N members" and ", N unread" when there are unread messages | | | |
-| 6 | Opening a room does not read out the whole history; focus lands in the message box | | | |
-| 7 | Enter sends, Shift+Enter adds a line; a new incoming message is announced once | | | |
-| 8 | Receipts changing to Delivered/Read do not re-announce earlier messages | | | |
-| 9 | Typing over 2000 characters: field marked invalid, reason announced, Send disabled | | | |
+| 5 | Room buttons read as "# name, N members" and ", N unread" when there are unread messages | | | Pass (real NVDA 2026.3 / Firefox 157.0): “number NVDA Capture Project , 2 members” and “2 members , 1 unread”. |
+| 6 | Opening a room does not read out the whole history; focus lands in the message box | | | Fail (real NVDA 2026.3 / Firefox 157.0): opening history spoke “History alpha one”, “History beta two” and “History gamma three”; focus then landed on Message. |
+| 7 | Enter sends, Shift+Enter adds a line; a new incoming message is announced once | | | Pass (real NVDA 2026.3 / Firefox 157.0, continuous speech): “NVDA incoming singular message” occurred once in 8 seconds. |
+| 8 | Receipts changing to Delivered/Read do not re-announce earlier messages | | | Pass (real NVDA 2026.3 / Firefox 157.0, continuous speech): Read caused no earlier-message speech during 8 seconds; no spoken phrase to quote. |
+| 9 | Typing over 2000 characters: field marked invalid, reason announced, Send disabled | | | Pass (real NVDA 2026.3 / Firefox 157.0, controlled native boundary key): “Message is longer than 2000 characters. Shorten it to send.” and “invalid entry”; length 2001, Send disabled. |
 | 10 | Message list can be focused and scrolled with arrow keys | | | |
-| 11 | "Leave room": focus returns to that room in the list; "Left # …" announced | | | |
+| 11 | "Leave room": focus returns to that room in the list; "Left # …" announced | | | Pass (real NVDA 2026.3 / Firefox 157.0): “Left number NVDA Capture Project.”; focus returned to that room button. |
 | 12 | Sign out with the keyboard; focus returns to Username | | | |
 | 13 | Focus ring visible on every control, including on the dark room panel | | | |
-| 14 | 200% browser zoom: no content lost or overlapping, no horizontal scrolling of text | | | |
+| 14 | 200% browser zoom: no content lost or overlapping, no horizontal scrolling of text | Pass (equivalent viewport: 640×400 CSS px, DPR 2; no real Ctrl+Plus zoom) | Fail: room-list text clipped (equivalent viewport: 640×400 CSS px, DPR 2, Firefox pref retained; see method adjustment below) | |
 | 15 | 320 px wide window (or 400% zoom): layout reflows to one column, all functions usable | | | |
-| 16 | Stop the server briefly: "Connection lost. Reconnecting…" and then "Reconnected." announced | | | |
+| 16 | Stop the server briefly: "Connection lost. Reconnecting…" and then "Reconnected." announced | | | Pass (real NVDA 2026.3 / Firefox 157.0, continuous speech): “Connection lost. Reconnecting...” then “Reconnected.” after the real server interruption. |
 
 Tested head: 7285098 (isolated automated run below; manual table above remains uncompleted)  Date: 2026-11-09  Tester: Codex/Playwright, with Chrome 157.0.8103.38 (About Chrome verified) and Firefox 157.0 (Playwright-managed; runtime version verified, About page unverified)  QA review (Yaswanth): ______
 
@@ -193,3 +193,64 @@ Using `alice_c_a11y` and `bob_c_a11y`, recreated the two-user room membership, u
 A full-page screenshot was captured and inspected: the long conversation heading wrapped within the column. Raw observations and screenshot are temporary artifacts in `C:\Users\soham\AppData\Local\Temp\chat-a11y-82e6929-HL8mQt` (`results.json`, `Chrome-320px.png`). This records the same scoped row-15 keyboard/reflow check as the earlier re-run; it does not complete the full manual WCAG audit. Firefox, other rows, the manual table, NVDA notes and QA sign-off were not changed or evaluated by this run.
 
 Cleanup: stopped the isolated `npm start` server with **Ctrl+C**. A subsequent health request to `http://127.0.0.1:31340/api/health` returned **ECONNREFUSED**. Only this documentation section was appended; no other repository file was edited, and no commit or push was made.
+
+
+## Row 14 and NVDA run at e960ad6
+
+Date: **10 November 2026 (Asia/Calcutta)**. Tester: **Codex**. `git pull --ff-only origin CHAT-38-accessibility` completed; `git rev-parse --short HEAD` was **e960ad6** before and after testing. Node **v24.15.0**. Only the requested main-table row-14 results/NVDA notes and this new section are changed; older execution records and QA sign-off remain historical.
+
+### Isolation and versions
+
+A fresh temporary SQLite database, a newly generated **96-hex-character JWT_SECRET** and unused loopback **127.0.0.1:31341** were used. The repository data/ folder and .env were not used. Because the repository npm start script includes --env-file-if-exists=.env, a temporary npm package launched the same absolute src/index.js entry point without any env-file option. No repository script or configuration was edited. The server login limit was retained; Part A used four logins across the two browsers, and later speech runs were paced across subsequent windows.
+
+Browsers: installed **Chrome 157.0.8103.39** (channel chrome, browser sandbox enabled) and Playwright-managed **Firefox 157.0**. NVDA executable ProductVersion: **2026.3**, FileVersion **2026.3.0.58174**; Guidepup portable bundle **0.2.1-2026.3**. Tools: **@guidepup/guidepup 0.40.0**, **@guidepup/setup 0.29.3**. Browser versions came from the running-browser API and NVDA version from executable metadata; browser About pages were not re-tested.
+
+WindowsSandbox.exe was absent, no NVDA installation/running process was found initially, and the host registry reported Windows 10 Home / Core. After the user explicitly approved temporary host NVDA/Guidepup setup, the tools and portable NVDA assets were installed below the test temporary folder. The inspected Guidepup Windows setup path was a no-op; host security/startup settings were not changed. Windows Sandbox was not launched. [Guidepup](https://github.com/guidepup/guidepup) drove native keyboard commands; speech was recorded from the real NVDA remote SPEAK stream, not inferred from ARIA or expected output.
+
+### Row 14 method and result
+
+**Actual workflow method: equivalent viewport, not real browser zoom.** Chrome used viewport **640×400** with deviceScaleFactor **2**. The supplied Firefox recipe (viewport 1280×800 plus layout.css.devPixelsPerPx="2.0") was tried first but actually returned **innerWidth=1280 and devicePixelRatio=1**: Playwright overrode the preference. An explicit DPR 2 with that viewport still returned innerWidth=1280. Firefox was therefore tested with the preference retained plus an explicit **640×400 / DPR 2** context. Before app testing, both browsers were observed at **window.innerWidth=640**, **window.innerHeight=400**, **devicePixelRatio=2**. This adjustment establishes the requested layout geometry but is a departure from the literal Firefox launch recipe.
+
+All app steps used only keyboard navigation/text input: register, explicitly sign in after signing out, create two rooms, send a message with Enter, open the other room with Space, leave it and sign out. The long room name was **Accessibility review room for 200 percent zoom checks** (53 characters). Every step completed in both browsers. Full-page screenshots were captured for sign-in and room-open states in each browser, and inspected alongside control/text bounding boxes. Vertical scrolling was permitted. Native Guidepup Ctrl+Equals and Ctrl+NumPadPlus were also tried in separate visible disposable windows (including a native, non-emulated viewport); none established a twofold DPR change/halved layout width. Those attempts are not claimed as successful real 200% zoom.
+
+| Browser / method | State | clientWidth (px) | scrollWidth (px) | Overlap / clipping observed | Row 14 |
+|---|---|---:|---:|---|---|
+| Chrome — equivalent viewport 640×400 / DPR 2 | sign-in | 640 | 640 | No overlapping or clipped visible text/control found | Pass |
+| Chrome — equivalent viewport 640×400 / DPR 2 | room-open | 640 | 640 | No overlapping or clipped visible text/control found | Pass |
+| Firefox — equivalent viewport 640×400 / DPR 2 | sign-in | 640 | 640 | No overlapping or clipped visible text/control found | Fail |
+| Firefox — equivalent viewport 640×400 / DPR 2 | room-open | 640 | 640 | Partially clipped room-list text/control; no overlapping boxes | Fail |
+
+**Failure: row 14, Firefox room-open state.** Steps: after the Chrome workflow, use the separate Firefox profile in the shared fresh test database; register/sign in, create Second room Firefox and the 52-character long room, send a message and inspect the open-room state. The catalogue contained four rooms (including the two created in Chrome). Expected: no horizontally clipped control/text at the zoom-equivalent geometry. Observed: page width stayed **640 / 640**, but Second room Firefox was partially cut off by the horizontally scrolling room list. Its label text box extended from **x=580.88 to x=714.40** while the room-list clipping edge was **x=616**; its button extended to **x=737.83**. The full-page screenshot visibly cuts the label. All keyboard actions still completed, and no overlapping boxes were found. This result is tied to that catalogue state; it does not establish a browser-exclusive defect.
+
+Bounding-box review excluded visually hidden accessibility text and an initial scanner artifact that compared an input control border box with its own content clip. The actual ancestor-clipping findings were retained; no overlap/clipping finding was converted into a pass without review. Raw and reviewed diagnostics are both retained.
+
+### NVDA speech results — Firefox
+
+Primary profile: a real visible Firefox window with **nvda_alice2**. Second user **nvda_bob2** used a separate headless Firefox process/profile to generate messages/receipts using keyboard events. Primary navigation and activation used Guidepup native keys; small text preparation used keyboard text APIs. Each quoted phrase below is an actual substring from the continuous NVDA SPEAK stream. Eight-second negative/once-only observations are bounded to those windows; no claim is made about later speech.
+
+| TC-UX-01 row | Result | Captured spoken phrase / observation |
+|---|---|---|
+| 3 | Pass — real NVDA 2026.3 / Firefox 157.0 | “Signed in as nvda alice 2.”; focus was #room-name (Create a room). |
+| 5 | Pass — real NVDA 2026.3 / Firefox 157.0 | “number NVDA Capture Project , 2 members, button, focused”; later “number NVDA Capture Project , 2 members , 1 unread, button, focused”. NVDA pronounced # as number. |
+| 6 | Fail — real NVDA 2026.3 / Firefox 157.0 | Opening the room spoke all four saved messages, including “Unread first NVDA message”, “History alpha one”, “History beta two” and “History gamma three”; then “Message, edit, multi line”. Focus was Message. |
+| 7 | Pass — real NVDA 2026.3 / Firefox 157.0 | “nvda bob 2 04:41 PM NVDA incoming singular message”; the message body occurred once in the eight-second continuous capture. |
+| 8 | Pass — real NVDA 2026.3 / Firefox 157.0 | No speech was captured during the eight seconds after Delivered changed to Read; no earlier message was re-read. There is no spoken phrase to quote for this expected silence. |
+| 9 | Pass — real NVDA 2026.3 / Firefox 157.0 | “Message is longer than 2000 characters. Shorten it to send.”; “invalid entry”. Checked length 2001, aria-invalid=true, Send disabled and Firefox/message focus retained. |
+| 11 | Pass — real NVDA 2026.3 / Firefox 157.0 | “Left number NVDA Capture Project.”; focus returned to that room button. |
+| 16 | Pass — real NVDA 2026.3 / Firefox 157.0 | “Connection lost. Reconnecting...” followed by “Reconnected.” after Ctrl+C, at least five seconds down and a restart of the same isolated server. |
+
+**Failure: NVDA row 6.** Steps: while the primary user is in NVDA Capture Other, have the second user send four messages in NVDA Capture Project; focus its room button and open it with Enter. Expected: focus lands on Message without reading the saved backlog. Observed: focus did land on Message, but NVDA spoke the sender/time and all four stored message bodies before announcing the Message field. The continuous log contains all four bodies within the eight-second observation window.
+
+### Capture checks, retries and limits
+
+An initial harness used Guidepup command-scoped spokenPhraseLog(), which does not continuously retain asynchronous speech between commands. Its empty asynchronous logs were rejected as inconclusive. The definitive run added a continuous listener to Guidepup’s actual NVDA remote SPEAK events. Row 3’s raw literal matcher also rejected the username’s spoken spacing (nvda alice 2 versus nvda_alice2); the recorded speech and correct focus establish the reviewed Pass, without changing the quote.
+
+Row 9 was repeated because a burst attempt included unrelated Windows Search speech, and a subsequent synthetic text-preparation attempt did not establish the checked boundary. The final valid attempt used native keyboard batches of 100 characters, verified each cumulative count through 2000 and checked document.hasFocus() plus Message focus. It then typed one native x through NVDA and continuously captured eight seconds. The before/after lengths were **2000 / 2001**, focus stayed Message in the foreground, and the reason plus invalid-entry speech were captured. Only that controlled attempt determines the final row-9 result.
+
+Real Ctrl+Plus 200% zoom was **not established**; row-14 results are explicitly for equivalent-viewport layout. Firefox’s literal requested viewport/preference recipe was **not reproduced as intended**, and its adjusted context is stated above. Firefox is the Playwright-managed distribution, not the user’s existing profile. Screen-reader audio was not independently evaluated by a human; the evidence is NVDA’s emitted spoken-phrase stream. No full WCAG conformance or Yaswanth QA sign-off is implied.
+
+### Evidence and cleanup
+
+Temporary evidence directory: `C:\Users\soham\AppData\Local\Temp\chat-a11y-e960ad6-GzSZcG`. Files include `row14-results.json` (raw), `row14-reviewed.json`, `Chrome-sign-in.png`, `Chrome-room-open.png`, `Firefox-sign-in.png`, `Firefox-room-open.png`, `nvda-results-continuous.json`, `nvda-continuous-speech.jsonl`, `nvda-row9-native-boundary.json`, `native-zoom-results.json`, `native-zoom-numpad-results.json` and `final-reviewed-results.json`. Earlier invalid attempts are retained separately and are not final pass/fail evidence.
+
+The isolated server was stopped with **Ctrl+C**; a final request to port 31341 failed with **ECONNREFUSED**. Portable NVDA was stopped, all disposable test browser windows were closed, and the final process check found no nvda/firefox process. No Windows Sandbox existed to close. Temporary tools/evidence remain in the stated temporary folder. Only this documentation file was edited in the repository; no source/configuration edit, commit or push was made.
