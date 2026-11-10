@@ -3,7 +3,7 @@
 **Author:** Kalluri Yaswanth (`kalluri088`), QA Lead & Software Engineer  
 **Recipient:** Jamula Soham Rao (`JSohamRao`), Product Owner & Integration Lead  
 **Date:** 31 October 2026  
-**Status:** ADOPTED (Option A selected by Product Owner on 31 October 2026; see `docs/OCT31_SCOPE_DECISION_BRIEF.md`)  
+**Status:** ADOPTED (Option A selected under Soham's delegated Product Owner authority on 31 October 2026; see `docs/OCT31_SCOPE_DECISION_BRIEF.md`. This records delegated scoping, not team or course approval.)  
 **References:** Submitted SRS v1.0, SAD v1.0, STP v1.0, Jira CHAT-51, GitHub Issues #50, #41, #42, `docs/DEVIATIONS.md`, `docs/OCT31_SCOPE_DECISION_BRIEF.md`  
 
 ---
@@ -30,7 +30,7 @@ This document presents a structured decision proposal to reconcile these discrep
   - Room-scoped presence, debounced/expiring typing indicators, and unread badges for inactive rooms (`CHAT-F-017` through `CHAT-F-019`).
 - All 5 security requirements in the numbered SRS:
   - TLS 1.2+ configuration enforcement (`CHAT-SR-001`).
-  - bcrypt cost factor >= 10 with 72-byte safe UTF-8 truncation (`CHAT-SR-002`).
+  - bcrypt cost factor >= 10 with 72-byte maximum, no silent truncation (`CHAT-SR-002`).
   - Fresh revocable database session verification per event (`CHAT-SR-003`).
   - IP-based rate limiting of 5 attempts/minute/IP on login (`CHAT-SR-004`).
   - Parameterized SQL and HTML sanitization (`CHAT-SR-005`).
@@ -77,7 +77,7 @@ This document presents a structured decision proposal to reconcile these discrep
 
 ## 5. Decisions and Stakeholder Actions Status
 
-- [x] **Product Owner Approval:** Jamula Soham Rao formally accepted Option A on 31 October 2026 under delegated authority (recorded in `docs/OCT31_SCOPE_DECISION_BRIEF.md` and `docs/OCT31_REVIEW_RESPONSE.md`). All 29 numbered SRS requirements constitute the Sprint 2 baseline. Admin and private messaging features are formally deferred to the future backlog.
+- [x] **Product Owner Delegated Decision:** Option A was selected on 31 October 2026 under Soham's delegated authority (recorded in `docs/OCT31_SCOPE_DECISION_BRIEF.md` and `docs/OCT31_REVIEW_RESPONSE.md`), defining the 29 numbered SRS requirements as the Sprint 2 baseline and deferring admin/private messaging features to the future backlog. This records delegated scoping, not team or course approval.
 - [x] **Deviation Log Ratification:** Recorded in `docs/DEVIATIONS.md` and referenced across review artifacts.
-- [ ] **Cross-Browser / Accessibility Evidence:** Hrisheek Karaturi to execute and submit manual Firefox/screen-reader test results for CHAT-38.
+- [ ] **Cross-Browser / Accessibility Evidence:** Reassigned to Soham on 8 Nov (fixes and isolated keyboard runs in PR #58); manual NVDA screen-reader and 200% zoom checks remain open.
 - [ ] **Production Hosting Agreement:** Team to determine if a public deployed endpoint will be provisioned for external TLS scanning and 30-day availability monitoring.
