@@ -254,3 +254,17 @@ Real Ctrl+Plus 200% zoom was **not established**; row-14 results are explicitly 
 Temporary evidence directory: `C:\Users\soham\AppData\Local\Temp\chat-a11y-e960ad6-GzSZcG`. Files include `row14-results.json` (raw), `row14-reviewed.json`, `Chrome-sign-in.png`, `Chrome-room-open.png`, `Firefox-sign-in.png`, `Firefox-room-open.png`, `nvda-results-continuous.json`, `nvda-continuous-speech.jsonl`, `nvda-row9-native-boundary.json`, `native-zoom-results.json`, `native-zoom-numpad-results.json` and `final-reviewed-results.json`. Earlier invalid attempts are retained separately and are not final pass/fail evidence.
 
 The isolated server was stopped with **Ctrl+C**; a final request to port 31341 failed with **ECONNREFUSED**. Portable NVDA was stopped, all disposable test browser windows were closed, and the final process check found no nvda/firefox process. No Windows Sandbox existed to close. Temporary tools/evidence remain in the stated temporary folder. Only this documentation file was edited in the repository; no source/configuration edit, commit or push was made.
+
+### Fixes after the row 14 and NVDA run
+
+- **NVDA row 6.** Cause: the log was rebuilt under `aria-busy`, and clearing `aria-busy` made Firefox report the
+  whole log as changed, so NVDA read the saved messages; focus also moved to Message only after the presence
+  round trip. Fix: the log is rebuilt with `aria-live="off"`, focus moves to Message immediately, and polite
+  announcements are restored 750 ms later. The jsdom harness checks this (30/30) and the CI browser test now
+  records the attribute sequence (`off`, then `polite`) when a room is opened.
+- **Row 14, Firefox.** Cause: on narrow screens the room list was a horizontally scrolling strip, so a button at
+  its edge was partly cut off. Fix: at 640 px and below the room buttons wrap onto new lines and long names wrap
+  instead of being truncated. Checked in Chromium with four rooms including two very long names: at 640x400 and
+  at 320 px every room button is fully inside the list, nothing is truncated and there is no horizontal overflow.
+  The CI browser test now checks for clipped rooms at 320 px and at 640x400.
+- Rows 6 (NVDA) and 14 (Firefox) need re-running at the new head.

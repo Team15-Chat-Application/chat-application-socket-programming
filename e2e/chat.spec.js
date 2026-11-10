@@ -6,7 +6,10 @@ test('actual two-browser product: rooms, messages, receipts, unread badges and k
  try{
   await signUp(a,'Alice_'+Date.now());await signUp(b,'Bob_'+Date.now());
   await a.getByLabel('Create a room',{exact:true}).fill('Project Team');await a.getByRole('button',{name:'Create room',exact:true}).click();
+  await b.evaluate(()=>{window.__live=[];new MutationObserver(list=>list.forEach(m=>window.__live.push(m.target.getAttribute('aria-live')))).observe(document.getElementById('messages'),{attributes:true,attributeFilter:['aria-live']});});
   await b.getByRole('button',{name:/# Project Team/}).click();
+  await expect(b.locator('#message')).toBeFocused();
+  await expect.poll(()=>b.evaluate(()=>window.__live.join(',')),{timeout:3000}).toBe('off,polite');
   await a.getByLabel('Message',{exact:true}).fill('Hello team');await a.getByLabel('Message',{exact:true}).press('Enter');
   await expect(b.locator('#messages')).toContainText('Hello team');await expect(a.locator('.receipt').last()).toHaveText('Read');
   await b.getByLabel('Message',{exact:true}).fill('Working together');await expect(a.locator('#typing')).toContainText('typing');
@@ -31,8 +34,9 @@ test('login form and mobile layout pass automated accessibility checks',async({p
  await page.keyboard.press('Tab');await expect(page.locator('.skip')).toBeFocused();
  await page.screenshot({path:'reports/chat-mobile.png',fullPage:true});
 });
+const roomsClipped=page=>page.evaluate(()=>{const list=document.getElementById('room-list').getBoundingClientRect();return [...document.querySelectorAll('.room-button')].filter(b=>{const r=b.getBoundingClientRect(),n=b.querySelector('.room-name');return r.left<list.left-0.5||r.right>list.right+0.5||n.scrollWidth>n.clientWidth+1;}).map(b=>b.textContent);});
 const overflows=page=>page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
-test('TC-UX-01 row 15: 320 px viewport reflows without horizontal page overflow',async({page})=>{
+test('TC-UX-01 rows 14 and 15: 320 px and 200% zoom-equivalent viewports reflow without overflow or clipped rooms',async({page})=>{
  await page.setViewportSize({width:320,height:800});await page.goto('/');expect(await overflows(page)).toBe(false);
  const name='Narrow_'+Date.now();await signUp(page,name);
  for(const room of ['Narrow room','Another very long room name here','Design reviews']){
@@ -40,7 +44,9 @@ test('TC-UX-01 row 15: 320 px viewport reflows without horizontal page overflow'
   await expect(page.locator('#room-title')).toHaveText('# '+room);
   expect(await overflows(page)).toBe(false);
  }
- await page.getByRole('button',{name:/# Narrow room/}).focus();expect(await overflows(page)).toBe(false);
+ await page.getByRole('button',{name:/# Narrow room/}).focus();expect(await overflows(page)).toBe(false);expect(await roomsClipped(page)).toEqual([]);
+ // Row 14: 200% zoom on a 1280x800 window lays out at 640x400 CSS px.
+ await page.setViewportSize({width:640,height:400});expect(await overflows(page)).toBe(false);expect(await roomsClipped(page)).toEqual([]);
  await page.screenshot({path:'reports/chat-320px.png',fullPage:true});
 });
 test('TC-UX-01 row 3: signing in again announces the signed-in user, not a reconnect',async({page})=>{

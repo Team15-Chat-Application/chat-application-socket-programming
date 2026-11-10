@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 $('messages').tabIndex=0;
-let session=null,socket=null,registering=false,active=null,reconnecting=false,retrying=false;
+let session=null,socket=null,registering=false,active=null,reconnecting=false,retrying=false,liveTimer=null;
 const rooms=new Map(),joined=new Set(),messages=new Map(),unread=new Map(),reading=new Set();
 const decode=value=>String(value??'').replace(/&(lt|gt|amp|quot|#39);/g,(_,key)=>({lt:'<',gt:'>',amp:'&',quot:'"','#39':"'"}[key]));
 function notice(text){$('notice').textContent=text;}
@@ -46,11 +46,12 @@ function messageRow(message,mine){
 }
 // Rows are reused and only new ones are inserted, so screen readers announce new messages once
 // instead of re-reading the whole conversation on every receipt or status change. Opening a
-// room marks the log busy while its history loads, so the backlog is not read aloud.
+// room rebuilds the log with announcements switched off, so the backlog is not read aloud
+// (clearing aria-busy made Firefox report the whole log as new, and NVDA read it).
 function renderMessages(){
   const log=$('messages');const nearBottom=log.scrollHeight-log.scrollTop-log.clientHeight<100;
   const switching=log.dataset.room!==String(active);
-  if(switching){log.setAttribute('aria-busy','true');log.replaceChildren();log.dataset.room=String(active);}
+  if(switching){clearTimeout(liveTimer);log.setAttribute('aria-live','off');log.replaceChildren();log.dataset.room=String(active);}
   const rows=new Map([...log.children].map(row=>[row.dataset.message,row]));
   const wanted=new Set();let previous=null;
   for(const message of messages.get(active)||[]){
@@ -64,7 +65,7 @@ function renderMessages(){
   }
   for(const [id,row] of rows)if(!wanted.has(id))row.remove();
   if(switching||nearBottom)log.scrollTop=log.scrollHeight;
-  if(switching)requestAnimationFrame(()=>log.removeAttribute('aria-busy'));
+  if(switching)liveTimer=setTimeout(()=>log.setAttribute('aria-live','polite'),750);
 }
 function merge(roomId,items){
   const map=new Map((messages.get(roomId)||[]).map(m=>[m.messageId,m]));
@@ -80,7 +81,7 @@ async function openRoom(roomId){
   if(result.history){const live=messages.get(roomId)||[];messages.set(roomId,[]);merge(roomId,result.history);merge(roomId,live);}
   else{const history=await emit('room:history',{roomId});merge(roomId,history.messages);}
   $('room-title').textContent='# '+decode(rooms.get(roomId)?.name||result.name);document.title=$('room-title').textContent+' · Common Room';$('empty-chat').hidden=true;$('message-form').hidden=false;$('leave-room').hidden=false;$('typing').textContent='';
-  renderRooms();renderMessages();await refreshPeople();$('message').focus();
+  renderRooms();renderMessages();$('message').focus();await refreshPeople();
 }
 function resetSession(text='Signed out.'){
   socket?.disconnect();socket=null;session=null;reconnecting=false;retrying=false;active=null;rooms.clear();joined.clear();messages.clear();unread.clear();reading.clear();
