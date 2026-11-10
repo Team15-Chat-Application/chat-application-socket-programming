@@ -55,6 +55,7 @@ test('production refuses plaintext, weak signing configuration and flag spelling
   }
  }finally{require('node:fs').rmSync(dir,{recursive:true,force:true});}
  expect(()=>createRuntime({env:{NODE_ENV:'development',TLS_CERT_PATH:'unused.pem'}})).toThrow('Both TLS_CERT_PATH and TLS_KEY_PATH');
+ expect(()=>createRuntime({env:{NODE_ENV:'development',TLS_KEY_PATH:'unused.pem'}})).toThrow('Both TLS_CERT_PATH and TLS_KEY_PATH');
 });
 test('typing debounce, room-scoped presence, and outsider rejection use real credentials',async()=>{
  const a=await user('Alice'),b=await user('Bob');const sa=await client(a),sb=await client(b);
