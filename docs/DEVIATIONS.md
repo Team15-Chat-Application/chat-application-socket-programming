@@ -179,7 +179,7 @@ The scheduled Sprint 2 end was 30 October. This work is dated 31 October and is 
 
 Kalluri Yaswanth prepared the formal reconciliation report and test-method disposition (see `docs/ADMIN_PRIVATE_SCOPE_RECONCILIATION.md` and `docs/QA_TEST_SUMMARY_SPRINT2.md`):
 - Confirms alignment with the Product Owner's Option A scope decision: the 29 numbered SRS requirements constitute the verified Sprint 2 delivery baseline, and uncontracted admin/private features are deferred as future backlog items.
-- Documents tool and environment deviations (Socket.IO client load testing in lieu of JMeter; unit/integration/TLS assertions in lieu of OWASP ZAP; SQLite in WAL mode; automated Axe-core Chromium in lieu of manual Firefox/screen-reader audit).
+- Documents tool and environment deviations (Socket.IO client load testing in lieu of JMeter; unit/integration/TLS assertions in lieu of OWASP ZAP; SQLite in WAL mode; automated Axe-core Chromium covers WCAG 2.1 AA rules and keyboard focus, while manual Firefox and screen-reader audits remain pending rather than replaced under TC-UX-01; CHAT-38 reassigned to Soham on 8 Nov with PR #58).
 - Provides end-to-end traceability across all 29 requirements with test IDs and failure/pass boundaries.
 
 
