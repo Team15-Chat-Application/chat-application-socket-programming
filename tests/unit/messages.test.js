@@ -15,12 +15,22 @@ function codeOf(action) {
   return 'NO_ERROR';
 }
 
-// Mock database used by unit tests.
-// The real SQLite database is tested separately.
-function createMockDatabase() {
+// Mock HistoryStore used by unit tests.
+function createMockHistory() {
+  let savedMessage = null;
+
   return {
-    saveMessage: jest.fn(),
-    getRecentMessages: jest.fn(() => [])
+    save: jest.fn(message => {
+      savedMessage = message;
+    }),
+    get: jest.fn(() => ({
+      ...savedMessage,
+      status: 'Sent',
+      readBy: []
+    })),
+    history: jest.fn(() => []),
+    delivered: jest.fn(),
+    read: jest.fn()
   };
 }
 
@@ -28,15 +38,15 @@ function setup({ member = true } = {}) {
   let roomSeq = 0;
   let messageSeq = 0;
 
+  const history = createMockHistory();
+
   const rooms = new RoomStore({
     newId: () => `room-${++roomSeq}`
   });
 
-  const database = createMockDatabase();
-
   const service = new MessageService({
     rooms,
-    database,
+    history,
     newId: () => `msg-${++messageSeq}`,
     clock: () => FIXED_TIME
   });
@@ -49,7 +59,7 @@ function setup({ member = true } = {}) {
 
   return {
     rooms,
-    database,
+    history,
     service,
     room,
     payload: {
@@ -60,7 +70,7 @@ function setup({ member = true } = {}) {
 }
 
 test('CHAT-14: the server issues identity, ID and timestamp, so payload fields cannot forge them', () => {
-  const { service, room, payload, database } = setup();
+  const { service, room, payload, history } = setup();
 
   expect(service.send(ALICE, 'sock-alice', {
     ...payload,
@@ -73,10 +83,21 @@ test('CHAT-14: the server issues identity, ID and timestamp, so payload fields c
     roomId: room.roomId,
     senderId: 'alice',
     content: 'hello',
+    createdAt: FIXED_TIME,
+    status: 'Sent',
+    readBy: []
+  });
+
+  expect(history.save).toHaveBeenCalledTimes(1);
+  expect(history.save).toHaveBeenCalledWith({
+    messageId: 'msg-1',
+    roomId: room.roomId,
+    senderId: 'alice',
+    content: 'hello',
     createdAt: FIXED_TIME
   });
 
-  expect(database.saveMessage).toHaveBeenCalledTimes(1);
+  expect(history.get).toHaveBeenCalledWith('msg-1');
 });
 
 test('CHAT-14: repeated messages receive distinct IDs', () => {
@@ -86,7 +107,11 @@ test('CHAT-14: repeated messages receive distinct IDs', () => {
   expect(service.send(ALICE, 'sock-alice', payload).messageId).toBe('msg-2');
 });
 
-test.each([undefined, {}, { rooms: null }])(
+test.each([
+  undefined,
+  {},
+  { rooms: null }
+])(
   'CHAT-14: the service cannot run without a shared RoomStore %#',
   options => {
     expect(() => new MessageService(options)).toThrow('RoomStore');
@@ -241,15 +266,15 @@ test('CHAT-17: strips script content, removes markup, and escapes text safely', 
 });
 
 test('CHAT-14: a failed ID allocation is a defect, never a partial message', () => {
+  const history = createMockHistory();
   const rooms = new RoomStore();
-  const database = createMockDatabase();
 
   const room = rooms.create(ALICE, { name: 'General' });
   rooms.join(ALICE, 'sock-alice', { roomId: room.roomId });
 
   const service = new MessageService({
     rooms,
-    database,
+    history,
     newId: () => null
   });
 
@@ -260,7 +285,7 @@ test('CHAT-14: a failed ID allocation is a defect, never a partial message', () 
     })
   ).toThrow('Message ID allocation failed');
 
-  expect(database.saveMessage).not.toHaveBeenCalled();
+  expect(history.save).not.toHaveBeenCalled();
 });
 
 test('CHAT-15: a broadcast failure returns a safe error without escaping or acknowledging success', () => {

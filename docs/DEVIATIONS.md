@@ -245,3 +245,20 @@ approval, monthly availability or manual accessibility result is inferred from t
   2.18.1; CI still runs the locked versions on Node 24. Treat this as "not reproduced", not "fixed", and
   re-check on Node 24 after the PR #53 tests are ported, because their leaked 3-second timers are a known
   source of cross-suite noise.
+
+## 9 November 2026: CHAT-30 / CHAT-NF-002 monthly availability not established for this delivery
+
+- **Requirement (SRS CHAT-NF-002, TC-Ops-01).** At least 99.5% uptime per calendar month, excluding planned
+  maintenance; acceptance is a monthly uptime report of at least 99.5%. Owner: Soham.
+- **Why it cannot be met in this delivery.** The course timeline gave two one-week sprints (19-23 and
+  26-30 October). There is no selected hosted service, and the application has only run locally on demand,
+  so no complete operational calendar month exists to measure. A month cannot be observed retrospectively.
+- **What exists.** `scripts/monitor_uptime.py` probes `/api/health`, appends every observation to a JSONL log
+  and writes a summary whose `monthlyAcceptance` is always `NOT_ESTABLISHED`. Recorded so far: two short local
+  windows on 28-29 October, 18 probes, all healthy. Unobserved time is not counted as healthy.
+- **Status.** CHAT-30 stays In Progress and the requirement is **not met** for this delivery. It is not waived
+  and is not claimed from short samples, CI runs or restart checks.
+- **For the final demo.** Explain the conflict between a monthly SLA and a two-week delivery window, show the
+  monitor and its `NOT_ESTABLISHED` output, and state what acceptance would need: a chosen host, continuous
+  probing for a full calendar month, a maintenance-exclusion log and a review of the resulting report.
+  Whether the course accepts this as a documented deviation is a team/course decision, not recorded here.
