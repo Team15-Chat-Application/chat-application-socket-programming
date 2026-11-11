@@ -79,5 +79,5 @@ This document presents a structured decision proposal to reconcile these discrep
 
 - [x] **Product Owner Delegated Decision:** Option A was selected on 31 October 2026 under Soham's delegated authority (recorded in `docs/OCT31_SCOPE_DECISION_BRIEF.md` and `docs/OCT31_REVIEW_RESPONSE.md`), defining the 29 numbered SRS requirements as the Sprint 2 baseline and deferring admin/private messaging features to the future backlog. This records delegated scoping, not team or course approval.
 - [x] **Deviation Log Ratification:** Recorded in `docs/DEVIATIONS.md` and referenced across review artifacts.
-- [ ] **Cross-Browser / Accessibility Evidence:** Reassigned to Soham on 8 Nov (fixes and isolated keyboard runs in PR #58); manual NVDA screen-reader and 200% zoom checks remain open.
+- [x] **Cross-Browser / Accessibility Evidence:** Completed. Reassigned to Soham on 8 Nov (fixes and keyboard runs in PR #58); manual NVDA screen-reader and 200% zoom checks completed and recorded on 10 November in PR #58.
 - [ ] **Production Hosting Agreement:** Team to determine if a public deployed endpoint will be provisioned for external TLS scanning and 30-day availability monitoring.
