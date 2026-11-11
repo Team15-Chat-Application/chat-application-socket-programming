@@ -55,6 +55,7 @@ test('production refuses plaintext, weak signing configuration and flag spelling
   }
  }finally{require('node:fs').rmSync(dir,{recursive:true,force:true});}
  expect(()=>createRuntime({env:{NODE_ENV:'development',TLS_CERT_PATH:'unused.pem'}})).toThrow('Both TLS_CERT_PATH and TLS_KEY_PATH');
+ expect(()=>createRuntime({env:{NODE_ENV:'development',TLS_KEY_PATH:'unused.pem'}})).toThrow('Both TLS_CERT_PATH and TLS_KEY_PATH');
 });
 test('typing debounce, room-scoped presence, and outsider rejection use real credentials',async()=>{
  const a=await user('Alice'),b=await user('Bob');const sa=await client(a),sb=await client(b);
@@ -65,3 +66,24 @@ test('typing debounce, room-scoped presence, and outsider rejection use real cre
  expect((await ack(sb,'typing:set',{roomId:room.roomId,typing:true})).data.debounced).toBe(true);
  const gone=new Promise(resolve=>sa.once('presence:changed',resolve));sb.disconnect();expect((await gone).status).toBe('offline');
 });
+test('serves static assets and rejects unknown paths with 404',async()=>{
+ expect((await fetch(url+'/')).status).toBe(200);
+ expect((await fetch(url+'/app.js')).status).toBe(200);
+ expect((await fetch(url+'/style.css')).status).toBe(200);
+ expect((await fetch(url+'/vendor/socket.io.min.js')).status).toBe(200);
+ expect((await fetch(url+'/unknown-file')).status).toBe(404);
+ expect((await fetch(url+'/api/auth/register',{method:'GET'})).status).toBe(404);
+});
+test('typing indicator auto-expires after 1500ms',async()=>{
+ const a=await user('Alice'),b=await user('Bob');const sa=await client(a),sb=await client(b);
+ const room=(await ack(sa,'room:create',{name:'TypingRoom'})).data;
+ await ack(sa,'room:join',{roomId:room.roomId});await ack(sb,'room:join',{roomId:room.roomId});
+ const cleared=new Promise(resolve=>{
+  sa.on('presence:typing',payload=>{if(!payload.typing)resolve(payload);});
+ });
+ await ack(sb,'typing:set',{roomId:room.roomId,typing:true});
+ const result=await cleared;
+ expect(result.typing).toBe(false);
+ expect(result.userId).toBe(b.user.userId);
+});
+
