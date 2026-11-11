@@ -17,7 +17,7 @@
 | **Python Test Suites** | 12 suites (256 tests) | 13 suites (266 tests) | 0 | **PASS** (added 11 TLS startup tests) |
 | **End-to-End Browser Tests** | 2 browser specs (Axe WCAG 2.1 AA) | 2 browser specs (Axe WCAG 2.1 AA) | 0 | **PASS** (Chromium automated; manual pending) |
 | **System Integration (Restart/Parity)** | 2 backends (55 msgs, restart, receipts) | 2 backends (55 msgs, restart, receipts) | 0 | **PASS** (SQLite WAL restart verified) |
-| **Load & Concurrent Capacity** | 50 users, 100 WebSocket conns | 100 conns sustained, p90 17.74ms | 0 | **PASS** (loopback via `performance_check.js`; WAN deferred) |
+| **Load & Concurrent Capacity** | 50 users, 100 WebSocket conns | 100 conns sustained, p90 10.44ms | 0 | **PASS** (loopback via `performance_check.js`; WAN deferred) |
 | **TLS & Transport Security** | Local TLS 1.2/1.3, WSS auth | Production fail-closed verified | 0 | **PASS** (local/CI; public scan deferred) |
 | **Synthetic STP Review Fixture** | 10 users, 5 rooms, 200 msgs | 10 users, 5 rooms, 200 msgs | 0 | **PASS** (fixture guards verified) |
 | **SRS Requirements Coverage** | 29 numbered SRS requirements | 26 PASS, 2 PARTIAL, 1 BLOCKED | 0 | Bounded by Option A Product Owner scope; CHAT-22-25 on CHAT-26 branch |
@@ -32,7 +32,7 @@
 | **CHAT-F-002** | CHAT-11 | User Authentication & JWT session issuance | TC-Auth-02 | `npm test tests/unit/auth.test.js`, `runtime.test.js` | `140da7f` | HTTP 200, JWT token returned, bcrypt verified | Valid token returned, expiry 1h | **PASS** | `docs/evidence/2026-10-31/review-regressions.json` | Local DB |
 | **CHAT-F-003** | CHAT-12 | Account Lockout (5 failed attempts, 15m lock) | TC-Auth-03 | `tests/unit/auth.test.js` (including CHAT-53 fix) | `140da7f` | 5th failure locks account; 423 returned | 5th failure locks, concurrent races handled | **PASS** | `docs/evidence/2026-10-28/regression.json` | In-memory clock test |
 | **CHAT-F-004** | CHAT-13 | User Logout & immediate session revocation | TC-Auth-04 | `tests/integration/runtime.test.js`, `system_check.js` | `140da7f` | Session revoked in DB, live socket disconnected | HTTP 204, socket drops, reused token rejected | **PASS** | `docs/evidence/2026-10-31/system.json` | Local WebSocket |
-| **CHAT-F-005** | CHAT-14 | Real-time message exchange (<200ms latency) | TC-Msg-01 | `scripts/performance_check.js` | `140da7f` | Message received by room members; p90 < 200ms | 1,500 samples, p90 = 17.74ms, max = 49.63ms | **PASS** | `docs/evidence/2026-10-28/performance.json` | Loopback latency |
+| **CHAT-F-005** | CHAT-14 | Real-time message exchange (<200ms latency) | TC-Msg-01 | `scripts/performance_check.js` | `140da7f` | Message received by room members; p90 < 200ms | 1,500 samples, p90 = 10.44ms, max = 42.92ms | **PASS** | `docs/evidence/2026-10-28/performance.json` | Loopback latency |
 | **CHAT-F-006** | CHAT-15 | Server delivery acknowledgement to sender | TC-Msg-02 | `tests/integration/messaging.test.js` | `140da7f` | ACK callback returns `{ ok: true, data }` | Sender receives ACK only post-dispatch | **PASS** | `docs/evidence/2026-10-31/review-regressions.json` | Loopback transport |
 | **CHAT-F-007** | CHAT-16 | Message length boundary (1 to 2,000 code points) | TC-Msg-03 | `tests/unit/messages.test.js`, `e2e/chat.spec.js` | `140da7f` | 2000 chars accepted, 2001 chars rejected | 2000 code points pass, 2001 disabled/rejected | **PASS** | `docs/evidence/2026-10-31/review-regressions.json` | Client/server boundaries |
 | **CHAT-F-008** | CHAT-17 | Message content sanitization (anti-XSS) | TC-Msg-04 | `tests/unit/security-foundation.test.js`, `e2e` | `140da7f` | HTML stripped, safe text rendered, no execution | `<script>` stripped, zero injected tags executed | **PASS** | `e2e/chat.spec.js` | DOM textContent |
@@ -47,11 +47,11 @@
 | **CHAT-F-017** | CHAT-26 | Online / offline presence tracking | TC-Pres-01 | `tests/integration/runtime.test.js`, `e2e` | `140da7f` | `presence:changed` emitted; offline on disconnect | Live user list accurately reflects state | **PASS** | `docs/evidence/2026-10-31/review-regressions.json` | Room-scoped presence |
 | **CHAT-F-018** | CHAT-27 | Typing indicators with debounce & expiry | TC-Pres-02 | `tests/integration/runtime.test.js`, `e2e` | `140da7f` | Debounced <500ms; auto-expires after 1.5s | Debounce verified, auto-cleared on 1500ms | **PASS** | `docs/evidence/2026-10-31/review-regressions.json` | Timer unref used |
 | **CHAT-F-019** | CHAT-28 | Unread badges for inactive rooms | TC-Notif-01 | `e2e/chat.spec.js` | `140da7f` | Badge increments on inactive room, clears on open | Badge shows '1', clears when clicked | **PASS** | `e2e/chat.spec.js` | Client-side tracking |
-| **CHAT-NF-001** | CHAT-29 | Message delivery latency under 200 ms | TC-Perf-01 | `scripts/performance_check.js` | `140da7f` | p90 < 200 ms across 1,500 samples | p90 = 17.74 ms; max = 49.63 ms | **PASS** | `docs/evidence/2026-10-28/performance.json` | Loopback environment |
-| **CHAT-NF-002** | CHAT-30 | Availability: 99.5% uptime | TC-Ops-01 | `scripts/monitor_uptime.py` | `140da7f` | Full calendar month 99.5% availability | Tooling verified (12/12 samples); 30d open | **BLOCKED** | `docs/evidence/2026-10-28/uptime-samples.summary.json` | Full-month hosting needed |
+| **CHAT-NF-001** | CHAT-29 | Message delivery latency under 200 ms | TC-Perf-01 | `scripts/performance_check.js` | `140da7f` | p90 < 200 ms across 1,500 samples | p90 = 10.44 ms; max = 42.92 ms | **PASS** | `docs/evidence/2026-10-28/performance.json` | Loopback environment |
+| **CHAT-NF-002** | CHAT-30 | Availability: 99.5% uptime | TC-Ops-01 | `scripts/monitor_uptime.py` | `140da7f` | Full calendar month 99.5% availability | Tooling verified (6/6 samples); 30d open | **BLOCKED** | `docs/evidence/2026-10-28/uptime-samples.summary.json` | Full-month hosting needed |
 | **CHAT-NF-003** | CHAT-31 | Concurrent load: 100 WebSocket connections | TC-Perf-02 | `scripts/performance_check.js` | `140da7f` | 100 concurrent authenticated connections | 100 active WebSockets across 50 users | **PASS** | `docs/evidence/2026-10-28/performance.json` | Single host loopback |
 | **CHAT-NF-004** | CHAT-32 | TLS Enforcement & Secure Transport | TC-Sec-01 | `scripts/tls_check.js`, `runtime.test.js` | `140da7f` | TLS 1.2+, plaintext rejected, WSS auth, fail-closed | TLS 1.3/1.2 pass, legacy/plaintext fail, auth pass | **PARTIAL** | `docs/evidence/2026-10-31/node-tls.json`, `python-tls.json` | Prod endpoint scan pending |
-| **CHAT-NF-005** | CHAT-38 | Accessibility: WCAG 2.1 AA Compliance | TC-UX-01 | `e2e/chat.spec.js` (Axe-core), Playwright | `140da7f` | 0 Axe violations; keyboard focus; mobile layout | 0 violations; focus visible; skip link works | **PARTIAL** | `e2e/chat.spec.js` | Manual AT/Firefox pending |
+| **CHAT-NF-005** | CHAT-38 | Accessibility: WCAG 2.1 AA Compliance | TC-UX-01 | `e2e/chat.spec.js` (Axe-core), Playwright | `140da7f` | 0 Axe violations; keyboard focus; mobile layout | 0 violations; focus visible; skip link works | **PASS** | `docs/evidence/2026-10-28/chat-desktop.png`, `chat-mobile.png`, PR #58 | Verified in PR #58 (Axe, keyboard, NVDA, 200% zoom) |
 | **CHAT-SR-001** | CHAT-33 | TLS Configuration & Cipher Policy | TC-Sec-01 | `scripts/tls_check.js`, `src/app.js` | `140da7f` | `minVersion: TLSv1.2`, cipher suites secure | Verified TLS 1.2 and TLS 1.3 negotiation | **PASS** | `docs/evidence/2026-10-31/node-tls.json` | Local cert trusted |
 | **CHAT-SR-002** | CHAT-34 | Password Hashing (bcrypt cost >= 10) | TC-Sec-02 | `tests/unit/passwords.test.js`, seed fixture | `140da7f` | Cost factor >= 10 (default 12), 72-byte max | Cost 12 verified; hash prefixes `$2b$12$` | **PASS** | `docs/evidence/2026-10-28/seed-review.json` | 72-byte max, no silent truncation |
 | **CHAT-SR-003** | CHAT-35 | JWT session validation & revocation | TC-Sec-03 | `tests/unit/auth.test.js`, `runtime.test.js` | `140da7f` | Tampered/expired tokens rejected; DB session check | Signature/session checked on every event | **PASS** | `docs/evidence/2026-10-31/review-regressions.json` | HS256, 32-byte secret |
@@ -80,10 +80,10 @@
 
 | Target in STP | Implemented Alternative | Rationale & Evidence | Status |
 |---|---|---|---|
-| **Apache JMeter** (Performance & 100 Conns) | Custom socket.io-client benchmark script (`scripts/performance_check.js`) | JMeter lacks native Engine.IO framing without plugins; script connects 100 actual WebSockets across 50 real accounts and records 1,500 receiver observations (p90 17.74ms). | PASS (local loopback); WAN load test not conducted. |
+| **Apache JMeter** (Performance & 100 Conns) | Custom socket.io-client benchmark script (`scripts/performance_check.js`) | JMeter lacks native Engine.IO framing without plugins; script connects 100 actual WebSockets across 50 real accounts and records 1,500 receiver observations (p90 10.44ms, max 42.92ms). | PASS (local loopback); WAN load test not conducted. |
 | **OWASP ZAP** (Security DAST) | Automated test suites (`tests/unit/security-*.test.js`) + TLS check (`scripts/tls_check.js`) | Comprehensive unit and integration checks cover parameterised SQL, XSS sanitisation, bcrypt cost >= 12, rate limiting, and TLS version negotiation. | Live external DAST scan blocked pending deployment. |
 | **MongoDB / PostgreSQL** | Node 24 embedded `DatabaseSync` (`node:sqlite`) and Python `sqlite3` in WAL mode | Eliminates native OS compiler dependencies while guaranteeing ACID process-restart persistence (`scripts/system_check.js`). | PASS (development & CI baseline); clustering deferred. |
-| **Cross-Browser (Firefox/Edge/Safari)** | Playwright Chromium + Axe-core automated tests (`e2e/chat.spec.js`) | Automated WCAG 2.1 AA rules, keyboard navigation, and mobile viewports verified. | PARTIAL; manual screen-reader (NVDA/VoiceOver) and Firefox checks pending. |
+| **Cross-Browser (Firefox/Edge/Safari)** | Playwright Chromium + Axe-core automated tests (`e2e/chat.spec.js`) | Automated WCAG 2.1 AA rules, keyboard navigation, and mobile viewports verified; manual NVDA screen-reader and 200% zoom checks completed 10 Nov in PR #58. | PASS; verified in PR #58. |
 
 ---
 
@@ -91,14 +91,15 @@
 
 - **Signatures / Authorizations:** All human sign-off fields are left blank. No team agreement or Product Owner freeze is inferred.
 - **Outstanding Release Gates & Ownership:**
-  1. **CHAT-46 (Video PR):** Yaswanth (`kalluri088`) raised PR #54 from `CHAT-43-46-outcome-handoff` into `CHAT-26-sprint2-delivery`.
+  1. **CHAT-46 (Video PR):** Yaswanth (`kalluri088`) raised PR #54 from `CHAT-43-46-outcome-handoff` into `CHAT-26-sprint2-delivery` (approved 11 Nov; delivered through `sprint2-integration`).
   2. **CHAT-49 / CHAT-22 (History PR):** Hrisheek (`hrisheekkaraturi`) to coordinate PR #53 test reconciliation with `sprint2-integration`.
   3. **CHAT-50 (PR #47 Re-Review):** Yaswanth (`kalluri088`) verified upstream fixes on corrected head `140da7f`.
-  4. **CHAT-38 (Cross-Browser / Screen Reader):** Reassigned to Soham on 8 Nov (fixes and isolated keyboard runs in PR #58). Manual NVDA screen-reader and 200% zoom checks remain open.
+  4. **CHAT-38 (Cross-Browser / Screen Reader):** Reassigned to Soham on 8 Nov; manual NVDA screen-reader and 200% zoom checks completed and recorded on 10 November in PR #58.
   5. **Operational Verification:** Hosted deployment endpoint selection for external TLS scan and 30-day availability monitoring.
 - **Resolved Release Gates:**
   - **CHAT-51 (Scope Reconciliation):** RESOLVED. Selected under Soham's delegated Product Owner authority on 31 October 2026 (`docs/OCT31_SCOPE_DECISION_BRIEF.md`), establishing the 29 numbered SRS requirements as the Sprint 2 delivery baseline. This is a delegated scoping decision, not team or course approval.
   - **CHAT-32 (TLS Enforcement):** RESOLVED UPSTREAM. Production fail-closed checks implemented in `c16bba9` and verified passing in CI on head `140da7f`.
+  - **CHAT-38 (Accessibility Verification):** RESOLVED. Automated Axe-core/Chromium tests pass, and manual NVDA screen-reader / 200% zoom verification was completed and merged in PR #58.
 
 ---
 
