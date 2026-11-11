@@ -1,0 +1,9 @@
+{
+  "startedAt": "2026-10-28T05:25:29.303130+00:00",
+  "endedAt": "2026-10-28T05:25:59.305635+00:00",
+  "samples": 6,
+  "healthy": 6,
+  "observedSamplePercent": 100.0,
+  "monthlyAcceptance": "NOT_ESTABLISHED",
+  "note": "Short real observations do not prove monthly 99.5% availability; retain a full operational calendar-month record and maintenance exclusions."
+}

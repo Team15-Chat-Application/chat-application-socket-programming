@@ -1,0 +1,24 @@
+[
+  {
+    "file": "videos/sprint-1-outcome-2026-10-28.webm",
+    "bytes": 3767295,
+    "duration": 60,
+    "width": 1280,
+    "height": 800,
+    "playing": true,
+    "recordedAt": "2026-10-28T05:20:55.365Z",
+    "method": "Actual Chromium UI capture, real account registration/login; no fixture auth or invented frames",
+    "lateDelivery": true
+  },
+  {
+    "file": "videos/sprint-2-outcome-2026-10-28.webm",
+    "bytes": 7738641,
+    "duration": 120,
+    "width": 1280,
+    "height": 800,
+    "playing": true,
+    "recordedAt": "2026-10-28T05:25:56.657Z",
+    "method": "Actual Chromium UI capture, real account registration/login; no fixture auth or invented frames",
+    "lateDelivery": false
+  }
+]

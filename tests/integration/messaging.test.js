@@ -1,4 +1,3 @@
-
 // CHAT-14 / CHAT-15 over the real Socket.IO transport.
 //
 // Fixture-backed verification, not production authentication.
@@ -8,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const { createApplication } = require('../../src/app');
 const { createJwtAuth, ISSUER, AUDIENCE } = require('../../src/jwt-auth');
 const { RoomStore } = require('../../src/rooms');
+const { HistoryStore } = require('../../src/history');
 const { MessageService, registerMessageHandlers } = require('../../src/messages');
 
 const SECRET = 'test-only-signing-key-with-at-least-32-bytes';
@@ -25,6 +25,24 @@ function once(socket, event) {
     socket.once(event, handler);
   });
 }
+function onceMatching(socket, event, predicate) {
+  return new Promise((resolve, reject) => {
+    const handler = value => {
+      if (!predicate(value)) return;
+
+      clearTimeout(timer);
+      socket.off(event, handler);
+      resolve(value);
+    };
+
+    const timer = setTimeout(() => {
+      socket.off(event, handler);
+      reject(new Error('Timed out waiting for matching event: ' + event));
+    }, 3000);
+
+    socket.on(event, handler);
+  });
+}
 
 const collect = (socket, event) => {
   const seen = [];
@@ -38,17 +56,18 @@ const ack = (s, e, p) => new Promise((resolve, reject) => {
   );
 });
 
-let app, clients, sessions, rooms, database, url;
+let app, clients, sessions, rooms, database, history, url;
 
 function build({ messageNewId = undefined } = {}) {
   clients = [];
   sessions = new Map();
-  rooms = new RoomStore();
   database = createDatabase(':memory:');
+  history = new HistoryStore(':memory:');
+  rooms = new RoomStore({ repository: history });
 
   const messages = new MessageService({
     rooms,
-    database,
+    history,
     newId: messageNewId
   });
 
@@ -82,6 +101,11 @@ afterEach(async () => {
   if (database) {
     database.close();
     database = null;
+  }
+
+  if (history) {
+    history.close();
+    history = null;
   }
 });
 
@@ -173,13 +197,29 @@ test('CHAT-14/CHAT-15: broadcast reaches every member and sender is acknowledged
       roomId: room.roomId,
       senderId: 'alice',
       content: 'hello world',
-      createdAt: expect.any(String)
+      createdAt: expect.any(String),
+      status: 'Delivered',
+      readBy: []
     }
   });
 
   expect(/T.*Z$/.test(result.data.createdAt)).toBe(true);
-  expect(await delivered).toEqual(result.data);
-  expect(await tabDelivery).toEqual(result.data);
+  expect(await delivered).toMatchObject({
+    messageId: result.data.messageId,
+    roomId: room.roomId,
+    senderId: 'alice',
+    content: 'hello world',
+    status: 'Sent',
+    readBy: []
+  });
+  expect(await tabDelivery).toMatchObject({
+    messageId: result.data.messageId,
+    roomId: room.roomId,
+    senderId: 'alice',
+    content: 'hello world',
+    status: 'Sent',
+    readBy: []
+  });
   expect(outsiderMessages).toEqual([]);
 });
 
@@ -202,7 +242,12 @@ test('CHAT-14: payload identity fields cannot override the verified token', asyn
   expect(result.data.senderId).toBe('alice');
   expect(result.data.messageId).not.toBe('forged');
   expect(result.data.createdAt).not.toBe('1970-01-01T00:00:00.000Z');
-  expect(await delivered).toEqual(result.data);
+  expect(await delivered).toMatchObject({
+    roomId: room.roomId,
+    senderId: 'alice',
+    content: 'hi',
+    status: 'Sent'
+  });
 });
 
 test('CHAT-14: a second room never receives another room messages', async () => {
@@ -407,7 +452,6 @@ test('CHAT-14: an unacknowledged emit still broadcasts', async () => {
 
   expect((await delivered).content).toBe('fire and forget');
 });
-
 // CHAT-15: a server-side defect must produce the failure envelope.
 test('CHAT-15: an internal failure returns the failure envelope and broadcasts nothing', async () => {
   await app.stop();
@@ -415,6 +459,8 @@ test('CHAT-15: an internal failure returns the failure envelope and broadcasts n
 
   database.close();
   database = null;
+  history.close();
+  history = null;
 
   build({ messageNewId: () => null });
 
@@ -538,7 +584,7 @@ test('CHAT-23: retrieves room message history in chronological order', async () 
     expect(result.ok).toBe(true);
   }
 
-  const history = await ack(bob, 'message:history', {
+  const history = await ack(bob, 'room:history', {
     roomId: room.roomId
   });
 
@@ -564,7 +610,7 @@ test('CHAT-23: history returns only the latest 50 messages', async () => {
     expect(result.ok).toBe(true);
   }
 
-  const history = await ack(bob, 'message:history', {
+  const history = await ack(bob, 'room:history', {
     roomId: room.roomId
   });
 
@@ -584,7 +630,7 @@ test('CHAT-23: non-members cannot retrieve room history', async () => {
     content: 'private message'
   });
 
-  const result = await ack(outsider, 'message:history', {
+  const result = await ack(outsider, 'room:history', {
     roomId: room.roomId
   });
 
@@ -592,22 +638,22 @@ test('CHAT-23: non-members cannot retrieve room history', async () => {
     ok: false,
     error: {
       code: 'FORBIDDEN',
-      message: 'Join the room before retrieving messages'
+      message: 'Join the room first'
     }
   });
 });
 
 // CHAT-24: delivery status is updated after the server broadcasts the message.
-test('CHAT-24: broadcasts message:delivered and persists delivered status', async () => {
+test('CHAT-24: broadcasts message:status and persists delivered status', async () => {
   const alice = await client('alice');
   const bob = await client('bob');
   const outsider = await client('outsider');
   const room = await joinRoom(alice, bob);
 
   const receivedByBob = once(bob, 'message:received');
-  const deliveredToBob = once(bob, 'message:delivered');
-  const deliveredToAlice = once(alice, 'message:delivered');
-  const outsiderDeliveryEvents = collect(outsider, 'message:delivered');
+  const deliveredToBob = once(bob, 'message:status');
+  const deliveredToAlice = once(alice, 'message:status');
+  const outsiderDeliveryEvents = collect(outsider, 'message:status');
 
   const result = await ack(alice, 'message:send', {
     roomId: room.roomId,
@@ -617,28 +663,32 @@ test('CHAT-24: broadcasts message:delivered and persists delivered status', asyn
   expect(result.ok).toBe(true);
 
   const receivedMessage = await receivedByBob;
-  expect(receivedMessage).toEqual(result.data);
+  expect(receivedMessage).toMatchObject({
+    messageId: result.data.messageId,
+    roomId: room.roomId,
+    senderId: 'alice',
+    content: 'delivery status check',
+    status: 'Sent'
+  });
 
   const bobDelivery = await deliveredToBob;
   const aliceDelivery = await deliveredToAlice;
   const expectedDelivery = {
-    roomId: room.roomId,
     messageId: result.data.messageId,
-    deliveryStatus: 'delivered'
+    roomId: room.roomId,
+    senderId: 'alice',
+    content: 'delivery status check',
+    createdAt: expect.any(String),
+    status: 'Delivered',
+    readBy: []
   };
 
-  expect(bobDelivery).toEqual(expectedDelivery);
-  expect(aliceDelivery).toEqual(expectedDelivery);
+  expect(bobDelivery).toMatchObject(expectedDelivery);
+  expect(aliceDelivery).toMatchObject(expectedDelivery);
+  expect(result.data).toMatchObject(expectedDelivery);
 
-  const history = database.getRecentMessages(room.roomId, 50);
-  const savedMessage = history.find(
-    message => message.messageId === result.data.messageId
-  );
-
-  expect(savedMessage).toMatchObject({
-    messageId: result.data.messageId,
-    deliveryStatus: 'delivered'
-  });
+  const savedMessage = history.get(result.data.messageId);
+  expect(savedMessage).toMatchObject(expectedDelivery);
 
   await ack(outsider, 'system:ping', { nonce: 'chat-24-delivery-barrier' });
   expect(outsiderDeliveryEvents).toEqual([]);
@@ -648,7 +698,7 @@ test('CHAT-24: each successfully broadcast message receives its own delivered st
   const alice = await client('alice');
   const bob = await client('bob');
   const room = await joinRoom(alice, bob);
-  const deliveryEvents = collect(bob, 'message:delivered');
+  const deliveryEvents = collect(bob, 'message:status');
 
   for (let i = 1; i <= 3; i++) {
     const result = await ack(alice, 'message:send', {
@@ -661,15 +711,10 @@ test('CHAT-24: each successfully broadcast message receives its own delivered st
   await ack(bob, 'system:ping', { nonce: 'chat-24-multiple-deliveries' });
 
   expect(deliveryEvents).toHaveLength(3);
-  expect(deliveryEvents.map(event => event.deliveryStatus)).toEqual([
-    'delivered',
-    'delivered',
-    'delivered'
-  ]);
+  expect(deliveryEvents.every(event => event.status === 'Delivered')).toBe(true);
   expect(new Set(deliveryEvents.map(event => event.messageId)).size).toBe(3);
   expect(deliveryEvents.every(event => event.roomId === room.roomId)).toBe(true);
 });
-
 // CHAT-25: A recipient can mark another user's message as read.
 test('CHAT-25: recipient marks a message as read and sender receives notification', async () => {
   const alice = await client('alice');
@@ -683,8 +728,23 @@ test('CHAT-25: recipient marks a message as read and sender receives notificatio
 
   expect(sent.ok).toBe(true);
 
-  const aliceReadEvent = once(alice, 'message:read');
-  const bobReadEvent = once(bob, 'message:read');
+  // Wait specifically for the Read event for this message.
+  // Ignore any delayed Delivered events.
+  const isReadEvent = message =>
+    message.messageId === sent.data.messageId &&
+    message.status === 'Read';
+
+  const aliceStatusEvent = onceMatching(
+    alice,
+    'message:status',
+    isReadEvent
+  );
+
+  const bobStatusEvent = onceMatching(
+    bob,
+    'message:status',
+    isReadEvent
+  );
 
   const result = await ack(bob, 'message:read', {
     roomId: room.roomId,
@@ -696,24 +756,27 @@ test('CHAT-25: recipient marks a message as read and sender receives notificatio
     data: {
       roomId: room.roomId,
       messageId: sent.data.messageId,
-      readerId: 'bob',
-      readAt: expect.any(String),
-      alreadyRead: false
+      senderId: 'alice',
+      content: 'read receipt test',
+      status: 'Read',
+      readBy: [
+        {
+          userId: 'bob',
+          readAt: expect.any(String)
+        }
+      ]
     }
   });
 
   const expectedEvent = result.data;
 
-  expect(await aliceReadEvent).toEqual(expectedEvent);
-  expect(await bobReadEvent).toEqual(expectedEvent);
+  expect(await aliceStatusEvent).toEqual(expectedEvent);
+  expect(await bobStatusEvent).toEqual(expectedEvent);
 
-  const receipts = database.getMessageReadReceipts(
-    sent.data.messageId
-  );
+  const receipts = history.get(sent.data.messageId).readBy;
 
   expect(receipts).toHaveLength(1);
   expect(receipts[0]).toMatchObject({
-    messageId: sent.data.messageId,
     userId: 'bob',
     readAt: expect.any(String)
   });
@@ -739,15 +802,15 @@ test('CHAT-25: duplicate read events create only one read receipt', async () => 
   const second = await ack(bob, 'message:read', payload);
 
   expect(first.ok).toBe(true);
-  expect(first.data.alreadyRead).toBe(false);
-
   expect(second.ok).toBe(true);
-  expect(second.data.alreadyRead).toBe(true);
+  expect(first.data.status).toBe('Read');
+  expect(second.data.status).toBe('Read');
+  expect(first.data.readBy).toHaveLength(1);
+  expect(second.data.readBy).toHaveLength(1);
+  expect(first.data.readBy[0].userId).toBe('bob');
+  expect(second.data.readBy[0].userId).toBe('bob');
 
-  const receipts = database.getMessageReadReceipts(
-    sent.data.messageId
-  );
-
+  const receipts = history.get(sent.data.messageId).readBy;
   expect(receipts).toHaveLength(1);
   expect(receipts[0].userId).toBe('bob');
 });
@@ -772,13 +835,11 @@ test('CHAT-25: sender cannot mark their own message as read', async () => {
     ok: false,
     error: {
       code: 'FORBIDDEN',
-      message: 'You cannot mark your own message as read'
+      message: 'A sender cannot mark their own message read'
     }
   });
 
-  expect(
-    database.getMessageReadReceipts(sent.data.messageId)
-  ).toHaveLength(0);
+  expect(history.get(sent.data.messageId).readBy).toHaveLength(0);
 });
 
 // CHAT-25: A user outside the room cannot mark its messages as read.
@@ -794,7 +855,7 @@ test('CHAT-25: non-members cannot mark room messages as read', async () => {
     content: 'private room message'
   });
 
-  const outsiderEvents = collect(outsider, 'message:read');
+  const outsiderEvents = collect(outsider, 'message:status');
 
   const result = await ack(outsider, 'message:read', {
     roomId: room.roomId,
@@ -805,7 +866,7 @@ test('CHAT-25: non-members cannot mark room messages as read', async () => {
     ok: false,
     error: {
       code: 'FORBIDDEN',
-      message: 'Join the room before marking messages as read'
+      message: 'Join the room first'
     }
   });
 
@@ -814,10 +875,7 @@ test('CHAT-25: non-members cannot mark room messages as read', async () => {
   });
 
   expect(outsiderEvents).toEqual([]);
-
-  expect(
-    database.getMessageReadReceipts(sent.data.messageId)
-  ).toHaveLength(0);
+  expect(history.get(sent.data.messageId).readBy).toHaveLength(0);
 });
 
 // CHAT-25: A message cannot be marked as read through the wrong room.
@@ -853,7 +911,5 @@ test('CHAT-25: users cannot mark messages as read in another room', async () => 
     }
   });
 
-  expect(
-    database.getMessageReadReceipts(sent.data.messageId)
-  ).toHaveLength(0);
+  expect(history.get(sent.data.messageId).readBy).toHaveLength(0);
 });

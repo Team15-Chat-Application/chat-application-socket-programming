@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-31T16:42:07.347179+00:00",
+  "scope": "Actual local verification of 31 October review corrections; corrected-head hosted CI and human re-review remain separate",
+  "review": {
+    "author": "kalluri088",
+    "state": "CHANGES_REQUESTED",
+    "reviewedHead": "577a69e08d5cda54141ea6bd229512cba8a434b2",
+    "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/pull/47#pullrequestreview-5721780080"
+  },
+  "startupRegressions": {
+    "before": {
+      "failed": 8,
+      "passed": 3
+    },
+    "after": {
+      "failed": 0,
+      "passed": 11
+    },
+    "source": "python_backend/tests/unit/test_tls_startup.py"
+  },
+  "node": {
+    "passed": 252,
+    "suites": 17
+  },
+  "python": {
+    "passed": 266
+  },
+  "nodeTls": {
+    "recordedAt": "2026-10-31T16:38:43.592Z",
+    "protocol": "TLSv1.3",
+    "tls12": "TLSv1.2",
+    "health": 200,
+    "plaintextRejected": true,
+    "legacyRejected": true,
+    "authenticatedWss": true,
+    "secureCsp": true,
+    "certificate": "Fresh local test certificate explicitly trusted by this client; not a public CA or deployment",
+    "pass": true
+  },
+  "flaskTls": {
+    "recordedAt": "2026-10-31T16:39:37.658Z",
+    "backend": "flask",
+    "productionFlag": "FLASK_ENV=production with NODE_ENV=development",
+    "protocol": "TLSv1.3",
+    "tls12": "TLSv1.2",
+    "health": 200,
+    "plaintextRejected": true,
+    "legacyRejected": true,
+    "secureCsp": true,
+    "realHttpsCredentials": true,
+    "authenticatedWss": true,
+    "negativeStartupChecks": {
+      "flaskProductionPlaintextRefused": true,
+      "certificateOnlyRefused": true,
+      "keyOnlyRefused": true
+    },
+    "scope": "Actual local Flask CLI listener and explicitly trusted temporary test certificate; not a public hosted endpoint",
+    "pass": true
+  },
+  "scopeDecision": "Soham delegated choice on 31 October; Option A selected; admin/private deferred, numbered NFR/security and genuine review gates retained",
+  "lateDelivery": true
+}

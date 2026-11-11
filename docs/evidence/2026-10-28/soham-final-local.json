@@ -1,0 +1,68 @@
+{
+  "recordedAt": "2026-10-28T09:46:12.987112+00:00",
+  "scope": "Local checks after Node lockout correction; earlier hosted Python/browser baseline is cited separately",
+  "node": {
+    "passed": 251,
+    "failed": 0,
+    "suites": 17
+  },
+  "authRegression": {
+    "originalControlledCases": {
+      "passed": 1,
+      "failed": 2
+    },
+    "afterFix": {
+      "passed": 3,
+      "failed": 0
+    },
+    "testFile": "tests/unit/auth.test.js"
+  },
+  "system": [
+    {
+      "backend": "node",
+      "recordedAt": "2026-10-28T09:38:57.252Z",
+      "realHttpCredentials": true,
+      "realWebSocketTransport": true,
+      "persistedMessages": 55,
+      "last50AfterProcessRestart": true,
+      "readReceiptPersisted": true,
+      "logoutRevocationPersisted": true,
+      "pass": true
+    },
+    {
+      "backend": "flask",
+      "recordedAt": "2026-10-28T09:39:09.825Z",
+      "realHttpCredentials": true,
+      "realWebSocketTransport": true,
+      "persistedMessages": 55,
+      "last50AfterProcessRestart": true,
+      "readReceiptPersisted": true,
+      "logoutRevocationPersisted": true,
+      "pass": true
+    }
+  ],
+  "seed": {
+    "recordedAt": "2026-10-28T09:34:16.937Z",
+    "file": "reports/review-fixtures/check-a122d3a4-283f-461d-a0b8-f29661bb2c56.sqlite",
+    "users": 10,
+    "rooms": 5,
+    "messages": 200,
+    "recipientReadReceipts": 50,
+    "bcryptCostAtLeast10": true,
+    "credentialRoundTripAndRevocation": true,
+    "scope": "Isolated synthetic STP seed data; seeded delivery/read states are not evidence of network delivery, UAT or human approval",
+    "passwordsAndTokensPrinted": false,
+    "guards": {
+      "existingDatabasePreserved": true,
+      "pathTraversalRejected": true,
+      "missingPasswordRejected": true
+    }
+  },
+  "previousHostedBaseline": {
+    "head": "b953e8c76b52874495cfb431cebaf6879f580e89",
+    "url": "https://github.com/Team15-Chat-Application/chat-application-socket-programming/actions/runs/40662534527",
+    "pythonPassed": 255,
+    "browserPassed": 2
+  },
+  "currentHeadCi": "See actual PR #47 checks after publication; no human approval or full-month SLA inferred"
+}
