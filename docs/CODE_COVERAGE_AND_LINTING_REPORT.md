@@ -12,9 +12,14 @@
 
 | Component / Layer | Test Suite Status | Statement Coverage | Function Coverage | Line Coverage | Branch Coverage | Static Linting / Syntax |
 |---|---|---|---|---|---|---|
-| **Node.js Core & Backend (`src/`)** | **253 / 253 PASS** (17 suites) | **92.59%** | **94.35%** | **95.95%** | **83.60%** | **CLEAN** (`node --check` 100% pass) |
+| **Node.js All Modules (`src/**/*.js`)** | **254 / 254 PASS** (17 suites) | **90.66%** | **92.12%** | **94.72%** | **83.40%** | **CLEAN** (`node --check` 100% pass) |
+| **Node.js Core Runtime (`src/` excl. CLI `index.js`)** | **254 / 254 PASS** (17 suites) | **92.59%** | **94.35%** | **95.95%** | **83.60%** | **CLEAN** (all modules unit tested) |
 | **Python Backend (`python_backend/`)** | **256 / 256 PASS** (13 suites) | **90.00%** | **92.10%** | **89.53%** | N/A | **CLEAN** (`compileall -q` 100% pass) |
-| **Browser Accessibility (Axe-core)** | **2 / 2 PASS** | 100.0% | 100.0% | 100.0% | 100.0% | 0 WCAG 2.1 AA Violations |
+
+> **Note on Test Counts & Scope Exclusions:**
+> - **Node.js:** All 17 test suites (254 tests) pass with zero failures. Full `src/**/*.js` directory coverage includes the CLI launcher `src/index.js` (90.66% statements / 92.12% functions / 94.72% lines / 83.40% branches); the core runtime modules table below excludes `src/index.js` which is verified via end-to-end integration launcher scripts (`scripts/system_check.js`).
+> - **Python Backend:** 256 tests represent the core unit and integration test suites on this branch; the 266 test count in the QA summary includes the 11 TLS startup fail-closed test cases (`test_tls_startup.py`).
+> - **Accessibility (Axe-core):** 2/2 browser specs pass with 0 WCAG 2.1 AA violations. (Axe evaluates accessibility compliance rather than statement code coverage, and manual NVDA/200% zoom checks were verified in PR #58).
 
 ---
 
