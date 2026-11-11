@@ -24,21 +24,21 @@ Generated using Jest VM modules execution (`--coverage --runInBand`) evaluating 
 
 | Module File | Function Coverage | Line Coverage | Statements | Functions Covered / Total | Key Tested Functions |
 |---|---|---|---|---|---|
-| [`src/runtime.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/runtime.js) | **100.0%** | **100.0%** | **94.56%** | 9 / 9 | `createRuntime`, `readBody`, `accountRoute`, static file dispatcher (`/`, `/app.js`, `/style.css`, `/vendor/socket.io.min.js`), 404 handler, socket handlers |
-| [`src/audit.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/audit.js) | **100.0%** | **100.0%** | **100.0%** | 1 / 1 | `audit(event, code)` safe structured log output |
-| [`src/auth.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/auth.js) | **100.0%** | 88.05% | 88.05% | 9 / 9 | `createAuthService`, `register`, `login`, `logout`, `nowSeconds`, `publicUser`, `getJwtAuth` |
-| [`src/config.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/config.js) | **100.0%** | **100.0%** | **100.0%** | 1 / 1 | `readConfig(env)` host/port/secret parsing |
-| [`src/database.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/database.js) | **100.0%** | **100.0%** | **100.0%** | 10 / 10 | `createDatabase`, schema creation, prepared statements, user/session CRUD |
-| [`src/errors.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/errors.js) | **100.0%** | **100.0%** | **100.0%** | 2 / 2 | `AppError`, `failure(err)` JSON envelope formatting |
-| [`src/history.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/history.js) | **100.0%** | 96.55% | 91.17% | 10 / 10 | `HistoryStore` constructor, `rooms`, `save`, `get`, `history`, `delivered`, `read`, `close` |
-| [`src/input.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/input.js) | **100.0%** | **100.0%** | **100.0%** | 4 / 4 | `withinCodePoints`, `sanitizePlainText`, `sanitizeUsername`, `sanitizeMessage` |
-| [`src/jwt-auth.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/jwt-auth.js) | **100.0%** | **100.0%** | 96.55% | 4 / 4 | `createJwtAuth`, `authenticate(payload)`, signature & session expiry checks |
-| [`src/login-limit.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/login-limit.js) | **100.0%** | **100.0%** | 95.45% | 4 / 4 | `LoginLimiter`, window bucket consumption, retry-after tracking |
-| [`src/passwords.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/passwords.js) | **100.0%** | 94.11% | 95.00% | 3 / 3 | `passwordBytes`, `hashPassword`, `verifyPassword` bcrypt work factor 12 |
-| [`src/rooms.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/rooms.js) | **96.4%** | 98.08% | 94.17% | 27 / 28 | `validateRoomName`, `requireIdentity`, `RoomStore`, `create`, `join`, `leave`, `registerRoomHandlers` |
-| [`src/presence.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/presence.js) | **90.0%** | 88.88% | 86.79% | 9 / 10 | `registerPresenceHandlers`, `online`, `requireRoom`, `typing:set`, 1500ms auto-expiry |
-| [`src/messages.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/messages.js) | **87.5%** | **100.0%** | 95.00% | 7 / 8 | `registerMessageHandlers`, `message:send`, `room:history`, `message:read` |
-| [`src/app.js`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/src/app.js) | **81.0%** | 91.01% | 86.53% | 17 / 21 | `createApplication`, routing, static files, socket authorization |
+| [`src/runtime.js`](../src/runtime.js) | **100.0%** | **100.0%** | **94.56%** | 9 / 9 | `createRuntime`, `readBody`, `accountRoute`, static file dispatcher (`/`, `/app.js`, `/style.css`, `/vendor/socket.io.min.js`), 404 handler, socket handlers |
+| [`src/audit.js`](../src/audit.js) | **100.0%** | **100.0%** | **100.0%** | 1 / 1 | `audit(event, code)` safe structured log output |
+| [`src/auth.js`](../src/auth.js) | **100.0%** | 88.05% | 88.05% | 9 / 9 | `createAuthService`, `register`, `login`, `logout`, `nowSeconds`, `publicUser`, `getJwtAuth` |
+| [`src/config.js`](../src/config.js) | **100.0%** | **100.0%** | **100.0%** | 1 / 1 | `readConfig(env)` host/port/secret parsing |
+| [`src/database.js`](../src/database.js) | **100.0%** | **100.0%** | **100.0%** | 10 / 10 | `createDatabase`, schema creation, prepared statements, user/session CRUD |
+| [`src/errors.js`](../src/errors.js) | **100.0%** | **100.0%** | **100.0%** | 2 / 2 | `AppError`, `failure(err)` JSON envelope formatting |
+| [`src/history.js`](../src/history.js) | **100.0%** | 96.55% | 91.17% | 10 / 10 | `HistoryStore` constructor, `rooms`, `save`, `get`, `history`, `delivered`, `read`, `close` |
+| [`src/input.js`](../src/input.js) | **100.0%** | **100.0%** | **100.0%** | 4 / 4 | `withinCodePoints`, `sanitizePlainText`, `sanitizeUsername`, `sanitizeMessage` |
+| [`src/jwt-auth.js`](../src/jwt-auth.js) | **100.0%** | **100.0%** | 96.55% | 4 / 4 | `createJwtAuth`, `authenticate(payload)`, signature & session expiry checks |
+| [`src/login-limit.js`](../src/login-limit.js) | **100.0%** | **100.0%** | 95.45% | 4 / 4 | `LoginLimiter`, window bucket consumption, retry-after tracking |
+| [`src/passwords.js`](../src/passwords.js) | **100.0%** | 94.11% | 95.00% | 3 / 3 | `passwordBytes`, `hashPassword`, `verifyPassword` bcrypt work factor 12 |
+| [`src/rooms.js`](../src/rooms.js) | **96.4%** | 98.08% | 94.17% | 27 / 28 | `validateRoomName`, `requireIdentity`, `RoomStore`, `create`, `join`, `leave`, `registerRoomHandlers` |
+| [`src/presence.js`](../src/presence.js) | **90.0%** | 88.88% | 86.79% | 9 / 10 | `registerPresenceHandlers`, `online`, `requireRoom`, `typing:set`, 1500ms auto-expiry |
+| [`src/messages.js`](../src/messages.js) | **87.5%** | **100.0%** | 95.00% | 7 / 8 | `registerMessageHandlers`, `message:send`, `room:history`, `message:read` |
+| [`src/app.js`](../src/app.js) | **81.0%** | 91.01% | 86.53% | 17 / 21 | `createApplication`, routing, static files, socket authorization |
 
 ---
 
@@ -48,17 +48,17 @@ Generated via `pytest --cov=python_backend/chat_backend` (256 passing unit & int
 
 | Module File | Statement Coverage | Function Status | Functions Covered | Tested Functions & Classes |
 |---|---|---|---|---|
-| [`python_backend/chat_backend/runtime.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/runtime.py) | **100.0%** (51/51) | **100% PASS** | 4 / 4 | `create_runtime`, `account_route`, `handler`, `close` |
-| [`python_backend/chat_backend/config.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/config.py) | **100.0%** (10/10) | **100% PASS** | 1 / 1 | `read_config` |
-| [`python_backend/chat_backend/input.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/input.py) | **100.0%** (18/18) | **100% PASS** | 3 / 3 | `sanitize_plain_text`, `sanitize_username`, `sanitize_message` |
-| [`python_backend/chat_backend/messages.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/messages.py) | **100.0%** (31/31) | **100% PASS** | 3 / 3 | `utc_timestamp`, `MessageService.__init__`, `MessageService.send` |
-| [`python_backend/chat_backend/history.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/history.py) | **98.0%** (50/51) | **100% PASS** | 9 / 9 | `HistoryStore.__init__`, `rooms`, `create_room`, `save`, `get`, `history`, `delivered`, `read`, `close` |
-| [`python_backend/chat_backend/rooms.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/rooms.py) | **98.2%** (110/112) | **100% PASS** | 13 / 13 | `validate_room_name`, `room_channel`, `require_identity`, `RoomStore.create`, `join`, `leave`, `disconnect`, `has_member` |
-| [`python_backend/chat_backend/accounts.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/accounts.py) | **97.3%** (71/73) | **100% PASS** | 10 / 10 | `Accounts.__init__`, `public`, `register`, `login`, `session`, `username`, `auth`, `logout`, `close` |
-| [`python_backend/chat_backend/login_limit.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/login_limit.py) | **95.8%** (23/24) | **100% PASS** | 2 / 2 | `LoginLimiter.__init__`, `consume` |
-| [`python_backend/chat_backend/jwt_auth.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/jwt_auth.py) | **94.7%** (36/38) | **100% PASS** | 4 / 4 | `valid_number`, `JwtAuth.__init__`, `authenticate`, `validate` |
-| [`python_backend/chat_backend/passwords.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/passwords.py) | **94.1%** (32/34) | **100% PASS** | 4 / 4 | `password_bytes`, `hash_password`, `verify_password` |
-| [`python_backend/chat_backend/app.py`](file:///home/yaswanth/Projects/SE_miniproject/worktree-yaswanth-final-docs/python_backend/chat_backend/app.py) | **84.2%** (278/330) | **88% PASS** | 31 / 35 | `create_application`, `catalogue`, `membership`, `login`, `connect`, `create_room`, `join_chat_room`, `send_message`, `room_history`, `read_message`, `presence_list`, `typing_set` |
+| [`python_backend/chat_backend/runtime.py`](../python_backend/chat_backend/runtime.py) | **100.0%** (51/51) | **100% PASS** | 4 / 4 | `create_runtime`, `account_route`, `handler`, `close` |
+| [`python_backend/chat_backend/config.py`](../python_backend/chat_backend/config.py) | **100.0%** (10/10) | **100% PASS** | 1 / 1 | `read_config` |
+| [`python_backend/chat_backend/input.py`](../python_backend/chat_backend/input.py) | **100.0%** (18/18) | **100% PASS** | 3 / 3 | `sanitize_plain_text`, `sanitize_username`, `sanitize_message` |
+| [`python_backend/chat_backend/messages.py`](../python_backend/chat_backend/messages.py) | **100.0%** (31/31) | **100% PASS** | 3 / 3 | `utc_timestamp`, `MessageService.__init__`, `MessageService.send` |
+| [`python_backend/chat_backend/history.py`](../python_backend/chat_backend/history.py) | **98.0%** (50/51) | **100% PASS** | 9 / 9 | `HistoryStore.__init__`, `rooms`, `create_room`, `save`, `get`, `history`, `delivered`, `read`, `close` |
+| [`python_backend/chat_backend/rooms.py`](../python_backend/chat_backend/rooms.py) | **98.2%** (110/112) | **100% PASS** | 13 / 13 | `validate_room_name`, `room_channel`, `require_identity`, `RoomStore.create`, `join`, `leave`, `disconnect`, `has_member` |
+| [`python_backend/chat_backend/accounts.py`](../python_backend/chat_backend/accounts.py) | **97.3%** (71/73) | **100% PASS** | 10 / 10 | `Accounts.__init__`, `public`, `register`, `login`, `session`, `username`, `auth`, `logout`, `close` |
+| [`python_backend/chat_backend/login_limit.py`](../python_backend/chat_backend/login_limit.py) | **95.8%** (23/24) | **100% PASS** | 2 / 2 | `LoginLimiter.__init__`, `consume` |
+| [`python_backend/chat_backend/jwt_auth.py`](../python_backend/chat_backend/jwt_auth.py) | **94.7%** (36/38) | **100% PASS** | 4 / 4 | `valid_number`, `JwtAuth.__init__`, `authenticate`, `validate` |
+| [`python_backend/chat_backend/passwords.py`](../python_backend/chat_backend/passwords.py) | **94.1%** (32/34) | **100% PASS** | 4 / 4 | `password_bytes`, `hash_password`, `verify_password` |
+| [`python_backend/chat_backend/app.py`](../python_backend/chat_backend/app.py) | **84.2%** (278/330) | **88% PASS** | 31 / 35 | `create_application`, `catalogue`, `membership`, `login`, `connect`, `create_room`, `join_chat_room`, `send_message`, `room_history`, `read_message`, `presence_list`, `typing_set` |
 
 ---
 
