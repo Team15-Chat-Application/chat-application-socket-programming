@@ -22,8 +22,10 @@ async function seedFixture({ name = 'review.sqlite', password } = {}) {
   const filename = path.join(fixtureRoot, name);
   // Exclusive creation: existing databases, including symlinks, are never replaced.
   fs.closeSync(fs.openSync(filename, 'wx', 0o600));
-  const database = createDatabase(filename);
+  // HistoryStore first, so the shared messages table gets the contract seq/status schema
+  // (same order as src/runtime.js; the other order fails with "no such column: seq").
   const history = new HistoryStore(filename);
+  const database = createDatabase(filename);
   try {
     const auth = createAuthService({ database, secret: randomBytes(48).toString('hex') });
     const users = [];
