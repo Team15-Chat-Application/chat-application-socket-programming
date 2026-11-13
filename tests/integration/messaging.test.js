@@ -62,7 +62,7 @@ function build({ messageNewId = undefined } = {}) {
   clients = [];
   sessions = new Map();
   database = createDatabase(':memory:');
-  history = new HistoryStore(':memory:');
+  history = new HistoryStore(':memory:', { db: database.db, ownsConnection: false });
   rooms = new RoomStore({ repository: history });
 
   const messages = new MessageService({

@@ -35,6 +35,23 @@ test('TC-Hist-03/04: Delivered follows broadcast; Read is per-recipient and idem
   expect(read.status).toBe('Read');expect(read.readBy.map(r=>r.userId)).toEqual(['reader','second-reader']);
   expect(store.delivered(message.messageId).status).toBe('Read');
 });
+test('parallel stores keep one durable read receipt per group recipient', async () => {
+  const message = send();
+  store.delivered(message.messageId);
+  const secondStore = new HistoryStore(join(folder, 'chat.sqlite'));
+  try {
+    await Promise.all([
+      Promise.resolve().then(() => store.read(message.messageId, 'reader-a')),
+      Promise.resolve().then(() => secondStore.read(message.messageId, 'reader-b')),
+      Promise.resolve().then(() => secondStore.read(message.messageId, 'reader-a'))
+    ]);
+    expect(store.get(message.messageId).readBy.map(receipt => receipt.userId).sort())
+      .toEqual(['reader-a', 'reader-b']);
+    expect(store.get(message.messageId).status).toBe('Read');
+  } finally {
+    secondStore.close();
+  }
+});
 test('SQL parameters retain quoted content and isolate rooms', () => {
   const message=send("hello '); DROP TABLE users; --");
   expect(store.get(message.messageId).content).toBe(message.content);
