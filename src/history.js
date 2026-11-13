@@ -1,20 +1,14 @@
-const { DatabaseSync } = require('node:sqlite');
-const { mkdirSync } = require('node:fs');
-const { dirname } = require('node:path');
 const { AppError } = require('./errors');
 
 class HistoryStore {
-  constructor(filename = ':memory:') {
-    if (filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true });
-    this.db = new DatabaseSync(filename);
-    this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;
-      CREATE TABLE IF NOT EXISTS rooms(room_id TEXT PRIMARY KEY, name TEXT NOT NULL, creator_id TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS messages(seq INTEGER PRIMARY KEY AUTOINCREMENT, message_id TEXT UNIQUE NOT NULL,
-        room_id TEXT NOT NULL REFERENCES rooms(room_id), sender_id TEXT NOT NULL, content TEXT NOT NULL,
-        created_at TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'Sent' CHECK(status IN ('Sent','Delivered','Read')));
-      CREATE INDEX IF NOT EXISTS messages_room_seq ON messages(room_id,seq);
-      CREATE TABLE IF NOT EXISTS receipts(message_id TEXT NOT NULL REFERENCES messages(message_id),
-        user_id TEXT NOT NULL, read_at TEXT NOT NULL, PRIMARY KEY(message_id,user_id));`);
+  constructor(filename = ':memory:', { db, ownsConnection = !db } = {}) {
+    this.ownsConnection = ownsConnection;
+    if (db) this.db = db;
+    else {
+      // Keep standalone store construction on the same migration path as runtime.
+      this.database = require('./database').createDatabase(filename);
+      this.db = this.database.db;
+    }
   }
   rooms() { return this.db.prepare('SELECT room_id AS roomId,name,0 AS memberCount FROM rooms ORDER BY rowid').all(); }
   createRoom(room, identity) {
@@ -49,6 +43,6 @@ class HistoryStore {
     } catch (error) { this.db.exec('ROLLBACK'); throw error; }
     return this.get(messageId);
   }
-  close() { this.db.close(); }
+  close() { if (this.ownsConnection) this.database.close(); }
 }
 module.exports = { HistoryStore };
