@@ -23,7 +23,7 @@ async function seedFixture({ name = 'review.sqlite', password } = {}) {
   // Exclusive creation: existing databases, including symlinks, are never replaced.
   fs.closeSync(fs.openSync(filename, 'wx', 0o600));
   const database = createDatabase(filename);
-  const history = new HistoryStore(filename);
+  const history = new HistoryStore(filename, { db: database.db, ownsConnection: false });
   try {
     const auth = createAuthService({ database, secret: randomBytes(48).toString('hex') });
     const users = [];
@@ -47,7 +47,6 @@ async function seedFixture({ name = 'review.sqlite', password } = {}) {
       }
     }
   } finally {
-    history.close();
     database.close();
   }
   const inspection = new DatabaseSync(filename, { readOnly: true });
