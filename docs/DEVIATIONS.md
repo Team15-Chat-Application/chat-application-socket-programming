@@ -262,3 +262,20 @@ approval, monthly availability or manual accessibility result is inferred from t
   monitor and its `NOT_ESTABLISHED` output, and state what acceptance would need: a chosen host, continuous
   probing for a full calendar month, a maintenance-exclusion log and a review of the resulting report.
   Whether the course accepts this as a documented deviation is a team/course decision, not recorded here.
+## 13 November 2026: SQLite persistence unification — integration review
+
+The SQLite unification work consolidates account and messaging persistence around one database connection.
+
+- `createDatabase()` initializes the canonical database schema.
+- `HistoryStore` receives the existing database connection rather than opening an independent connection.
+- Versioned migrations preserve supported legacy room, message and receipt data.
+- Migration backup, rollback, schema validation and foreign-key checks are covered by dedicated tests.
+- `scripts/seed_review.js` has been updated to use the shared connection.
+
+The earlier dual-connection initialization workaround documented in the 7–8 November incident is superseded by this architecture. The original incident and recovery history remain unchanged for traceability.
+
+The SQLite unification pull request has resolved its reported merge conflict. Its GitHub browser, Node and Python checks passed. Local verification on the source branch also passed 19 test suites and 283 tests, including the runtime restart-persistence tests.
+
+**Integration status:** Pull request review and final integration verification remain pending. These source-branch results do not establish acceptance on the integrated target branch.
+
+CHAT-22 through CHAT-25 acceptance must be verified against the integrated implementation before their completion is claimed.
