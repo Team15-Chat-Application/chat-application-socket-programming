@@ -1,3 +1,4 @@
+import sqlite3
 import time
 import pytest
 from chat_backend.accounts import Accounts, AccountError
@@ -18,6 +19,14 @@ def test_real_account_issuer_and_persistent_logout(accounts):
     with pytest.raises(Exception):accounts.auth().authenticate({'token':result['token']})
     row=accounts.db.execute('SELECT password_hash FROM users').fetchone()[0]
     assert row.startswith('$2b$12$') and 'test-password' not in row
+
+def test_account_connection_enforces_session_foreign_keys(accounts):
+    assert accounts.db.execute('PRAGMA foreign_keys').fetchone()[0] == 1
+    with pytest.raises(sqlite3.IntegrityError):
+        accounts.db.execute(
+            'INSERT INTO sessions(session_id,user_id,expires_at) VALUES (?,?,?)',
+            ('orphan-session','missing-user',int(time.time())+60)
+        )
 
 def test_five_failures_and_exact_fifteen_minute_boundary(accounts):
     accounts.register({'username':'Alice','password':'test-password'})
