@@ -10,7 +10,7 @@ integration and is recorded with its actual dates. This is a review record, not 
 | CHAT-22-25 | Message persistence, last 50, delivered, read | Hrisheek | Contract `HistoryStore` in `main` through PR #57; PR #53's tests ported to it in 21ce67c | Done |
 | CHAT-26-28 | Presence, typing indicator, in-app notification | Soham | PR #47, delivered through PR #57 | Done. QA re-review at 27eef79 satisfied (10 Nov) |
 | CHAT-29 | Latency under 200 ms | Soham | `scripts/performance_check.js`, CI | Done. Loopback measurement only |
-| CHAT-30 | 99.5% monthly availability | Soham | `scripts/monitor_uptime.py` | Not established for this delivery (deviation) |
+| CHAT-30 | 99.5% monthly availability | Soham | `scripts/monitor_uptime.py` | Not met; accepted as a deviation by the PO (15 Nov), closed in Jira |
 | CHAT-31 | 100 concurrent WebSockets | Hrisheek | `tests/integration/concurrent-load.test.js`, `performance_check.js` | Done |
 | CHAT-32, 33 | TLS enforcement (HTTP and WebSocket) | Yaswanth, Soham | PR #47 (c16bba9, a6b78bf), delivered through PR #57 | Done. QA findings satisfied |
 | CHAT-38 | WCAG 2.1 AA | Soham (reassigned 8 Nov) | PR #58, merged as d82aafd | Done. All 16 TC-UX-01 rows pass at 194b40d; QA signature still blank |
@@ -54,7 +54,7 @@ integration and is recorded with its actual dates. This is a review record, not 
 - **History/status protocol.** `main` uses the contract protocol (`room:history`, `message:status`). Hrisheek,
   owner of CHAT-22 to CHAT-25, ported his PR #53 tests to it in 21ce67c.
 - **CHAT-30 availability.** A calendar-month 99.5% measurement cannot be made in a two-week window without a
-  hosted service. Not met; not waived.
+  hosted service. Not met; accepted as a documented deviation by the Product Owner on 15 November (not a course approval).
 - **Scope.** Admin and private-conversation features described in the SAD/STP are deferred (Option A, chosen
   31 October under Soham's delegated authority; not recorded as team or course approval).
 - **Test tooling.** Socket.IO load script instead of JMeter, automated security tests instead of an OWASP ZAP
