@@ -13,9 +13,9 @@ integration and is recorded with its actual dates. This is a review record, not 
 | CHAT-30 | 99.5% monthly availability | Soham | `scripts/monitor_uptime.py` | Not met; accepted as a deviation by the PO (15 Nov), closed in Jira |
 | CHAT-31 | 100 concurrent WebSockets | Hrisheek | `tests/integration/concurrent-load.test.js`, `performance_check.js` | Done |
 | CHAT-32, 33 | TLS enforcement (HTTP and WebSocket) | Yaswanth, Soham | PR #47 (c16bba9, a6b78bf), delivered through PR #57 | Done. QA findings satisfied |
-| CHAT-38 | WCAG 2.1 AA | Soham (reassigned 8 Nov) | PR #58, merged as d82aafd | Done. All 16 TC-UX-01 rows pass at 194b40d; QA signature still blank |
+| CHAT-38 | WCAG 2.1 AA | Soham (reassigned 8 Nov) | PR #58, merged as d82aafd | Done. All 16 TC-UX-01 rows pass at 194b40d; QA signed off by Yaswanth, 16 Nov (PR #65) |
 | CHAT-46 | Two-minute outcome video | Yaswanth | `videos/sprint-2-outcome-2026-10-28.webm` (PR #54 closed as delivered through #57) | Done |
-| CHAT-47, 48 | Documents and freeze | Soham | This file, `DEVIATIONS.md`, `FINAL_HANDOFF.md` | In Review. Freeze record not filled |
+| CHAT-47, 48 | Documents and freeze | Soham | This file, `DEVIATIONS.md`, `FINAL_HANDOFF.md` | Done. Freeze recorded 16 Nov at ce3db73 (CI run #137) |
 | CHAT-50, 51 | QA review, scope reconciliation | Yaswanth | PR reviews; PR #55, merged as df68292 | Done |
 | CHAT-52 | Review of Soham's presence/account work | Hrisheek | PR #61 (two fixes plus regression tests), in `main` via #62 | Done (15 Nov) |
 
