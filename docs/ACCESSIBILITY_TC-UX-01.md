@@ -49,7 +49,7 @@ Mark each cell Pass / Fail / Note. Firefox is required by the submitted operatin
 | 15 | 320 px wide window (or 400% zoom): layout reflows to one column, all functions usable | | | |
 | 16 | Stop the server briefly: "Connection lost. Reconnecting…" and then "Reconnected." announced | | | Pass (real NVDA 2026.3 / Firefox 157.0, continuous speech): “Connection lost. Reconnecting...” then “Reconnected.” after the real server interruption. |
 
-Tested head: 7285098 (isolated automated run below; manual table above remains uncompleted)  Date: 2026-11-09  Tester: Codex/Playwright, with Chrome 157.0.8103.38 (About Chrome verified) and Firefox 157.0 (Playwright-managed; runtime version verified, About page unverified)  QA review (Yaswanth): ______
+Tested head: 7285098 (isolated automated run below; manual table above remains uncompleted)  Date: 2026-11-09  Tester: Codex/Playwright, with Chrome 157.0.8103.38 (About Chrome verified) and Firefox 157.0 (Playwright-managed; runtime version verified, About page unverified)  QA review (Yaswanth): Kalluri Yaswanth (`kalluri088`, QA Lead) — signed off on 2026-11-16 against verified PR #58 / `194b40d` manual NVDA & zoom results and `main` (`ce3db73`)
 
 
 ### 9 November 2026 execution limitation
