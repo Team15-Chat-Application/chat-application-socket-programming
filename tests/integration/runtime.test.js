@@ -460,3 +460,57 @@ test('typing indicator auto-expires after 1500ms', async () => {
   expect(result.typing).toBe(false);
   expect(result.userId).toBe(b.user.userId);
 });
+
+test('typing state clears when its tab disconnects while another tab keeps the user online', async () => {
+  const alice = await user('TypingTabsAlice');
+  const bob = await user('TypingTabsBob');
+  const typingTab = await client(alice);
+  const idleTab = await client(alice);
+  const observer = await client(bob);
+  const room = (await ack(typingTab, 'room:create', { name: 'TypingTabs' })).data;
+  const payload = { roomId: room.roomId };
+  await ack(typingTab, 'room:join', payload);
+  await ack(idleTab, 'room:join', payload);
+  await ack(observer, 'room:join', payload);
+
+  const states = [];
+  observer.on('presence:typing', event => states.push(event));
+  const typingStarted = new Promise(resolve => observer.once('presence:typing', resolve));
+  await ack(typingTab, 'typing:set', { ...payload, typing: true });
+  expect((await typingStarted).typing).toBe(true);
+
+  typingTab.disconnect();
+  await new Promise(resolve => setTimeout(resolve, 25));
+  expect(states.map(event => event.typing)).toEqual([true, false]);
+  expect((await ack(idleTab, 'presence:list', payload)).data.users)
+    .toEqual(expect.arrayContaining([expect.objectContaining({ userId: alice.user.userId, status: 'online' })]));
+});
+
+test('typing in two tabs remains active until the last tab stops or disconnects', async () => {
+  const alice = await user('ConcurrentTypingAlice');
+  const bob = await user('ConcurrentTypingBob');
+  const firstTab = await client(alice);
+  const secondTab = await client(alice);
+  const observer = await client(bob);
+  const room = (await ack(firstTab, 'room:create', { name: 'ConcurrentTyping' })).data;
+  const payload = { roomId: room.roomId };
+  await ack(firstTab, 'room:join', payload);
+  await ack(secondTab, 'room:join', payload);
+  await ack(observer, 'room:join', payload);
+
+  const states = [];
+  observer.on('presence:typing', event => states.push(event.typing));
+  const firstStarted = new Promise(resolve => observer.once('presence:typing', resolve));
+  await ack(firstTab, 'typing:set', { ...payload, typing: true });
+  expect((await firstStarted).typing).toBe(true);
+  await ack(secondTab, 'typing:set', { ...payload, typing: true });
+  await new Promise(resolve => setTimeout(resolve, 25));
+  expect(states).toEqual([true]);
+
+  firstTab.disconnect();
+  await new Promise(resolve => setTimeout(resolve, 25));
+  expect(states).toEqual([true]);
+  const stopped = new Promise(resolve => observer.once('presence:typing', resolve));
+  secondTab.disconnect();
+  expect((await stopped).typing).toBe(false);
+});

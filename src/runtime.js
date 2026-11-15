@@ -6,7 +6,7 @@ const { createAuthService } = require('./auth');
 const { HistoryStore } = require('./history');
 const { RoomStore } = require('./rooms');
 const { MessageService, registerMessageHandlers } = require('./messages');
-const { registerPresenceHandlers } = require('./presence');
+const { createPresenceState, registerPresenceHandlers } = require('./presence');
 const { AppError, failure } = require('./errors');
 
 async function readBody(req) {
@@ -38,6 +38,7 @@ function createRuntime({ env=process.env, filename, secret=env.JWT_SECRET }={}) 
   if(production&&(!secret||Buffer.byteLength(secret)<32))throw Error('Production requires JWT_SECRET of at least 32 bytes');
   const file=filename||env.NODE_DB_PATH||env.CHAT_DB_PATH||path.join(process.cwd(),'data','chat.sqlite');
   const database=createDatabase(file),history=new HistoryStore(file,{db:database.db,ownsConnection:false}),rooms=new RoomStore({repository:history});
+  const presenceState=createPresenceState();
   const authService=typeof secret==='string'&&Buffer.byteLength(secret)>=32 ? createAuthService({database,secret}) : null;
   history.usernameFor=id=>database.findUserById(id)?.username||id.slice(0,8);
   const messages=new MessageService({rooms,history});
@@ -81,7 +82,7 @@ function createRuntime({ env=process.env, filename, secret=env.JWT_SECRET }={}) 
     },
     registerHandlers(io,socket){
       registerMessageHandlers(socket,messages,io);
-      registerPresenceHandlers(io,socket,rooms,history.usernameFor);
+      registerPresenceHandlers(io,socket,rooms,history.usernameFor,presenceState);
     }
   });
   let closed=false;

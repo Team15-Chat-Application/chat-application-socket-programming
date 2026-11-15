@@ -38,6 +38,8 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
     app.extensions['chat_identities']=identities
     room_events = RLock()
     typing_last,typing_timers={},{}
+    typing_active,typing_owners={},{}
+    typing_lock=RLock()
 
     def audit(event, code):
         # Never log exception strings, tokens, credentials, payloads or message text.
@@ -53,6 +55,75 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
         socketio.emit('room:membership', notice, to=room_channel(notice['roomId']))
         socketio.emit('presence:changed',{'roomId':notice['roomId'],'userId':notice['userId'],
             'status':'online' if notice['action']=='join' else 'offline'},to=room_channel(notice['roomId']))
+
+    def stop_typing(sid, room_id, keep_last=False):
+        key=(sid,room_id);should_emit=False;user_id=None
+        with typing_lock:
+            timer=typing_timers.pop(key,None)
+            if timer:timer.cancel()
+            if not keep_last:typing_last.pop(key,None)
+            user_id=typing_owners.pop(key,None)
+            if user_id is not None:
+                active=typing_active.get((room_id,user_id))
+                if active is not None:
+                    active.discard(sid)
+                    if not active:
+                        typing_active.pop((room_id,user_id),None)
+                        should_emit=True
+        if should_emit:
+            socketio.emit('presence:typing',{'roomId':room_id,'userId':user_id,'typing':False},
+                          to=room_channel(room_id),skip_sid=sid)
+        return should_emit
+
+    def set_typing(sid, room_id, user_id, is_typing):
+        key=(sid,room_id);now=time.monotonic();should_emit=False;timer_to_start=None
+        with typing_lock:
+            if is_typing and now-typing_last.get(key,-1)<0.5:
+                return {'debounced':True}
+            typing_last[key]=now
+            old=typing_timers.pop(key,None)
+            if old:old.cancel()
+
+            if not is_typing:
+                owner=typing_owners.pop(key,None)
+                active=typing_active.get((room_id,owner)) if owner is not None else None
+                if active is not None:
+                    active.discard(sid)
+                    if not active:
+                        typing_active.pop((room_id,owner),None)
+                        should_emit=True
+            else:
+                group=(room_id,user_id)
+                active=typing_active.setdefault(group,set())
+                should_emit=not active
+                active.add(sid)
+                typing_owners[key]=user_id
+
+                def expire():
+                    notify=False
+                    with typing_lock:
+                        if typing_timers.get(key) is not timer_to_start:return
+                        typing_timers.pop(key,None)
+                        typing_owners.pop(key,None)
+                        members=typing_active.get(group)
+                        if members is not None:
+                            members.discard(sid)
+                            if not members:
+                                typing_active.pop(group,None)
+                                notify=True
+                    if notify:
+                        socketio.emit('presence:typing',{'roomId':room_id,'userId':user_id,'typing':False},
+                                      to=room_channel(room_id),skip_sid=sid)
+
+                timer_to_start=Timer(1.5,expire)
+                timer_to_start.daemon=True
+                typing_timers[key]=timer_to_start
+                timer_to_start.start()
+
+        if should_emit:
+            socketio.emit('presence:typing',{'roomId':room_id,'userId':user_id,'typing':is_typing},
+                          to=room_channel(room_id),skip_sid=sid)
+        return {'accepted':True}
 
     if register_handler is not None:
         app.add_url_rule('/api/auth/register','register',register_handler,methods=['POST'])
@@ -123,8 +194,8 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
 
     @socketio.on('disconnect')
     def disconnected(_reason=None):
-        for key,timer in list(typing_timers.items()):
-            if key[0]==request.sid:timer.cancel();typing_timers.pop(key,None);typing_last.pop(key,None)
+        for sid,room_id in list(typing_owners):
+            if sid==request.sid:stop_typing(sid,room_id)
         context = identities.pop(request.sid, None)
         if context is not None:
             with context['lock'], room_events:
@@ -266,6 +337,7 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                     except Exception:
                         disconnect()
                     raise
+                stop_typing(request.sid,room['roomId'])
                 if result['changed']:
                     membership({'roomId': room['roomId'], 'userId': identity['userId'],
                                 'action': 'leave', 'memberCount': result['room']['memberCount']})
@@ -367,19 +439,8 @@ def create_application(auth=None, rooms=None, login_limiter=None, login_handler=
                 room=rooms.get(payload);sid=request.sid
                 if not rooms.has_socket(room['roomId'],sid):raise RoomError('FORBIDDEN','Join the room first')
                 if type(payload.get('typing')) is not bool:raise RoomError('VALIDATION_ERROR','typing must be boolean')
-                key=(sid,room['roomId']);now=time.monotonic()
-                if payload['typing'] and now-typing_last.get(key,-1)<0.5:return {'ok':True,'data':{'debounced':True}}
-                typing_last[key]=now
-                old=typing_timers.pop(key,None)
-                if old:old.cancel()
-                data={'roomId':room['roomId'],'userId':identities[sid]['identity']['userId'],'typing':payload['typing']}
-                socketio.emit('presence:typing',data,to=room_channel(room['roomId']),skip_sid=sid)
-                if payload['typing']:
-                    def expire():
-                        typing_timers.pop(key,None)
-                        if sid in identities:socketio.emit('presence:typing',dict(data,typing=False),to=room_channel(room['roomId']),skip_sid=sid)
-                    timer=Timer(1.5,expire);timer.daemon=True;typing_timers[key]=timer;timer.start()
-                return {'ok':True,'data':{'accepted':True}}
+                result=set_typing(sid,room['roomId'],identities[sid]['identity']['userId'],payload['typing'])
+                return {'ok':True,'data':result}
         except RoomError as error:return failure(error.code,str(error))
         except Exception:
             audit('typing-set','INTERNAL_ERROR')
