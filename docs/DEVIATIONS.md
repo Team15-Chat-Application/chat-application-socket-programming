@@ -258,6 +258,8 @@ Resolved on 11 November; see the 11 November entry below. The text here is kept 
 
 ## 9 November 2026: CHAT-30 / CHAT-NF-002 monthly availability not established for this delivery
 
+Dispositioned on 15 November: accepted as a documented deviation; see the 15 November entry at the end. The text below is kept as written on 9 November.
+
 - **Requirement (SRS CHAT-NF-002, TC-Ops-01).** At least 99.5% uptime per calendar month, excluding planned
   maintenance; acceptance is a monthly uptime report of at least 99.5%. Owner: Soham.
 - **Why it cannot be met in this delivery.** The course timeline gave two one-week sprints (19-23 and
@@ -342,3 +344,16 @@ CHAT-22 through CHAT-25 acceptance must be verified against the integrated imple
   based on the CI and local evidence above, and is recorded on #62. CHAT-52 was moved to Done by
   Hrisheek on 15 November.
   Build and test run #131 on `main` at d608eb0 passed the Node, Python and Browser jobs.
+
+## 15 November 2026: CHAT-30 accepted as a documented deviation and closed
+
+- **Decision.** The Product Owner (Soham) accepted CHAT-30 / CHAT-NF-002 (at least 99.5% availability
+  per calendar month, TC-Ops-01) as a documented deviation for this delivery. CHAT-30 was moved to Done
+  in Jira with a comment saying the requirement is not met. Epic CHAT-6 was closed because CHAT-29 and
+  CHAT-31 are delivered and CHAT-30 is dispositioned.
+- **What this does and does not mean.** The requirement is **not met**. No monthly availability figure
+  is claimed. "Done" in Jira records the disposition, not achievement. This is a Product Owner decision
+  for the team's freeze, not a course approval; whether the course accepts the deviation is the
+  evaluator's call.
+- **What meeting it would need.** A chosen host, continuous probing with `scripts/monitor_uptime.py` for a
+  full calendar month, a maintenance-exclusion log, and a review of the resulting report.

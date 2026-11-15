@@ -31,7 +31,7 @@ signature, approval, release or freeze. Do not backdate any entry.
 | PR #58 merged (QA verified code 10 Nov) | Soham | Done: d82aafd, 11 Nov |
 | Full-suite determinism re-checked after the port | Soham | Done: 15 of 15 runs passed at 7bff802 on Node 22 (11 Nov); 285/285 passed at 87c6ed3 on Node 24.22 (15 Nov). Open: Jest reports it "did not exit" on Node 24 |
 | Final merged `main` passes all three CI jobs | Soham | Done: run #131 at d608eb0, 15 Nov (Node, Python and Browser jobs); earlier run #114 at 7bff802 |
-| CHAT-30 availability | Soham | Recorded as not established (deviation) |
+| CHAT-30 availability | Soham | Dispositioned: not met; accepted as a documented deviation by the Product Owner, 15 Nov (CHAT-30 and epic CHAT-6 closed in Jira) |
 | Videos retained, Sprint 1 lateness explicit | Done | `videos/`, `docs/evidence/2026-10-28/video-evidence.json` |
 | Repository visibility decision | Done | Kept public, 28 Oct (deviation) |
 | Review of PR #60 (SQLite unification) | Yaswanth or Soham | Open: merged without review; post-merge review requested on #62 |
