@@ -1,6 +1,6 @@
 # Development and operation
 
-Current 28 October 2026. Use Node 24 and Python 3.12. Install locked dependencies with `npm ci` and `python -m pip install -r python_backend/requirements-dev.lock.txt` in a virtual environment. Node uses built-in SQLite, so Windows C++ build tools are unnecessary.
+Current 28 October 2026. Use Node 24.16 or newer (Node 24 line) and Python 3.12. Install locked dependencies with `npm ci` and `python -m pip install -r python_backend/requirements-dev.lock.txt` in a virtual environment. Node uses built-in SQLite, so Windows C++ build tools are unnecessary.
 
 ## Setup and launch
 

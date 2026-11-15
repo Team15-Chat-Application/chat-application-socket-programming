@@ -17,7 +17,7 @@ integration and is recorded with its actual dates. This is a review record, not 
 | CHAT-46 | Two-minute outcome video | Yaswanth | `videos/sprint-2-outcome-2026-10-28.webm` (PR #54 closed as delivered through #57) | Done |
 | CHAT-47, 48 | Documents and freeze | Soham | This file, `DEVIATIONS.md`, `FINAL_HANDOFF.md` | In Review. Freeze record not filled |
 | CHAT-50, 51 | QA review, scope reconciliation | Yaswanth | PR reviews; PR #55, merged as df68292 | Done |
-| CHAT-52 | Review of Soham's presence/account work | Hrisheek | Not yet posted | In Progress |
+| CHAT-52 | Review of Soham's presence/account work | Hrisheek | PR #61 (two fixes plus regression tests), in `main` via #62 | Done (15 Nov) |
 
 ## Evidence to show
 
