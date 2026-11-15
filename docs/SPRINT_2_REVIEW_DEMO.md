@@ -1,37 +1,38 @@
 # Sprint 2 review and final demo notes
 
-Updated 10 November 2026. Official Sprint 2 window: 26-30 October 2026. Work after 30 October is late
+Updated 11 November 2026. Official Sprint 2 window: 26-30 October 2026. Work after 30 October is late
 integration and is recorded with its actual dates. This is a review record, not an acceptance or freeze.
 
 ## What Sprint 2 delivered
 
-| Jira | Requirement | Owner | Where it is | State on 10 Nov |
+| Jira | Requirement | Owner | Where it is | State on 11 Nov |
 |---|---|---|---|---|
-| CHAT-22-25 | Message persistence, last 50, delivered, read | Hrisheek | Two implementations: PR #53 (merged to `main` 7 Nov) and the contract `HistoryStore` in draft PR #57 | In Review. Protocol choice and port of 11 PR #53 tests pending (`SPRINT2_INTEGRATION_HANDOFF.md`) |
-| CHAT-26-28 | Presence, typing indicator, in-app notification | Soham | PR #47, carried in PR #57 | In Review. QA re-review at 27eef79 satisfied (10 Nov) |
-| CHAT-29 | Latency under 200 ms | Soham | `scripts/performance_check.js`, CI | In Review. Loopback measurement only |
+| CHAT-22-25 | Message persistence, last 50, delivered, read | Hrisheek | Contract `HistoryStore` in `main` through PR #57; PR #53's tests ported to it in 21ce67c | Done |
+| CHAT-26-28 | Presence, typing indicator, in-app notification | Soham | PR #47, delivered through PR #57 | Done. QA re-review at 27eef79 satisfied (10 Nov) |
+| CHAT-29 | Latency under 200 ms | Soham | `scripts/performance_check.js`, CI | Done. Loopback measurement only |
 | CHAT-30 | 99.5% monthly availability | Soham | `scripts/monitor_uptime.py` | Not established for this delivery (deviation) |
-| CHAT-31 | 100 concurrent WebSockets | Hrisheek | `tests/integration/concurrent-load.test.js`, `performance_check.js` | In Review, waits on PR #57 |
-| CHAT-32, 33 | TLS enforcement (HTTP and WebSocket) | Yaswanth, Soham | PR #47 (c16bba9, a6b78bf), carried in PR #57 | In Review. QA findings satisfied |
-| CHAT-38 | WCAG 2.1 AA | Soham (reassigned 8 Nov) | PR #58 into `sprint2-integration` | In Review. Code verified by QA; zoom and NVDA rows open |
-| CHAT-46 | Two-minute outcome video | Yaswanth | `videos/sprint-2-outcome-2026-10-28.webm` (in PR #57; PR #54 superseded) | In Review |
-| CHAT-47, 48 | Documents and freeze | Soham | This file, `DEVIATIONS.md`, `FINAL_HANDOFF.md` | In progress |
-| CHAT-50, 51 | QA review, scope reconciliation | Yaswanth | PR reviews; PR #55 (changes requested 10 Nov) | Done in Jira |
-| CHAT-52 | Review of Soham's presence/account work | Hrisheek | Not started | To Do |
+| CHAT-31 | 100 concurrent WebSockets | Hrisheek | `tests/integration/concurrent-load.test.js`, `performance_check.js` | Done |
+| CHAT-32, 33 | TLS enforcement (HTTP and WebSocket) | Yaswanth, Soham | PR #47 (c16bba9, a6b78bf), delivered through PR #57 | Done. QA findings satisfied |
+| CHAT-38 | WCAG 2.1 AA | Soham (reassigned 8 Nov) | PR #58, merged as d82aafd | Done. All 16 TC-UX-01 rows pass at 194b40d; QA signature still blank |
+| CHAT-46 | Two-minute outcome video | Yaswanth | `videos/sprint-2-outcome-2026-10-28.webm` (PR #54 closed as delivered through #57) | Done |
+| CHAT-47, 48 | Documents and freeze | Soham | This file, `DEVIATIONS.md`, `FINAL_HANDOFF.md` | In Review. Freeze record not filled |
+| CHAT-50, 51 | QA review, scope reconciliation | Yaswanth | PR reviews; PR #55, merged as df68292 | Done |
+| CHAT-52 | Review of Soham's presence/account work | Hrisheek | Not yet posted | In Progress |
 
 ## Evidence to show
 
-- **CI.** `main` is green after the PR #56 revert (Build and test #81). On PR #57 and PR #58 the Python and
-  browser jobs pass; the Node job fails only on the 11 PR #53 tests awaiting the port.
+- **CI.** Build and test run #114 on `main` at 7bff802 (the PR #57 merge) passes the Node, Python and Browser
+  jobs: 268 Node tests, the Python suite, and the Playwright and axe browser checks.
 - **Outcome videos.** `videos/sprint-1-outcome-2026-10-28.webm` (60 s, late) and
   `videos/sprint-2-outcome-2026-10-28.webm` (120 s): real two-user sessions with rooms, live messages,
   receipts, presence, unread badge and saved history.
 - **System check.** `scripts/system_check.js`: real HTTP login, WebSocket chat, 55 persisted messages, last
   50 after a process restart, read receipt and logout revocation.
 - **Accessibility.** `ACCESSIBILITY_TC-UX-01.md`: audit, fixes, isolated keyboard runs in Chrome and Firefox,
-  and the open manual rows.
+  and all 16 manual rows passing at 194b40d, including real NVDA runs.
 - **QA reviews (10 Nov).** PR #47 re-review (security findings satisfied), PR #57 architectural review
-  (endorses the contract protocol), PR #58 QA review (`public/` changes verified).
+  (endorses the contract protocol), PR #58 QA review (`public/` changes verified). PR #55, Yaswanth's QA
+  summary, was merged on 11 Nov.
 
 ## Live demo outline (about 3 minutes)
 
@@ -49,9 +50,9 @@ integration and is recorded with its actual dates. This is a review record, not 
 - **Late delivery.** Sprint 1 completed and its video was recorded on 28 October, after the 23 October end.
   Sprint 2 integration continued after 30 October.
 - **7 November merge incident.** A merge from a stale branch combined two history implementations and broke
-  `main`; PR #56 reverted it on 8 November. Recovery goes through PR #57.
-- **History/status protocol.** Keeping the contract protocol is proposed and endorsed by the QA Lead, but
-  needs Hrisheek's agreement as owner of CHAT-22 to CHAT-25.
+  `main`; PR #56 reverted it on 8 November. The recovery, PR #57, was merged on 11 November (7bff802).
+- **History/status protocol.** `main` uses the contract protocol (`room:history`, `message:status`). Hrisheek,
+  owner of CHAT-22 to CHAT-25, ported his PR #53 tests to it in 21ce67c.
 - **CHAT-30 availability.** A calendar-month 99.5% measurement cannot be made in a two-week window without a
   hosted service. Not met; not waived.
 - **Scope.** Admin and private-conversation features described in the SAD/STP are deferred (Option A, chosen

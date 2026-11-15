@@ -225,6 +225,8 @@ approval, monthly availability or manual accessibility result is inferred from t
 
 ## 7-8 November 2026: Sprint 2 merge incident and pending protocol decision
 
+Resolved on 11 November; see the 11 November entry below. The text here is kept as written on 8 November.
+
 - **What happened.** On 7 November, 8555c53 merged `CHAT-26-sprint2-delivery` into `main` from a stale local
   copy (140da7f). It kept the `HistoryStore`-based `src/messages.js` together with PR #53's `src/database.js`
   message schema and tests. Both create a `messages` table in the same SQLite file, so the server failed to
@@ -264,12 +266,39 @@ approval, monthly availability or manual accessibility result is inferred from t
 - **What exists.** `scripts/monitor_uptime.py` probes `/api/health`, appends every observation to a JSONL log
   and writes a summary whose `monthlyAcceptance` is always `NOT_ESTABLISHED`. Recorded so far: two short local
   windows on 28-29 October, 18 probes, all healthy. Unobserved time is not counted as healthy.
-- **Status.** CHAT-30 stays In Progress and the requirement is **not met** for this delivery. It is not waived
+- **Status.** CHAT-30 is not moved to Done, and the requirement is **not met** for this delivery. It is not waived
   and is not claimed from short samples, CI runs or restart checks.
 - **For the final demo.** Explain the conflict between a monthly SLA and a two-week delivery window, show the
   monitor and its `NOT_ESTABLISHED` output, and state what acceptance would need: a chosen host, continuous
   probing for a full calendar month, a maintenance-exclusion log and a review of the resulting report.
   Whether the course accepts this as a documented deviation is a team/course decision, not recorded here.
+## 11 November 2026: Sprint 2 integration merged to `main`
+
+- **Protocol decision.** Hrisheek ported the 11 PR #53 tests to the contract events (`room:history`,
+  `message:status`) in 21ce67c. The 8 November proposal is therefore settled in favour of the contract
+  protocol by the owner of CHAT-22 to CHAT-25.
+- **Dependency change in the port.** 21ce67c also changed `sanitize-html` from the pinned `2.18.1` to
+  `^2.17.4` (lock file: 2.17.4) and force-added `reports/performance.json`, which is in a gitignored path.
+  Both are recorded here, not reverted.
+- **Seed fixture.** `scripts/seed_review.js` constructed the database before `HistoryStore` and failed in CI
+  with the same `no such column: seq` error as the 7 November incident. e360001 uses the same order as
+  `src/runtime.js`.
+- **Merges.** PR #58 (CHAT-38) went in as d82aafd and PR #55 as df68292, both into `sprint2-integration`.
+  CI passed on df68292 (runs #112 and #113). PR #57 was merged into `main` as 7bff802, and run #114 on `main`
+  passed the Node, Python and Browser jobs. All three merges used merge commits, so each member's commits
+  stay in `main`'s history. PRs #47 and #54 were closed as delivered through #57.
+- **Jira.** CHAT-22 to CHAT-29, CHAT-31 to CHAT-33, CHAT-38, CHAT-46 and CHAT-53 were moved to Done on
+  11 November, each with a comment citing 7bff802 and run #114. Epics CHAT-3, CHAT-4, CHAT-5, CHAT-7 and
+  CHAT-8 were moved to Done because every child issue is Done. CHAT-6 stays open because of CHAT-30.
+  CHAT-30, CHAT-47, CHAT-48 and CHAT-52 are not Done.
+- **Full-suite determinism re-check.** This replaces the 8 November caveat. 15 consecutive `npm test` runs
+  (`--runInBand`) at 7bff802, on Node 22.23.4 with the locked `sanitize-html` 2.17.4 loaded directly (the
+  8 November `moduleNameMapper` shim is no longer needed). Every run reported 19 suites and 268 tests
+  passed, printed a summary, and never hit "Jest did not exit". Node 24 evidence comes from CI runs #112
+  to #114 only.
+- **Still open.** The freeze record (CHAT-48), Hrisheek's CHAT-52 review, Yaswanth's QA signature on
+  TC-UX-01, and the team's disposition of the CHAT-30 deviation.
+
 ## 13 November 2026: SQLite persistence unification — integration review
 
 The SQLite unification work consolidates account and messaging persistence around one database connection.
@@ -287,3 +316,22 @@ The SQLite unification pull request has resolved its reported merge conflict. It
 **Integration status:** Pull request review and final integration verification remain pending. These source-branch results do not establish acceptance on the integrated target branch.
 
 CHAT-22 through CHAT-25 acceptance must be verified against the integrated implementation before their completion is claimed.
+
+## 15 November 2026: PR #60 and PR #61 verified on `sprint2-integration`
+
+- **What changed.** PR #60 (Hrisheek, SQLite unification, merged into `sprint2-integration` on
+  13 November) gives accounts and history one shared database connection, with versioned migrations.
+  PR #61 (Hrisheek, CHAT-52 review fixes) fixes the multi-tab typing lifecycle and enables SQLite
+  foreign keys on the Python account connection, with regression tests. #61 was approved by Soham and
+  merged as dc4e13b on 15 November. **#60 was merged without a PR review**; the checks below cover its
+  behaviour, but no reviewer approved it.
+- **Verification (15 November, at 87c6ed3, Node 24.22.3).** 285/285 Node tests and 284/284 Python tests
+  passed. `scripts/system_check.js` passed on both backends: real HTTP login, WebSocket chat,
+  55 messages persisted, last 50 after a process restart, read receipt, logout revocation. The browser
+  job passed in CI on push and PR; it could not be run locally because Chromium could not be
+  downloaded.
+- **Runtime requirement.** `package.json` now requires Node >=24.16 because migration backups use
+  `DatabaseSync.serialize()`. On Node 22, 11 database tests fail. The README still says "Node 24".
+- **Open.** On Node 24 the Jest run passes but ends with "Jest did not exit one second after the test
+  run has completed", which points to an open handle. CHAT-22 to CHAT-25 stay Done: their behaviour is
+  re-verified above on the unified implementation.
