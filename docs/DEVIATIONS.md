@@ -331,7 +331,14 @@ CHAT-22 through CHAT-25 acceptance must be verified against the integrated imple
   job passed in CI on push and PR; it could not be run locally because Chromium could not be
   downloaded.
 - **Runtime requirement.** `package.json` now requires Node >=24.16 because migration backups use
-  `DatabaseSync.serialize()`. On Node 22, 11 database tests fail. The README still says "Node 24".
+  `DatabaseSync.serialize()`. On Node 22, 11 database tests fail. The README and `DEVELOPMENT.md` now say
+  Node 24.16 or newer.
 - **Open.** On Node 24 the Jest run passes but ends with "Jest did not exit one second after the test
   run has completed", which points to an open handle. CHAT-22 to CHAT-25 stay Done: their behaviour is
   re-verified above on the unified implementation.
+- **Merged to `main`.** PR #62 (`sprint2-integration` into `main`) was merged as d608eb0 on 15 November
+  at about 22:30 IST, without a teammate approval. Yaswanth's review was requested at 18:36 and had not
+  arrived. GitHub does not let an author approve their own PR. The merge was the Product Owner's call,
+  based on the CI and local evidence above, and is recorded on #62. CHAT-52 was moved to Done by
+  Hrisheek on 15 November.
+  Build and test run #131 on `main` at d608eb0 passed the Node, Python and Browser jobs.

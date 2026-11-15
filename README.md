@@ -4,7 +4,7 @@ A working browser chat application with equivalent Node/Socket.IO and Python/Fla
 
 ## Run
 
-Requires Node **24**, Python **3.12** for the secondary backend, and Git. In PowerShell at the repository root:
+Requires Node **24.16 or newer** (Node 24 line; older versions fail the database migration tests), Python **3.12** for the secondary backend, and Git. In PowerShell at the repository root:
 
 ```powershell
 npm ci
