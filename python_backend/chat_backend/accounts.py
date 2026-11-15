@@ -23,6 +23,7 @@ class Accounts:
         if filename != ':memory:':Path(filename).parent.mkdir(parents=True,exist_ok=True)
         self.db=sqlite3.connect(filename,check_same_thread=False)
         self.db.row_factory=sqlite3.Row
+        self.db.execute('PRAGMA foreign_keys=ON')
         self.lock=RLock()
         self.secret,self.clock=secret,clock
         self.db.executescript('''PRAGMA journal_mode=WAL;

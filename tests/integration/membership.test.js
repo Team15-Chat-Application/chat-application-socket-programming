@@ -37,7 +37,11 @@ test('TC-Room-02/03/04: real transport join, room-only delivery, leave and live 
   outsider.on('room:membership',n=>outsideMembership.push(n));
   outsider.on('test:room-probe',n=>outsideProbes.push(n));
   bob.on('test:room-probe',n=>bobProbes.push(n));
-  const update=once(outsider,'room:list-updated');
+  // A new socket can receive its initial empty catalogue after `connect` fires.
+  // Wait for the catalogue containing the room created below, not that snapshot.
+  const update=new Promise(resolve=>outsider.on('room:list-updated',data=>{
+    if(data.rooms.some(candidate=>candidate.name==='General'))resolve(data);
+  }));
   const room=(await ack(alice,'room:create',{name:'General'})).data;
   expect((await update).rooms).toContainEqual(room);
   const payload={roomId:room.roomId};

@@ -272,7 +272,6 @@ Resolved on 11 November; see the 11 November entry below. The text here is kept 
   monitor and its `NOT_ESTABLISHED` output, and state what acceptance would need: a chosen host, continuous
   probing for a full calendar month, a maintenance-exclusion log and a review of the resulting report.
   Whether the course accepts this as a documented deviation is a team/course decision, not recorded here.
-
 ## 11 November 2026: Sprint 2 integration merged to `main`
 
 - **Protocol decision.** Hrisheek ported the 11 PR #53 tests to the contract events (`room:history`,
@@ -299,3 +298,40 @@ Resolved on 11 November; see the 11 November entry below. The text here is kept 
   to #114 only.
 - **Still open.** The freeze record (CHAT-48), Hrisheek's CHAT-52 review, Yaswanth's QA signature on
   TC-UX-01, and the team's disposition of the CHAT-30 deviation.
+
+## 13 November 2026: SQLite persistence unification — integration review
+
+The SQLite unification work consolidates account and messaging persistence around one database connection.
+
+- `createDatabase()` initializes the canonical database schema.
+- `HistoryStore` receives the existing database connection rather than opening an independent connection.
+- Versioned migrations preserve supported legacy room, message and receipt data.
+- Migration backup, rollback, schema validation and foreign-key checks are covered by dedicated tests.
+- `scripts/seed_review.js` has been updated to use the shared connection.
+
+The earlier dual-connection initialization workaround documented in the 7–8 November incident is superseded by this architecture. The original incident and recovery history remain unchanged for traceability.
+
+The SQLite unification pull request has resolved its reported merge conflict. Its GitHub browser, Node and Python checks passed. Local verification on the source branch also passed 19 test suites and 283 tests, including the runtime restart-persistence tests.
+
+**Integration status:** Pull request review and final integration verification remain pending. These source-branch results do not establish acceptance on the integrated target branch.
+
+CHAT-22 through CHAT-25 acceptance must be verified against the integrated implementation before their completion is claimed.
+
+## 15 November 2026: PR #60 and PR #61 verified on `sprint2-integration`
+
+- **What changed.** PR #60 (Hrisheek, SQLite unification, merged into `sprint2-integration` on
+  13 November) gives accounts and history one shared database connection, with versioned migrations.
+  PR #61 (Hrisheek, CHAT-52 review fixes) fixes the multi-tab typing lifecycle and enables SQLite
+  foreign keys on the Python account connection, with regression tests. #61 was approved by Soham and
+  merged as dc4e13b on 15 November. **#60 was merged without a PR review**; the checks below cover its
+  behaviour, but no reviewer approved it.
+- **Verification (15 November, at 87c6ed3, Node 24.22.3).** 285/285 Node tests and 284/284 Python tests
+  passed. `scripts/system_check.js` passed on both backends: real HTTP login, WebSocket chat,
+  55 messages persisted, last 50 after a process restart, read receipt, logout revocation. The browser
+  job passed in CI on push and PR; it could not be run locally because Chromium could not be
+  downloaded.
+- **Runtime requirement.** `package.json` now requires Node >=24.16 because migration backups use
+  `DatabaseSync.serialize()`. On Node 22, 11 database tests fail. The README still says "Node 24".
+- **Open.** On Node 24 the Jest run passes but ends with "Jest did not exit one second after the test
+  run has completed", which points to an open handle. CHAT-22 to CHAT-25 stay Done: their behaviour is
+  re-verified above on the unified implementation.
